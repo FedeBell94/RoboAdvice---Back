@@ -5,34 +5,45 @@
  */
 package it.uiip.digitalgarage.roboadvice.persistence.model;
 
-import java.io.Serializable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  *
  * @author Simone
  */
-public class AssetClass implements Serializable {
 
-    private int id;
-    private String name;
+@Entity
+@Table(name = "AssetClass")
+public class AssetClass {
 
-    public AssetClass() {
-    }
+	@Id
+	@GeneratedValue
+	private int id;
 
-    public int getId() {
-        return id;
-    }
+	@Column(name = "name", nullable = false)
+	private String name;
 
-    public void setId(int id) {
-        this.id = id;
-    }
+	public AssetClass() {
+	}
 
-    public String getName() {
-        return name;
-    }
+	public int getId() {
+		return id;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 
 }
