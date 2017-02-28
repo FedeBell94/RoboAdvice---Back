@@ -1,4 +1,4 @@
-package hello;
+package it.uiip.digitalgarage.roboadvice;
 
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;

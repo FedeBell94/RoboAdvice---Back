@@ -1,4 +1,4 @@
-package hello;
+package it.uiip.digitalgarage.roboadvice;
 
 public class Greeting {
 
