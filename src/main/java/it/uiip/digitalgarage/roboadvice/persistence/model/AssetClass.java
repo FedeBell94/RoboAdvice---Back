@@ -5,6 +5,8 @@
  */
 package it.uiip.digitalgarage.roboadvice.persistence.model;
 
+import lombok.*;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -18,6 +20,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "AssetClass")
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class AssetClass {
 
 	@Id
@@ -27,23 +30,6 @@ public class AssetClass {
 	@Column(name = "name", nullable = false)
 	private String name;
 
-	public AssetClass() {
-	}
 
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
 
 }

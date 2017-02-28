@@ -2,17 +2,32 @@ package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
+import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import it.uiip.digitalgarage.roboadvice.persistence.model.AssetClass;
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
+import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetClassRepository;
 import it.uiip.digitalgarage.roboadvice.utils.PasswordAuthentication;
 
 @RestController
 public class UserController {
+
+	@Autowired
+	private AssetClassRepository assetClassRepository;
+
+	@RequestMapping(value = "/prova", method = RequestMethod.POST)
+	public @ResponseBody String prova(HttpServletRequest request) {
+		System.out.println("I'm hereeee");
+		AssetClass assetClass = AssetClass.builder().id(10).name("Ciaoone").build();
+		assetClassRepository.save(assetClass);
+		return "done";
+	}
 
 	/**
 	 * This REST api can log in a user after the proper credential check.
@@ -27,30 +42,23 @@ public class UserController {
 	 * @return the answer wrapper containing the success or the failure of the
 	 *         operation.
 	 * @see User
-	 * 
+	 *
 	 */
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public @ResponseBody Boolean logInUtente(@RequestBody User u, HttpServletRequest request) {
 
 		User user = new User();
-
 		if (u.getUsername().equals("noValue") || u.getPassword().equals("noValue")) {
-
 			return false;
 		} else {
 			// DBACCESS for user
 
 			PasswordAuthentication pa = new PasswordAuthentication(16);
 			char[] pass = u.getPassword().toCharArray();
-
 			if (!pa.authenticate(pass, user.getPassword())) {
-
 				return false;
-
 			}
-
 		}
-
 		user.setPassword("");
 		return true;
 	}
@@ -69,7 +77,7 @@ public class UserController {
 	 * @return the answer wrapper containing the success or the failure of the
 	 *         operation.
 	 * @see User
-	 * 
+	 *
 	 */
 	@RequestMapping(value = "/signUp", method = RequestMethod.POST)
 	public @ResponseBody Boolean signUp(@RequestBody User u, HttpServletRequest request) {

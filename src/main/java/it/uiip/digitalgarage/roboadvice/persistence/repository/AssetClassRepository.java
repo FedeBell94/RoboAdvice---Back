@@ -1,7 +1,9 @@
 package it.uiip.digitalgarage.roboadvice.persistence.repository;
 
-/**
- * Created by feder on 28/02/2017.
- */
-public class AssetClassRepository {
+import org.springframework.data.repository.CrudRepository;
+
+import it.uiip.digitalgarage.roboadvice.persistence.model.AssetClass;
+
+public interface AssetClassRepository extends CrudRepository<AssetClass, Long> {
+
 }
