@@ -5,60 +5,30 @@
  */
 package it.uiip.digitalgarage.roboadvice.persistence.model;
 
-import java.io.Serializable;
+import lombok.*;
+
+import javax.persistence.*;
 import java.sql.Timestamp;
 
-/**
- *
- * @author Simone
- */
-public class User implements Serializable {
+@Entity
+@Table(name = "User")
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+public class User {
 
+    @Id
+    @GeneratedValue
     private int id;
-    private String email, password, username;
+
+    @Column(name = "email", nullable = false)
+    private String email;
+
+    @Column(name = "password", nullable = false)
+    private String password;
+
+    @Column(name = "username", nullable = false)
+    private String username;
+
+    @Column(name = "registration", nullable = false)
     private Timestamp registration;
-
-    public User() {
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public Timestamp getRegistration() {
-        return registration;
-    }
-
-    public void setRegistration(Timestamp registration) {
-        this.registration = registration;
-    }
 
 }

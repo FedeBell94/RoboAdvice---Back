@@ -3,6 +3,7 @@ package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 import javax.servlet.http.HttpServletRequest;
 
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
+import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,13 +20,13 @@ import it.uiip.digitalgarage.roboadvice.utils.PasswordAuthentication;
 public class UserController {
 
 	@Autowired
-	private AssetClassRepository assetClassRepository;
+	private UserRepository userRepository;
 
 	@RequestMapping(value = "/prova", method = RequestMethod.POST)
 	public @ResponseBody String prova(HttpServletRequest request) {
 		System.out.println("I'm hereeee");
-		AssetClass assetClass = AssetClass.builder().id(10).name("Ciaoone").build();
-		assetClassRepository.save(assetClass);
+		User user = User.builder().email("ciao").password("password").username("pasqualino").build();
+		userRepository.save(user);
 		return "done";
 	}
 
