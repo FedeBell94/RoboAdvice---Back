@@ -1,10 +1,11 @@
-package it.uiip.digitalgarage.roboadvice.controller;
+package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
-import it.uiip.digitalgarage.roboadvice.model.User;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.web.bind.annotation.*;
+
+import it.uiip.digitalgarage.roboadvice.persistence.model.User;
 
 @RestController
 public class RESTApi {

@@ -1,4 +1,4 @@
-package it.uiip.digitalgarage.roboadvice.controller;
+package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
 public class Greeting {
 
