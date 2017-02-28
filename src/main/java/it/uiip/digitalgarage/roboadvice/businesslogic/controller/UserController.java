@@ -2,6 +2,8 @@ package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
+import it.uiip.digitalgarage.roboadvice.businesslogic.model.AbstractResponse;
+import it.uiip.digitalgarage.roboadvice.businesslogic.model.SuccessResponse;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
 import it.uiip.digitalgarage.roboadvice.utils.Logger;
@@ -23,15 +25,16 @@ public class UserController {
 	private final PasswordAuthentication passwordAuth = new PasswordAuthentication(8);
 
 	@RequestMapping(value = "/registerUser", method = RequestMethod.POST)
-	public @ResponseBody String registerUser(@RequestParam("email") String email,
-											 @RequestParam("password") String password, HttpServletRequest request) {
+	public @ResponseBody AbstractResponse registerUser(@RequestParam("email") String email,
+													   @RequestParam("password") String password,
+													   HttpServletRequest request) {
 		final String hashPassword = passwordAuth.hash(password.toCharArray());
 		Logger.debug(UserController.class,
 				"Register User method called: email -> " + email + ", password -> " + hashPassword);
 
 		User user = User.builder().email(email).password(hashPassword).build();
-		userRepository.save(user);
-		return "done";
+		user = userRepository.save(user);
+		return new SuccessResponse<>(user);
 	}
 
 	/**
