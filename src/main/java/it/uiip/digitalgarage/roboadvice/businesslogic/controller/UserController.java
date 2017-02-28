@@ -4,12 +4,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
+import it.uiip.digitalgarage.roboadvice.utils.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import it.uiip.digitalgarage.roboadvice.persistence.model.AssetClass;
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
@@ -17,15 +14,22 @@ import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetClassReposit
 import it.uiip.digitalgarage.roboadvice.utils.PasswordAuthentication;
 
 @RestController
+@SuppressWarnings("unused")
 public class UserController {
 
 	@Autowired
 	private UserRepository userRepository;
 
-	@RequestMapping(value = "/prova", method = RequestMethod.POST)
-	public @ResponseBody String prova(HttpServletRequest request) {
-		System.out.println("I'm hereeee");
-		User user = User.builder().email("ciao").password("password").username("pasqualino").build();
+	private final PasswordAuthentication passwordAuth = new PasswordAuthentication(8);
+
+	@RequestMapping(value = "/registerUser", method = RequestMethod.POST)
+	public @ResponseBody String registerUser(@RequestParam("email") String email,
+											 @RequestParam("password") String password, HttpServletRequest request) {
+		final String hashPassword = passwordAuth.hash(password.toCharArray());
+		Logger.debug(UserController.class,
+				"Register User method called: email -> " + email + ", password -> " + hashPassword);
+
+		User user = User.builder().email(email).password(hashPassword).build();
 		userRepository.save(user);
 		return "done";
 	}
@@ -80,17 +84,17 @@ public class UserController {
 	 * @see User
 	 *
 	 */
-	@RequestMapping(value = "/signUp", method = RequestMethod.POST)
-	public @ResponseBody Boolean signUp(@RequestBody User u, HttpServletRequest request) {
-
-		PasswordAuthentication pa = new PasswordAuthentication();
-		u.setPassword(pa.hash(u.getPassword().toCharArray()));
-
-		User user = new User();
-
-		// DBACCESS FOR REGISTRATION
-
-		user.setPassword("");
-		return true;
-	}
+//	@RequestMapping(value = "/signUp", method = RequestMethod.POST)
+//	public @ResponseBody Boolean signUp(@RequestBody User u, HttpServletRequest request) {
+//
+//		PasswordAuthentication pa = new PasswordAuthentication();
+//		u.setPassword(pa.hash(u.getPassword().toCharArray()));
+//
+//		User user = new User();
+//
+//		// DBACCESS FOR REGISTRATION
+//
+//		user.setPassword("");
+//		return true;
+//	}
 }
