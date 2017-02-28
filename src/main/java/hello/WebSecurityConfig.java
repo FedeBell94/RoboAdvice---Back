@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 
 /**
  * Created by fabio on 27/02/2017.
@@ -14,21 +15,15 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter  {
+    private static final String REALM = "MY_REALM";
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http    .csrf().disable()
                 .authorizeRequests()
-                .anyRequest().authenticated()
-                .and()
-                    .formLogin().successHandler(getSuccessHandler())
-                    .permitAll()
-                .and()
-                    .anonymous().disable()
-                    .exceptionHandling()
-                    .authenticationEntryPoint(new org.springframework.boot.autoconfigure.security.Http401AuthenticationEntryPoint("headerValue"))
-                .and()
-                .logout()
-                .permitAll();
+                .antMatchers("/api/**").hasRole("USER")
+                .and().httpBasic().realmName(REALM).authenticationEntryPoint(getAuthEntryPoint())
+                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
     @Bean
@@ -36,15 +31,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter  {
         return new AuthEntryPoint();
     }
 
-    @Bean
-    public SuccessHandler getSuccessHandler(){
-        return new SuccessHandler();
-    }
 
     @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth
-                .inMemoryAuthentication()
-                .withUser("user").password("password").roles("USER");
+    public void configureGlobalSecurity(AuthenticationManagerBuilder auth) throws Exception {
+        auth.inMemoryAuthentication().withUser("user").password("password").roles("USER");
+        auth.inMemoryAuthentication().withUser("tom").password("abc123").roles("USER");
     }
 }
