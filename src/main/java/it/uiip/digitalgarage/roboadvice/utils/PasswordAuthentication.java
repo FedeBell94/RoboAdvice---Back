@@ -1,4 +1,4 @@
-package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
+package it.uiip.digitalgarage.roboadvice.utils;
 
 
 import java.security.NoSuchAlgorithmException;

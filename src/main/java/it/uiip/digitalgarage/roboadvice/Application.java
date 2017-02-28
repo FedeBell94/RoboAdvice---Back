@@ -1,4 +1,4 @@
-package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
+package it.uiip.digitalgarage.roboadvice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
