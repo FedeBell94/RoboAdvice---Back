@@ -8,7 +8,12 @@ package it.uiip.digitalgarage.roboadvice.persistence.model;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Calendar;
 
 @Entity
 @Table(name = "User")
@@ -19,7 +24,7 @@ public class User {
     @GeneratedValue
     private int id;
 
-    @Column(name = "email", nullable = false)
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     @Column(name = "password", nullable = false)
@@ -29,6 +34,6 @@ public class User {
     private String username;
 
     @Column(name = "registration", nullable = false)
-    private Timestamp registration;
+    private Date registration;
 
 }

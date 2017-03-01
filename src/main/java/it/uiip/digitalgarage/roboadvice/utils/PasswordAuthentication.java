@@ -63,10 +63,10 @@ public class PasswordAuthentication {
         return ID + cost + '$' + enc.encodeToString(hash);
     }
 
-    public Boolean authenticate(char[] password, String token) {
+    public boolean authenticate(char[] password, String token) {
         Matcher m = layout.matcher(token);
         if (!m.matches()) {
-            throw new IllegalArgumentException("Invalid token format");            
+            throw new IllegalArgumentException("Invalid token format");
         }
         int iterations = iterations(Integer.parseInt(m.group(1)));
         byte[] hash = Base64.getUrlDecoder().decode(m.group(2));
@@ -76,7 +76,7 @@ public class PasswordAuthentication {
         for (int idx = 0; idx < check.length; ++idx) {
             zero |= hash[salt.length + idx] ^ check[idx];
         }
-        return true;
+        return zero == 0;
     }
 
     private static byte[] pbkdf2(char[] password, byte[] salt, int iterations) {
