@@ -2,7 +2,7 @@ package it.uiip.digitalgarage.roboadvice.businesslogic.model;
 
 public enum ExchangeError {
 	DEFAULT_ERROR_CODE(0, ""), EMAIL_ALREADY_USED(100, "Email already used"),WRONG_EMAIL(101, "Wrong email"),
-	WRONG_PASSWORD(102, "Wrong password");
+	WRONG_PASSWORD(102, "Wrong password"), SECURITY_ERROR(999, "Security error");
 
 	private final int errorCode;
 	private final String errorString;
