@@ -34,13 +34,13 @@ public class UserController {
 
 	private final PasswordAuthentication passwordAuth = new PasswordAuthentication(16);
 
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "/registerUser", method = RequestMethod.POST)
-	public @ResponseBody AbstractResponse registerUser(@RequestParam("email") String email,
-													   @RequestParam("password") String password,
-													   HttpServletRequest request) {
-		final String hashPassword = passwordAuth.hash(password.toCharArray());
+	public @ResponseBody AbstractResponse registerUser(@RequestBody User inputUser, HttpServletRequest request) {
 
-		final User user = User.builder().email(email).password(hashPassword).registration(
+		final String hashPassword = passwordAuth.hash(inputUser.getPassword().toCharArray());
+
+		final User user = User.builder().email(inputUser.getEmail()).password(hashPassword).registration(
 				new Date(Calendar.getInstance().getTime().getTime())).build();
 
 		try {
@@ -50,19 +50,18 @@ public class UserController {
 			return new ErrorResponse(ExchangeError.EMAIL_ALREADY_USED);
 		}
 
-		Logger.debug(UserController.class, "User " + email + " registered successfully");
+		Logger.debug(UserController.class, "User " + inputUser.getEmail() + " registered successfully");
 		return new SuccessResponse<>(user);
 	}
 
 	@RequestMapping(value = "/loginUser", method = RequestMethod.POST)
-	public @ResponseBody AbstractResponse loginUser(@RequestParam("email") String email,
-													   @RequestParam("password") String password,
+	public @ResponseBody AbstractResponse loginUser(@RequestBody User inputUser,
 													   HttpServletRequest request) {
 
-		User user = userRepository.findByEmail(email);
+		User user = userRepository.findByEmail(inputUser.getEmail());
 
 		if(user != null) {
-			if(passwordAuth.authenticate(password.toCharArray(), user.getPassword())){
+			if(passwordAuth.authenticate(inputUser.getPassword().toCharArray(), user.getPassword())){
 				return new SuccessResponse<>(user);
 			}
 			return new ErrorResponse(ExchangeError.WRONG_PASSWORD);
