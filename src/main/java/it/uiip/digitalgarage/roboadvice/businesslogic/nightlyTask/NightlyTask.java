@@ -1,12 +1,9 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask;
 
 import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dataUpdater.IDataUpdater;
-import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dateProvider.DateProvider;
 import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dateProvider.LiarDateProvider;
 import it.uiip.digitalgarage.roboadvice.persistence.model.*;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,8 +18,6 @@ import java.util.Map;
 
 @Service
 public class NightlyTask implements INightlyTask {
-
-    private static final Log LOGGER = LogFactory.getLog(NightlyTask.class);
 
     private final StrategyRepository strategyRepository;
     private final PortfolioRepository portfolioRepository;
@@ -43,7 +38,6 @@ public class NightlyTask implements INightlyTask {
         this.dataUpdater = dataUpdater;
     }
 
-
     /**
      * The default start worth of a user. It is set to 10000.
      */
@@ -59,9 +53,6 @@ public class NightlyTask implements INightlyTask {
 
         // Finds all assets
         final Iterable<Asset> assets = assetRepository.findAll();
-
-        // For each asset finds the latest price
-        //final Map<Long, BigDecimal> latestPrices = findAssetsPriceDay(assets, dateProvider.getToday());
 
 
         for (User currUser : users) {
@@ -82,7 +73,7 @@ public class NightlyTask implements INightlyTask {
 
             LiarDateProvider dateProvider = new LiarDateProvider(currUser.getLastPortfolioComputation().toString());
             dateProvider.goNextDay();
-            while (dateProvider.getToday().compareTo(Date.valueOf(LocalDate.now())) < 0) {
+            while (dateProvider.getToday().compareTo(Date.valueOf(LocalDate.now())) <= 0) {
 
                 // Find last portfolio computed for the current user
                 List<Portfolio> userPortfolio =
@@ -107,14 +98,14 @@ public class NightlyTask implements INightlyTask {
                     // #3: update portfolio for 'old' users which didn't change the strategy yesterday
 
                     final List<Data> todayNewPrices = dataRepository.findByDate(dateProvider.getToday());
-                    updatePortfolio(dateProvider, userPortfolio, todayNewPrices);
+                    updatePortfolio(dateProvider.getToday(), userPortfolio, todayNewPrices);
                 }
 
                 dateProvider.goNextDay();
             }
 
             // Update of last portfolio computation date
-            currUser.setLastPortfolioComputation(Date.valueOf(LocalDate.now()));
+            currUser.setLastPortfolioComputation(dateProvider.getYesterday());
             userRepository.save(currUser);
         }
     }
@@ -140,8 +131,6 @@ public class NightlyTask implements INightlyTask {
                     BigDecimal latestAssetPrice = latestPrices.get(currAsset.getId());
                     BigDecimal assetUnits = assetMoney.divide(latestAssetPrice, 4, RoundingMode.HALF_UP);
 
-                    //LOGGER.debug(assetMoney + " " + latestAssetPrice + " " + assetUnits);
-
                     insertList.add(Portfolio.builder()
                             .user(user)
                             .assetClass(currAsset.getAssetClass())
@@ -159,7 +148,6 @@ public class NightlyTask implements INightlyTask {
     private Map<Long, BigDecimal> findAssetsPriceDay(final Iterable<Asset> assets, final Date date) {
         Map<Long, BigDecimal> latestPrices = new HashMap<>();
         for (Asset curr : assets) {
-            // TODO before and equal!!!
             Data data = dataRepository.findTop1ByDateLessThanEqualAndAssetOrderByDateDesc(date, curr);
             latestPrices.put(data.getAsset().getId(), data.getValue());
         }
@@ -176,11 +164,8 @@ public class NightlyTask implements INightlyTask {
         return worth;
     }
 
-    private void updatePortfolio(final DateProvider dateProvider, final List<Portfolio> portfolios,
+    private void updatePortfolio(final Date date, final List<Portfolio> portfolios,
                                  final List<Data> todayNewPrices) {
-
-        final Date currDate = dateProvider.getToday();
-
 
         List<Portfolio> insertList = new ArrayList<>();
         for (Portfolio currPortfolio : portfolios) {
@@ -201,7 +186,7 @@ public class NightlyTask implements INightlyTask {
                         .asset(currPortfolio.getAsset())
                         .unit(currPortfolio.getUnit())
                         .value(assetMoney)
-                        .date(currDate)
+                        .date(date)
                         .build());
             } else {
                 insertList.add(Portfolio.builder()
@@ -210,123 +195,10 @@ public class NightlyTask implements INightlyTask {
                         .asset(currPortfolio.getAsset())
                         .unit(currPortfolio.getUnit())
                         .value(currPortfolio.getValue())
-                        .date(currDate)
+                        .date(date)
                         .build());
             }
         }
         portfolioRepository.save(insertList);
     }
-
-//    private Map<Long, BigDecimal> findAssetsPriceDay(final Iterable<Asset> assets, final Date date) {
-//        Map<Long, BigDecimal> latestPrices = new HashMap<>();
-//        for (Asset curr : assets) {
-//            // This query is only for testing (to compute the correct value on demo creation of the portfolio)
-//            Data data = dataRepository.findTop1ByDateBeforeAndAssetOrderByDateDesc(date, curr);
-//            latestPrices.put(data.getAsset().getId(), data.getValue());
-//        }
-//        return latestPrices;
-//    }
-//
-//    private BigDecimal computeWorth(final List<Portfolio> portfolios, final Map<Long, BigDecimal> latestPrices) {
-//        BigDecimal worth = new BigDecimal(0);
-//        for (Portfolio currPortfolio : portfolios) {
-//            BigDecimal singleWorth =
-//                    currPortfolio.getUnit().multiply(latestPrices.get(currPortfolio.getAsset().getId()));
-//            worth = worth.add(singleWorth);
-//        }
-//        return worth;
-//    }
-//
-//    private void computePortfolio(final Date date, final User user, final List<Data> todayNewPrices) {
-//
-//        // Finds the user portfolio for the date passed
-//        List<Portfolio> userPortfolio = portfolioRepository.findByUserAndDate(user, date);
-//
-//        if(userPortfolio.isEmpty()){
-//            // Portfolio creation
-//        }
-//
-//    }
-//
-//    private void updatePortfolio(final DateProvider dateProvider, final List<Portfolio> portfolios,
-//                                 final List<Data> todayNewPrices) {
-//
-//        final Date currDate = dateProvider.getToday();
-//
-//
-//        List<Portfolio> insertList = new ArrayList<>();
-//        for (Portfolio currPortfolio : portfolios) {
-//
-//            Data latestAssetPrice = null;
-//            for (Data currData : todayNewPrices) {
-//                if (currData.getAsset().getId() == currPortfolio.getAsset().getId()) {
-//                    latestAssetPrice = currData;
-//                }
-//            }
-//
-//            if (latestAssetPrice != null) {
-//                BigDecimal assetMoney = currPortfolio.getUnit().multiply(latestAssetPrice.getValue());
-//
-//                insertList.add(Portfolio.builder()
-//                        .user(currPortfolio.getUser())
-//                        .assetClass(currPortfolio.getAssetClass())
-//                        .asset(currPortfolio.getAsset())
-//                        .unit(currPortfolio.getUnit())
-//                        .value(assetMoney)
-//                        .date(currDate)
-//                        .build());
-//            } else {
-//                insertList.add(Portfolio.builder()
-//                        .user(currPortfolio.getUser())
-//                        .assetClass(currPortfolio.getAssetClass())
-//                        .asset(currPortfolio.getAsset())
-//                        .unit(currPortfolio.getUnit())
-//                        .value(currPortfolio.getValue())
-//                        .date(currDate)
-//                        .build());
-//            }
-//        }
-//        portfolioRepository.save(insertList);
-//    }
-//
-//    private void createPortfolio(final DateProvider dateProvider, final User user, final Iterable<Asset> assets,
-//                                 final BigDecimal totalMoney, final Map<Long, BigDecimal> latestPrices) {
-//
-//        final Date currDate = dateProvider.getToday();
-//        // Finds the active strategy of the current user
-//        List<Strategy> userStrategy = strategyRepository.findByUserAndActiveTrue(user);
-//
-//        List<Portfolio> insertList = new ArrayList<>();
-//        for (Strategy currStrategy : userStrategy) {
-//            for (Asset currAsset : assets) {
-//                if (currAsset.getAssetClass().equals(currStrategy.getAssetClass())) {
-//
-//                    /*
-//                     * assetMoney = totalMoney*(assetClassStrategyPerc)*(assetDistributionPerc)
-//                     *
-//                     * assetMoney = totalMoney*(assetClassStrategy / 100)*(assetDistribution / 100)
-//                     *
-//                     * assetMoney = totalMoney*(assetClassStrategy * assetDistribution)/10000
-//                     */
-//                    BigDecimal assetMoney = totalMoney.multiply(currStrategy.getPercentage())
-//                            .multiply(currAsset.getFixedPercentage()).divide(new BigDecimal(10000), 4);
-//
-//                    BigDecimal latestAssetPrice = latestPrices.get(currAsset.getId());
-//                    BigDecimal assetUnits = assetMoney.divide(latestAssetPrice, 4, RoundingMode.HALF_UP);
-//
-//                    //LOGGER.debug(assetMoney + " " + latestAssetPrice + " " + assetUnits);
-//
-//                    insertList.add(Portfolio.builder()
-//                            .user(user)
-//                            .assetClass(currAsset.getAssetClass())
-//                            .asset(currAsset)
-//                            .unit(assetUnits)
-//                            .value(assetMoney)
-//                            .date(currDate)
-//                            .build());
-//                }
-//            }
-//        }
-//        portfolioRepository.save(insertList);
-//    }
 }
