@@ -5,6 +5,9 @@
  */
 package it.uiip.digitalgarage.roboadvice.persistence.model;
 
+import lombok.*;
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -13,45 +16,33 @@ import java.sql.Date;
  *
  * @author Simone
  */
+
+@Entity
+@Table(name = "Data")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Data implements Serializable {
 
-    private int id, assetId;
+    @Id
+    @GeneratedValue
+    private int id;
+
+    /*@Column(name = "assetId", nullable = false)
+    private int assetId;*/
+
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name = "asset", referencedColumnName = "asset_id")
+    private Asset asset;
+
+    @Column(name = "date", nullable = false)
     private Date date;
+
+    @Column(name = "value", nullable = false)
     private BigDecimal value;
 
-    public Data() {
-    }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getAssetId() {
-        return assetId;
-    }
-
-    public void setAssetId(int assetId) {
-        this.assetId = assetId;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    public BigDecimal getValue() {
-        return value;
-    }
-
-    public void setValue(BigDecimal value) {
-        this.value = value;
-    }
 
 }
