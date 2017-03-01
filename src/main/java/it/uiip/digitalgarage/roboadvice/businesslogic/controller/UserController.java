@@ -54,6 +54,7 @@ public class UserController {
 		return new SuccessResponse<>(user);
 	}
 
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "/loginUser", method = RequestMethod.POST)
 	public @ResponseBody AbstractResponse loginUser(@RequestBody User inputUser,
 													   HttpServletRequest request) {
