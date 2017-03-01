@@ -1,6 +1,8 @@
-package it.uiip.digitalgarage.roboadvice.tests;
+package it.uiip.digitalgarage.roboadvice.unitTests;
 
-import it.uiip.digitalgarage.roboadvice.persistence.model.*;
+import it.uiip.digitalgarage.roboadvice.persistence.model.Data;
+import it.uiip.digitalgarage.roboadvice.testUtils.AssertAnnotations;
+import it.uiip.digitalgarage.roboadvice.testUtils.ReflectTool;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,17 +25,16 @@ import javax.persistence.*;
 @ContextConfiguration(classes = {PersistenceContext.class})
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class,
         TransactionalTestExecutionListener.class})
-public class AssetClassTests {
+public class DataTests {
 
     @Test
-
     public void typeAnnotations() {
 
         // assert
 
         AssertAnnotations.assertType(
 
-                AssetClass.class, Entity.class, Table.class);
+                Data.class, Entity.class, Table.class);
 
     }
 
@@ -43,21 +44,28 @@ public class AssetClassTests {
 
         // assert
 
-        AssertAnnotations.assertField(AssetClass.class, "id", Id.class);
+        AssertAnnotations.assertField(Data.class, "id", Id.class, GeneratedValue.class);
 
-        AssertAnnotations.assertField(AssetClass.class, "name", Column.class);
+        AssertAnnotations.assertField(Data.class, "asset", ManyToOne.class, JoinColumn.class);
+
+        AssertAnnotations.assertField(Data.class, "date", Column.class);
+
+        AssertAnnotations.assertField(Data.class, "value", Column.class);
 
     }
 
     @Test
-
     public void methodAnnotations() {
 
         // assert
 
-        AssertAnnotations.assertMethod(AssetClass.class, "getId");
+        AssertAnnotations.assertMethod(Data.class, "getId");
 
-        AssertAnnotations.assertMethod(AssetClass.class, "getName");
+        AssertAnnotations.assertMethod(Data.class, "getAsset");
+
+        AssertAnnotations.assertMethod(Data.class, "getDate");
+
+        AssertAnnotations.assertMethod(Data.class, "getValue");
     }
 
     @Test
@@ -67,7 +75,7 @@ public class AssetClassTests {
 
         Entity a
 
-                = ReflectTool.getClassAnnotation(AssetClass.class, Entity.class);
+                = ReflectTool.getClassAnnotation(Data.class, Entity.class);
 
         // assert
 
@@ -82,12 +90,13 @@ public class AssetClassTests {
 
         Table t
 
-                = ReflectTool.getClassAnnotation(AssetClass.class, Table.class);
+                = ReflectTool.getClassAnnotation(Data.class, Table.class);
 
         // assert
 
-        Assert.assertEquals("AssetClass", t.name());
+        Assert.assertEquals("Data", t.name());
 
     }
+
 
 }

@@ -52,9 +52,7 @@ public class StrategyRESTController {
     /**
      * Retrieve the last active strategy for the caller {@link User}.
      *
-     * @param authentication
-     *         Represents the token for an authentication request or for an authenticated {@link User}.
-     *
+     * @param authentication Represents the token for an authentication request or for an authenticated {@link User}.
      * @return The last active {@link StrategyDTO} for the user, null in case the user has not a strategy set.
      */
     @RequestMapping(value = "/strategy", method = RequestMethod.GET)
@@ -74,11 +72,8 @@ public class StrategyRESTController {
     /**
      * Insert the strategy passed if the {@link User} is new, or update the strategy if the {@link User} is not new.
      *
-     * @param strategyInput
-     *         The new strategy to insert into the database.
-     * @param authentication
-     *         Represents the token for an authentication request or for an authenticated {@link User}.
-     *
+     * @param strategyInput  The new strategy to insert into the database.
+     * @param authentication Represents the token for an authentication request or for an authenticated {@link User}.
      * @return An empty {@link SuccessResponse}.
      */
     @RequestMapping(value = "/strategy", method = RequestMethod.POST)
@@ -90,7 +85,7 @@ public class StrategyRESTController {
         if (user.getIsNewUser()) {
             user.setIsNewUser(false);
             userRepository.save(user);
-        } else{
+        } else {
             // Disable the previous active strategy
             List<Strategy> previousActive = strategyRepository.findByUserAndActiveTrue(user);
             for (Strategy curr : previousActive) {
@@ -98,7 +93,6 @@ public class StrategyRESTController {
                 strategyRepository.save(curr);
             }
         }
-
 
         // Insert the new strategy
         // TODO delete strategy in the same day if inserted more than once!!!
