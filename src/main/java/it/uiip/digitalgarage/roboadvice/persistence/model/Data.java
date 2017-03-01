@@ -34,15 +34,14 @@ public class Data implements Serializable {
     private int assetId;*/
 
     @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name = "asset", referencedColumnName = "asset_id")
+    @JoinColumn(name = "asset_id")
     private Asset asset;
 
     @Column(name = "date", nullable = false)
     private Date date;
 
-    @Column(name = "value", nullable = false)
+    @Column(name = "value", nullable = false, precision = 14, scale = 4)
     private BigDecimal value;
-
 
 
 }

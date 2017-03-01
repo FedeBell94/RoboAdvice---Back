@@ -11,9 +11,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * @author Simone.
  */
 
+/*
 @Configuration
 @EnableAsync
 @EnableScheduling
+ */
 public class DailyExecutor {
 
     private class QuandlDailyUpdate implements Runnable {
