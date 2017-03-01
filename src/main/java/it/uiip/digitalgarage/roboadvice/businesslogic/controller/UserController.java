@@ -16,7 +16,6 @@ import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetClassReposit
 import it.uiip.digitalgarage.roboadvice.utils.PasswordAuthentication;
 
 @RestController
-@SuppressWarnings("unused")
 public class UserController {
 
 	@Autowired

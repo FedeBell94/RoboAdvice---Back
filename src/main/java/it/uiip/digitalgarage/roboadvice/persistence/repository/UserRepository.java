@@ -11,6 +11,5 @@ import org.springframework.data.repository.query.Param;
  */
 public interface UserRepository extends CrudRepository<User, Long> {
 
-    @Query("SELECT COUNT(u) FROM User u WHERE user.email = email")
-    Boolean existsByEmail(@Param("email") String email);
+
 }
