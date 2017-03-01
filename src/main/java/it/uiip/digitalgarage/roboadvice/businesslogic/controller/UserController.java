@@ -1,5 +1,6 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
+import javax.jws.soap.SOAPBinding;
 import javax.servlet.http.HttpServletRequest;
 
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
@@ -18,6 +19,7 @@ import it.uiip.digitalgarage.roboadvice.persistence.model.AssetClass;
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetClassRepository;
 import it.uiip.digitalgarage.roboadvice.utils.PasswordAuthentication;
+import sun.rmi.runtime.Log;
 
 import java.sql.Date;
 import java.time.LocalDate;
@@ -30,7 +32,7 @@ public class UserController {
 	@Autowired
 	private UserRepository userRepository;
 
-	private final PasswordAuthentication passwordAuth = new PasswordAuthentication(8);
+	private final PasswordAuthentication passwordAuth = new PasswordAuthentication(16);
 
 	@RequestMapping(value = "/registerUser", method = RequestMethod.POST)
 	public @ResponseBody AbstractResponse registerUser(@RequestParam("email") String email,
@@ -52,6 +54,22 @@ public class UserController {
 		return new SuccessResponse<>(user);
 	}
 
+	@RequestMapping(value = "/loginUser", method = RequestMethod.POST)
+	public @ResponseBody AbstractResponse loginUser(@RequestParam("email") String email,
+													   @RequestParam("password") String password,
+													   HttpServletRequest request) {
+
+		User user = userRepository.findByEmail(email);
+
+		if(user != null) {
+			if(passwordAuth.authenticate(password.toCharArray(), user.getPassword())){
+				return new SuccessResponse<>(user);
+			}
+			return new ErrorResponse(ExchangeError.WRONG_PASSWORD);
+		}
+		return new ErrorResponse(ExchangeError.WRONG_EMAIL);
+	}
+
 	/**
 	 * This REST api can log in a user after the proper credential check.
 	 * <p>
@@ -67,24 +85,24 @@ public class UserController {
 	 * @see User
 	 *
 	 */
-	@RequestMapping(value = "/login", method = RequestMethod.POST)
-	public @ResponseBody Boolean logInUtente(@RequestBody User u, HttpServletRequest request) {
-
-		User user = new User();
-		if (u.getUsername().equals("noValue") || u.getPassword().equals("noValue")) {
-			return false;
-		} else {
-			// DBACCESS for user
-
-			PasswordAuthentication pa = new PasswordAuthentication(16);
-			char[] pass = u.getPassword().toCharArray();
-			if (!pa.authenticate(pass, user.getPassword())) {
-				return false;
-			}
-		}
-		user.setPassword("");
-		return true;
-	}
+//	@RequestMapping(value = "/login", method = RequestMethod.POST)
+//	public @ResponseBody Boolean logInUtente(@RequestBody User u, HttpServletRequest request) {
+//
+//		User user = new User();
+//		if (u.getUsername().equals("noValue") || u.getPassword().equals("noValue")) {
+//			return false;
+//		} else {
+//			// DBACCESS for user
+//
+//			PasswordAuthentication pa = new PasswordAuthentication(16);
+//			char[] pass = u.getPassword().toCharArray();
+//			if (!pa.authenticate(pass, user.getPassword())) {
+//				return false;
+//			}
+//		}
+//		user.setPassword("");
+//		return true;
+//	}
 
 	/**
 	 * This REST api can register a new user storing the info he provided in the

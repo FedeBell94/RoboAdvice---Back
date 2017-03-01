@@ -11,5 +11,5 @@ import org.springframework.data.repository.query.Param;
  */
 public interface UserRepository extends CrudRepository<User, Long> {
 
-
+    User findByEmail(String email);
 }
