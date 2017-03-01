@@ -4,6 +4,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.AbstractResponse;
+import it.uiip.digitalgarage.roboadvice.businesslogic.model.ErrorResponse;
+import it.uiip.digitalgarage.roboadvice.businesslogic.model.ExchangeError;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.SuccessResponse;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
@@ -35,8 +37,6 @@ public class UserController {
 													   @RequestParam("password") String password,
 													   HttpServletRequest request) {
 		final String hashPassword = passwordAuth.hash(password.toCharArray());
-		Logger.debug(UserController.class,
-				"Register User method called: email -> " + email + ", password -> " + hashPassword);
 
 		final User user = User.builder().email(email).password(hashPassword).registration(
 				new Date(Calendar.getInstance().getTime().getTime())).build();
@@ -44,9 +44,11 @@ public class UserController {
 		try {
 			userRepository.save(user);
 		} catch(DataIntegrityViolationException e){
-			Logger.error(UserController.class, "not inserted");
+			Logger.debug(UserController.class, "Mail already used - user not registered");
+			return new ErrorResponse(ExchangeError.EMAIL_ALREADY_USED);
 		}
 
+		Logger.debug(UserController.class, "User " + email + " registered successfully");
 		return new SuccessResponse<>(user);
 	}
 
