@@ -13,11 +13,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-/**
- *
- * @author Simone
- */
-
 @Entity
 @Table(name = "AssetClass")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
@@ -29,7 +24,4 @@ public class AssetClass {
 
 	@Column(name = "name", nullable = false)
 	private String name;
-
-
-
 }
