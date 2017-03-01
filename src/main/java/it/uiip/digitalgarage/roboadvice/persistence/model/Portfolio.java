@@ -5,77 +5,41 @@
  */
 package it.uiip.digitalgarage.roboadvice.persistence.model;
 
+import lombok.*;
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Date;
 
-/**
- *
- * @author Simone
- */
-public class Portfolio implements Serializable {
 
-    private int id, userId, assetClassId, assetId;
-    private BigDecimal unit, value;
+@Entity
+@Table(name = "Portfolio")
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+public class Portfolio {
+
+    @Id
+    @GeneratedValue
+    private int id;
+
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="user_id")
+    private User user;
+
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="asset_class_id")
+    private AssetClass assetClass;
+
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="asset_id")
+    private Asset asset;
+
+    @Column(name = "unit", nullable = false, precision = 14, scale = 4)
+    private BigDecimal unit;
+
+    @Column(name = "value", nullable = false, precision = 14, scale = 4)
+    private BigDecimal value;
+
+    @Column(name = "date", nullable = false)
     private Date date;
-
-    public Portfolio() {
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    public int getAssetClassId() {
-        return assetClassId;
-    }
-
-    public void setAssetClassId(int assetClassId) {
-        this.assetClassId = assetClassId;
-    }
-
-    public int getAssetId() {
-        return assetId;
-    }
-
-    public void setAssetId(int assetId) {
-        this.assetId = assetId;
-    }
-
-    public BigDecimal getUnit() {
-        return unit;
-    }
-
-    public void setUnit(BigDecimal unit) {
-        this.unit = unit;
-    }
-
-    public BigDecimal getValue() {
-        return value;
-    }
-
-    public void setValue(BigDecimal value) {
-        this.value = value;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
 }

@@ -7,6 +7,8 @@ import it.uiip.digitalgarage.roboadvice.businesslogic.model.AbstractResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.ErrorResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.ExchangeError;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.SuccessResponse;
+import it.uiip.digitalgarage.roboadvice.persistence.model.Portfolio;
+import it.uiip.digitalgarage.roboadvice.persistence.repository.PortfolioRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
 import it.uiip.digitalgarage.roboadvice.utils.AuthProvider;
 import it.uiip.digitalgarage.roboadvice.utils.Logger;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
 import it.uiip.digitalgarage.roboadvice.utils.PasswordAuthentication;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.Calendar;
 
@@ -26,6 +29,10 @@ public class UserRESTController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    PortfolioRepository p;
+
 
     private final PasswordAuthentication passwordAuth = new PasswordAuthentication(16);
 
@@ -73,9 +80,11 @@ public class UserRESTController {
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/updateUserUsername", method = RequestMethod.POST)
     public @ResponseBody AbstractResponse updateUserUsername(@CookieValue("userToken") String userToken) {
-        if(userToken == null || !AuthProvider.getInstance().checkToken(userToken)){
+        Integer userId = AuthProvider.getInstance().checkToken(userToken);
+        if(userToken == null || userId == null){
             return new ErrorResponse(ExchangeError.SECURITY_ERROR);
         }
+
         return new SuccessResponse<>("Andato tutto bene");
     }
 

@@ -29,14 +29,14 @@ public class AuthProvider {
         this.userTokenMap.remove(userId);
     }
 
-    public boolean checkToken(String userToken){
+    public Integer checkToken(String userToken){
         Logger.debug(AuthProvider.class, "Check token called " + userToken);
         for(Map.Entry curr : userTokenMap.entrySet()){
             if(curr.getValue().equals(userToken)){
-                return true;
+                return (Integer)curr.getKey();
             }
         }
-        return false;
+        return null;
     }
 
     private String generateToken(int userId){

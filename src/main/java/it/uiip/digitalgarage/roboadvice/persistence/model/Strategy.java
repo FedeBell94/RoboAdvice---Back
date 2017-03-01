@@ -5,70 +5,36 @@
  */
 package it.uiip.digitalgarage.roboadvice.persistence.model;
 
+import lombok.*;
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Date;
 
-/**
- *
- * @author Simone
- */
-public class Strategy implements Serializable {
+@Entity
+@Table(name = "Strategy")
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+public class Strategy {
 
-    private int id, userId, assetClassId;
+    @Id
+    @GeneratedValue
+    private int id;
+
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="user_id")
+    private User user;
+
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="asset_class_id")
+    private AssetClass assetClass;
+
+    @Column(name = "percentage", nullable = false, precision = 14, scale = 4)
     private BigDecimal percentage;
+
+    @Column(name = "active", nullable = false)
     private boolean active;
+
+    @Column(name = "starting_date", nullable = false)
     private Date startingDate;
-
-    public Strategy() {
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    public int getAssetClassId() {
-        return assetClassId;
-    }
-
-    public void setAssetClassId(int assetClassId) {
-        this.assetClassId = assetClassId;
-    }
-
-    public BigDecimal getPercentage() {
-        return percentage;
-    }
-
-    public void setPercentage(BigDecimal percentage) {
-        this.percentage = percentage;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
-    public Date getStartingDate() {
-        return startingDate;
-    }
-
-    public void setStartingDate(Date startingDate) {
-        this.startingDate = startingDate;
-    }
-
 }

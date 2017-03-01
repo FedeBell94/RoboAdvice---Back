@@ -5,77 +5,37 @@
  */
 package it.uiip.digitalgarage.roboadvice.persistence.model;
 
+import lombok.*;
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-/**
- *
- * @author Simone
- */
-public class Asset implements Serializable {
+@Entity
+@Table(name = "Asset")
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+public class Asset {
 
-	private int id, assetClassId, quandlId;
+	@Id
+	@GeneratedValue
+	private int id;
+
+	@ManyToOne(fetch=FetchType.LAZY)
+	@JoinColumn(name="asset_class_id")
+	private AssetClass assetClass;
+
+	@Column(name = "quandlId", nullable = false)
+	private String quandlId;
+
+	@Column(name = "name", nullable = false)
 	private String name;
-	private String quandlKey, column;
+
+	@Column(name = "quandlKey", nullable = false)
+	private String quandlKey;
+
+	@Column(name = "fixedPercentage", nullable = false)
 	private BigDecimal fixedPercentage;
 
-	public Asset() {
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public int getAssetClassId() {
-		return assetClassId;
-	}
-
-	public void setAssetClassId(int assetClassId) {
-		this.assetClassId = assetClassId;
-	}
-
-	public int getQuandlId() {
-		return quandlId;
-	}
-
-	public void setQuandlId(int quandlId) {
-		this.quandlId = quandlId;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getQuandlKey() {
-		return quandlKey;
-	}
-
-	public void setQuandlKey(String quandlKey) {
-		this.quandlKey = quandlKey;
-	}
-
-	public String getColumn() {
-		return column;
-	}
-
-	public void setColumn(String column) {
-		this.column = column;
-	}
-
-	public BigDecimal getFixedPercentage() {
-		return fixedPercentage;
-	}
-
-	public void setFixedPercentage(BigDecimal fixedPercentage) {
-		this.fixedPercentage = fixedPercentage;
-	}
-
+	@Column(name = "column", nullable = false)
+	private String column;
 }
