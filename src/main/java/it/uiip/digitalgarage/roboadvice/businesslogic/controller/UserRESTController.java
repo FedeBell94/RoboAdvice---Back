@@ -4,32 +4,29 @@ import javax.servlet.http.HttpServletRequest;
 
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.AbstractResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.SuccessResponse;
-import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
 import it.uiip.digitalgarage.roboadvice.utils.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import it.uiip.digitalgarage.roboadvice.persistence.model.AssetClass;
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
-import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetClassRepository;
 import it.uiip.digitalgarage.roboadvice.utils.PasswordAuthentication;
 
 @RestController
 @SuppressWarnings("unused")
-public class UserController {
+public class UserRESTController {
 
 	@Autowired
 	private UserRepository userRepository;
 
-	private final PasswordAuthentication passwordAuth = new PasswordAuthentication(8);
+	private final PasswordAuthentication passwordAuth = new PasswordAuthentication(16);
 
 	@RequestMapping(value = "/registerUser", method = RequestMethod.POST)
 	public @ResponseBody AbstractResponse registerUser(@RequestParam("email") String email,
 													   @RequestParam("password") String password,
 													   HttpServletRequest request) {
 		final String hashPassword = passwordAuth.hash(password.toCharArray());
-		Logger.debug(UserController.class,
+		Logger.debug(UserRESTController.class,
 				"Register User method called: email -> " + email + ", password -> " + hashPassword);
 
 		User user = User.builder().email(email).password(hashPassword).build();
