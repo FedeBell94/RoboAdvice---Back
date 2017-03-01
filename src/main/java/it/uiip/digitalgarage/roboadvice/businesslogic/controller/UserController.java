@@ -2,18 +2,25 @@ package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.AbstractResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.SuccessResponse;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
 import it.uiip.digitalgarage.roboadvice.utils.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.*;
 
 import it.uiip.digitalgarage.roboadvice.persistence.model.AssetClass;
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetClassRepository;
 import it.uiip.digitalgarage.roboadvice.utils.PasswordAuthentication;
+
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Calendar;
 
 @RestController
 public class UserController {
@@ -31,8 +38,15 @@ public class UserController {
 		Logger.debug(UserController.class,
 				"Register User method called: email -> " + email + ", password -> " + hashPassword);
 
-		User user = User.builder().email(email).password(hashPassword).build();
-		user = userRepository.save(user);
+		final User user = User.builder().email(email).password(hashPassword).registration(
+				new Date(Calendar.getInstance().getTime().getTime())).build();
+
+		try {
+			userRepository.save(user);
+		} catch(DataIntegrityViolationException e){
+			Logger.error(UserController.class, "not inserted");
+		}
+
 		return new SuccessResponse<>(user);
 	}
 
