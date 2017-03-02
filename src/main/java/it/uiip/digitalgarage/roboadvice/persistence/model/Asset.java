@@ -20,9 +20,10 @@ import java.math.BigDecimal;
 @Builder
 public class Asset {
 
-    @Id
-    @GeneratedValue
-    private int id;
+
+	@Id
+	private int id;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "asset_class_id")
@@ -37,10 +38,10 @@ public class Asset {
     @Column(name = "quandlId", nullable = false)
     private int quandlId;
 
-    @Column(name = "fixedPercentage", nullable = false)
-    private BigDecimal fixedPercentage;
-
 	@Column(name = "quandlColumn", nullable = false)
 	private String quandlColumn;
 
+	@Column(name = "fixedPercentage", nullable = false)
+	private BigDecimal fixedPercentage;
+    
 }

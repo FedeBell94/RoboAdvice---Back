@@ -1,0 +1,117 @@
+[{
+  "id": "1",
+  "assetClassId": "1",
+  "name": "U.S. Treasury Bond Futures",
+  "quandlKey": "CHRIS/CME_US1",
+  "quandlId": "1",
+  "fixedPercentage": "80",
+  "quandlColumn": "Open"
+},
+{
+  "id": "2",
+  "assetClassId": "1",
+  "name": "Ultra U.S. Treasury Bond Futures",
+  "quandlKey": "CHRIS/CME_UL1",
+  "quandlId": "1",
+  "fixedPercentage": "20",
+  "quandlColumn": "Open"
+},
+{
+  "id": "3",
+  "assetClassId": "2",
+  "name": "USD -> EUR",
+  "quandlKey": "CURRFX/USDEUR",
+  "quandlId": "1",
+  "fixedPercentage": "25",
+  "quandlColumn": "Rate"
+},
+{
+  "id": "4",
+  "assetClassId": "2",
+  "name": "USD -> CHF",
+  "quandlKey": "CURRFX/USDCHF",
+  "quandlId": "1",
+  "fixedPercentage": "50",
+  "quandlColumn": "Rate"
+},
+{
+  "id": "5",
+  "assetClassId": "2",
+  "name": "USD -> BIT",
+  "quandlKey": "BAVERAGE/USD",
+  "quandlId": "1",
+  "fixedPercentage": "25",
+  "quandlColumn": "24H Average"
+},
+{
+  "id": "6",
+  "assetClassId": "3",
+  "name": "Facebook",
+  "quandlKey": "WIKI/FB",
+  "quandlId": "11",
+  "fixedPercentage": "25",
+  "quandlColumn": "Adj. Close"
+},
+{
+  "id": "7",
+  "assetClassId": "3",
+  "name": "Apple",
+  "quandlKey": "WIKI/AAPL",
+  "quandlId": "11",
+  "fixedPercentage": "20",
+  "quandlColumn": "Adj. Close"
+},
+{
+  "id": "8",
+  "assetClassId": "3",
+  "name": "Microsoft",
+  "quandlKey": "WIKI/MSFT",
+  "quandlId": "11",
+  "fixedPercentage": "35",
+  "quandlColumn": "Adj. Close"
+},
+{
+  "id": "9",
+  "assetClassId": "3",
+  "name": "Twitter",
+  "quandlKey": "WIKI/TWTR",
+  "quandlId": "11",
+  "fixedPercentage": "20",
+  "quandlColumn": "Adj. Close"
+},
+{
+  "id": "10",
+  "assetClassId": "4",
+  "name": "Gold",
+  "quandlKey": "COM/WLD_GOLD",
+  "quandlId": "1",
+  "fixedPercentage": "30",
+  "quandlColumn": "Once/month"
+},
+{
+  "id": "11",
+  "assetClassId": "4",
+  "name": "Silver",
+  "quandlKey": "COM/WLD_SILVER",
+  "quandlId": "1",
+  "fixedPercentage": "20",
+  "quandlColumn": "Once/month"
+},
+{
+  "id": "12",
+  "assetClassId": "4",
+  "name": "Crude oil",
+  "quandlKey": "COM/OIL_BRENT",
+  "quandlId": "1",
+  "fixedPercentage": "30",
+  "quandlColumn": "Once/month"
+},
+{
+  "id": "13",
+  "assetClassId": "4",
+  "name": "Rice",
+  "quandlKey": "COM/WLD_RICE_05",
+  "quandlId": "1",
+  "fixedPercentage": "20",
+  "quandlColumn": "Once/month"
+}]

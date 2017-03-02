@@ -19,7 +19,6 @@ import javax.persistence.Table;
 public class AssetClass {
 
 	@Id
-	@GeneratedValue
 	private int id;
 
 	@Column(name = "name", nullable = false)

@@ -6,5 +6,5 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 /**
  * Created by feder on 01/03/2017.
  */
-public interface PortfolioRepository extends PagingAndSortingRepository<Portfolio, Long> {
+public interface PortfolioRepository extends PagingAndSortingRepository<Portfolio, Integer> {
 }
