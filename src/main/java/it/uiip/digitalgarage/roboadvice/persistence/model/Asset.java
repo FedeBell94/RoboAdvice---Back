@@ -17,7 +17,6 @@ import java.math.BigDecimal;
 public class Asset {
 
 	@Id
-	@GeneratedValue
 	private int id;
 
 	@ManyToOne(fetch=FetchType.LAZY)
@@ -33,10 +32,10 @@ public class Asset {
 	@Column(name = "quandlKey", nullable = false)
 	private String quandlKey;
 
+	@Column(name = "quandlColumn", nullable = false)
+	private String quandlColumn;
+
 	@Column(name = "fixedPercentage", nullable = false)
 	private BigDecimal fixedPercentage;
-
-//	@Column(name = "columns", nullable = false)
-//	private String column;
 
 }
