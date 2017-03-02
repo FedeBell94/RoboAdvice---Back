@@ -36,7 +36,7 @@ public class Asset {
 	@Column(name = "fixedPercentage", nullable = false)
 	private BigDecimal fixedPercentage;
 
-	@Column(name = "column", nullable = false)
-	private String column;
+//	@Column(name = "columns", nullable = false)
+//	private String column;
 
 }
