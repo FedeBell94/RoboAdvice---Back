@@ -1,6 +1,7 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.AbstractResponse;
@@ -23,6 +24,8 @@ import it.uiip.digitalgarage.roboadvice.utils.PasswordAuthentication;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @SuppressWarnings("unused")
@@ -33,7 +36,6 @@ public class UserRESTController {
 
     @Autowired
     PortfolioRepository p;
-
 
     private final PasswordAuthentication passwordAuth = new PasswordAuthentication(16);
 
@@ -68,26 +70,32 @@ public class UserRESTController {
             if(passwordAuth.authenticate(inputUser.getPassword().toCharArray(), user.getPassword())){
                 // Set the user just registered in the authentication provider
                 String userToken = AuthProvider.getInstance().setUserToken(user.getId());
-                response.addCookie(new Cookie("userToken", userToken));
-                return new SuccessResponse<>(user);
+                //response.addCookie(new Cookie("userToken", userToken));
+                response.addHeader("User-Token", userToken);
+                Logger.debug(UserRESTController.class, "User " + user.getEmail() + " just logged in.");
+                Map<String, Object> m = new HashMap<>();
+                m.put("userToken", userToken);
+                m.put("user", user);
+                return new SuccessResponse<>(m);
             }
+            Logger.debug(UserRESTController.class, "User " + user.getEmail() + " tried to log in with wrong password.");
             return new ErrorResponse(ExchangeError.WRONG_PASSWORD);
         }
+        Logger.debug(UserRESTController.class, "Login: mail " + user.getEmail() + " not found.");
         return new ErrorResponse(ExchangeError.WRONG_EMAIL);
 
     }
 
-
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/updateUserUsername", method = RequestMethod.POST)
-    public @ResponseBody AbstractResponse updateUserUsername(@RequestBody User inputUser,
-                                                             @CookieValue("userToken") String userToken) {
-        Integer userId = AuthProvider.getInstance().checkToken(userToken);
-        if(userToken == null || userId == null){
-            return new ErrorResponse(ExchangeError.SECURITY_ERROR);
-        }
+    public @ResponseBody AbstractResponse updateUserUsername(@RequestBody User inputUser /* ,
+                                                             @CookieValue("userToken") String userToken*/) {
+//        Integer userId = AuthProvider.getInstance().checkToken(userToken);
+//        if(userToken == null || userId == null){
+//            return new ErrorResponse(ExchangeError.SECURITY_ERROR);
+//        }
 
-        userRepository.setUserUsername(inputUser.getUsername(), userId);
+//        userRepository.setUserUsername(inputUser.getUsername(), userId);
         return new SuccessResponse<>(null);
     }
 }
