@@ -3,6 +3,7 @@ package it.uiip.digitalgarage.roboadvice.businesslogic.quandl;
 import com.jimmoores.quandl.*;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Data;
+import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.DataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.threeten.bp.*;
@@ -22,6 +23,9 @@ public class Quandl {
     //api key: ydS_4tVLnsPS_bxo3uvd
     @Autowired
     private static DataRepository dataRepository;
+
+    @Autowired
+    private static AssetRepository assetRepository;
 
     public static ArrayList<Data> callQuandl(Asset asset, int startYear, int startMonth, int startDay) {
 
@@ -82,10 +86,10 @@ public class Quandl {
         return null;
     }
 
-    /*public static void main(String[] args) {
+   /* public static void main(String[] args) {
         //callQuandl("WIKI/FB", 0, 2015, 5, 11);
         //callDailyQuandl("WIKI/FB",4);
-        callQuandl();
+        callQuandl(assetRepository.findOne(1),2);
     }*/
 
 
