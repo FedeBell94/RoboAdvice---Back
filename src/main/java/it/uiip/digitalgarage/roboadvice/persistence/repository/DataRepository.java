@@ -1,5 +1,6 @@
 package it.uiip.digitalgarage.roboadvice.persistence.repository;
 
+import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Data;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
@@ -8,5 +9,5 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  */
 public interface DataRepository  extends PagingAndSortingRepository<Data, Integer> {
 
-
+    Data findByAssetAndDate(Asset asset, java.sql.Date date);
 }
