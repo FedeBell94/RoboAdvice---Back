@@ -12,6 +12,7 @@ import it.uiip.digitalgarage.roboadvice.persistence.repository.PortfolioReposito
 import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
 import it.uiip.digitalgarage.roboadvice.utils.AuthProvider;
 import it.uiip.digitalgarage.roboadvice.utils.Logger;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.*;
@@ -79,77 +80,14 @@ public class UserRESTController {
 
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/updateUserUsername", method = RequestMethod.POST)
-    public @ResponseBody AbstractResponse updateUserUsername(@CookieValue("userToken") String userToken) {
+    public @ResponseBody AbstractResponse updateUserUsername(@RequestBody User inputUser,
+                                                             @CookieValue("userToken") String userToken) {
         Integer userId = AuthProvider.getInstance().checkToken(userToken);
         if(userToken == null || userId == null){
             return new ErrorResponse(ExchangeError.SECURITY_ERROR);
         }
 
-
-        return new SuccessResponse<>("Andato tutto bene");
+        userRepository.setUserUsername(inputUser.getUsername(), userId);
+        return new SuccessResponse<>(null);
     }
-
-    /**
-     * This REST api can log in a user after the proper credential check.
-     * <p>
-     * The call must be a POST and use the Spring Json parser to parse the
-     * input.
-     *
-     * @param u
-     *            the User who is trying to get logged in.
-     * @param request
-     *            the Http request sent with the POST.
-     * @return the answer wrapper containing the success or the failure of the
-     *         operation.
-     * @see User
-     *
-     */
-//	@RequestMapping(value = "/login", method = RequestMethod.POST)
-//	public @ResponseBody Boolean logInUtente(@RequestBody User u, HttpServletRequest request) {
-//
-//		User user = new User();
-//		if (u.getUsername().equals("noValue") || u.getPassword().equals("noValue")) {
-//			return false;
-//		} else {
-//			// DBACCESS for user
-//
-//			PasswordAuthentication pa = new PasswordAuthentication(16);
-//			char[] pass = u.getPassword().toCharArray();
-//			if (!pa.authenticate(pass, user.getPassword())) {
-//				return false;
-//			}
-//		}
-//		user.setPassword("");
-//		return true;
-//	}
-
-    /**
-     * This REST api can register a new user storing the info he provided in the
-     * form.
-     * <p>
-     * The call must be a POST and use the Spring Json parser to parse the
-     * input.
-     *
-     * @param u
-     *            the User bean carrying the user values provided in the form.
-     * @param request
-     *            the Http request sent with the POST.
-     * @return the answer wrapper containing the success or the failure of the
-     *         operation.
-     * @see User
-     *
-     */
-//	@RequestMapping(value = "/signUp", method = RequestMethod.POST)
-//	public @ResponseBody Boolean signUp(@RequestBody User u, HttpServletRequest request) {
-//
-//		PasswordAuthentication pa = new PasswordAuthentication();
-//		u.setPassword(pa.hash(u.getPassword().toCharArray()));
-//
-//		User user = new User();
-//
-//		// DBACCESS FOR REGISTRATION
-//
-//		user.setPassword("");
-//		return true;
-//	}
 }

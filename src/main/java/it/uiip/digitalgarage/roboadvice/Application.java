@@ -32,16 +32,16 @@ public class Application {
     private AssetRepository assetRepository;
 
     @PostConstruct
-    public void initDatabaseDefaultValues() throws Exception {
+    public void initDatabaseDefaultValues()  {
         Logger.debug(Application.class, "Database default values checking and inserting");
-        //assetClassRepository.save(AssetClass.builder().name("prova").build());
 
         JSONParser jsonParser = new JSONParser();
-        Reader defaultAssetClassReader = new FileReader(getClass().getClassLoader()
-                .getResource("DefaultAssetClass.json").getPath());
-        Reader defaultAssetReader = new FileReader(getClass().getClassLoader()
-                .getResource("DefaultAsset.json").getPath());
         try {
+            Reader defaultAssetClassReader = new FileReader(getClass().getClassLoader()
+                    .getResource("DefaultAssetClass.json").getPath());
+            Reader defaultAssetReader = new FileReader(getClass().getClassLoader()
+                    .getResource("DefaultAsset.json").getPath());
+
             List<JSONObject> assetClassList = (List<JSONObject>) jsonParser.parse(defaultAssetClassReader);
             List<JSONObject> assetList = (List<JSONObject>) jsonParser.parse(defaultAssetReader);
 
