@@ -13,30 +13,34 @@ import java.math.BigDecimal;
 
 @Entity
 @Table(name = "Asset")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Asset {
 
-	@Id
-	@GeneratedValue
-	private int id;
+    @Id
+    @GeneratedValue
+    private int id;
 
-	@ManyToOne(fetch=FetchType.LAZY)
-	@JoinColumn(name="asset_class_id")
-	private AssetClass assetClass;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "asset_class_id")
+    private AssetClass assetClass;
 
-	@Column(name = "quandlId", nullable = false)
-	private int quandlId;
+    @Column(name = "name", nullable = false)
+    private String name;
 
-	@Column(name = "name", nullable = false)
-	private String name;
+    @Column(name = "quandlKey", nullable = false)
+    private String quandlKey;
 
-	@Column(name = "quandlKey", nullable = false)
-	private String quandlKey;
+    @Column(name = "quandlId", nullable = false)
+    private int quandlId;
 
-	@Column(name = "fixedPercentage", nullable = false)
-	private BigDecimal fixedPercentage;
+    @Column(name = "fixedPercentage", nullable = false)
+    private BigDecimal fixedPercentage;
 
-//	@Column(name = "columns", nullable = false)
-//	private String column;
+	@Column(name = "quandlColumn", nullable = false)
+	private String quandlColumn;
 
 }
