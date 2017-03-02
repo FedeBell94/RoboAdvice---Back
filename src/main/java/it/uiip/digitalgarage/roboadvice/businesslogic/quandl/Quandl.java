@@ -1,7 +1,10 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.quandl;
 
 import com.jimmoores.quandl.*;
+import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Data;
+import it.uiip.digitalgarage.roboadvice.persistence.repository.DataRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.threeten.bp.*;
 
 import java.math.BigDecimal;
@@ -17,15 +20,17 @@ import java.util.Calendar;
 public class Quandl {
 
     //api key: ydS_4tVLnsPS_bxo3uvd
+    @Autowired
+    private static DataRepository dataRepository;
 
-    public static ArrayList<Data> callQuandl(String quandlKey, int quandlColumn, int startYear, int startMonth, int startDay) {
+    public static ArrayList<Data> callQuandl(Asset asset, int startYear, int startMonth, int startDay) {
 
         QuandlSession session = QuandlSession.create("ydS_4tVLnsPS_bxo3uvd");
 
         TabularResult tabularResultMulti = session.getDataSets(
                 MultiDataSetRequest.Builder
                         .of(
-                                QuandlCodeRequest.singleColumn(quandlKey, quandlColumn),
+                                QuandlCodeRequest.singleColumn(asset.getQuandlKey(), asset.getQuandlId()),
                                 QuandlCodeRequest.allColumns("DOE/RWTC")
                         )
                         .withStartDate(LocalDate.of(startYear, startMonth, startDay))
@@ -39,8 +44,9 @@ public class Quandl {
             System.out.println("Value on date " + date + " was " + value);
 
             if (value != null) {
-                res.add(Data.builder().date(new Date(date.getYear(), date.getMonthValue(), date.getDayOfMonth())).value(BigDecimal.valueOf(value)).build());
-
+                Data d = Data.builder().date(new Date(date.getYear(), date.getMonthValue(), date.getDayOfMonth())).value(BigDecimal.valueOf(value)).asset(asset).build();
+                res.add(d);
+                dataRepository.save(d);
             }
 
         }
@@ -48,14 +54,14 @@ public class Quandl {
         return res;
     }
 
-    public static Data callDailyQuandl(String quandlKey, int quandlColumn) {
+    public static Data callDailyQuandl(Asset asset) {
 
         QuandlSession session = QuandlSession.create("ydS_4tVLnsPS_bxo3uvd");
 
         TabularResult tabularResultMulti = session.getDataSets(
                 MultiDataSetRequest.Builder
                         .of(
-                                QuandlCodeRequest.singleColumn(quandlKey, quandlColumn),
+                                QuandlCodeRequest.singleColumn(asset.getQuandlKey(), asset.getQuandlId()),
                                 QuandlCodeRequest.allColumns("DOE/RWTC")
                         )
                         .build());
@@ -67,7 +73,9 @@ public class Quandl {
             System.out.println("Value on date " + date + " was " + value);
 
             if (value != null) {
-                return Data.builder().date(new Date(Calendar.getInstance().getTime().getTime())).value(BigDecimal.valueOf(value)).build();
+                Data d = Data.builder().date(new Date(Calendar.getInstance().getTime().getTime())).value(BigDecimal.valueOf(value)).build();
+                dataRepository.save(d);
+                return d;
             }
 
         }
@@ -75,8 +83,9 @@ public class Quandl {
     }
 
     /*public static void main(String[] args) {
-        callQuandl("WIKI/FB", 0, 2015, 5, 11);
+        //callQuandl("WIKI/FB", 0, 2015, 5, 11);
         //callDailyQuandl("WIKI/FB",4);
+        callQuandl();
     }*/
 
 

@@ -85,6 +85,7 @@ public class UserRESTController {
             return new ErrorResponse(ExchangeError.SECURITY_ERROR);
         }
 
+
         return new SuccessResponse<>("Andato tutto bene");
     }
 

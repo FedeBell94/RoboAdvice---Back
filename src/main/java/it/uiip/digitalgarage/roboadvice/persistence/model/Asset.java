@@ -25,7 +25,7 @@ public class Asset {
 	private AssetClass assetClass;
 
 	@Column(name = "quandlId", nullable = false)
-	private String quandlId;
+	private int quandlId;
 
 	@Column(name = "name", nullable = false)
 	private String name;
@@ -38,4 +38,5 @@ public class Asset {
 
 	@Column(name = "column", nullable = false)
 	private String column;
+
 }
