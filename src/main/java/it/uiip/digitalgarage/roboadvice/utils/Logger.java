@@ -8,7 +8,7 @@ import java.sql.Timestamp;
 public class Logger {
 
 	/**
-	 * Private constructor of the class. This class must not be created. All methods are static.
+	 * Private constructor of the class. All methods are static.
 	 */
 	private Logger() {
 	}

@@ -24,6 +24,7 @@ import java.util.Map;
 public class UserRESTController extends AbstractController {
 
     private final PasswordAuthentication passwordAuth = new PasswordAuthentication(16);
+    private final AuthProvider authProvider = AuthProvider.getInstance();
 
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/registerUser", method = RequestMethod.POST)
@@ -31,12 +32,12 @@ public class UserRESTController extends AbstractController {
 
         final String hashPassword = passwordAuth.hash(inputUser.getPassword().toCharArray());
 
-        final User user = User.builder().email(inputUser.getEmail()).password(hashPassword).registration(
-                new Date(Calendar.getInstance().getTime().getTime())).build();
+        final User user = User.builder().email(inputUser.getEmail()).password(hashPassword)
+                .registration(new Date(Calendar.getInstance().getTime().getTime())).build();
 
         try {
             userRepository.save(user);
-        } catch(DataIntegrityViolationException e){
+        } catch (DataIntegrityViolationException e) {
             Logger.debug(UserRESTController.class, "Mail already used - user not registered");
             return new ErrorResponse(ExchangeError.EMAIL_ALREADY_USED);
         }
@@ -47,15 +48,13 @@ public class UserRESTController extends AbstractController {
 
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/loginUser", method = RequestMethod.POST)
-    public @ResponseBody AbstractResponse loginUser(@RequestBody UserDTO inputUser,
-                                                    HttpServletResponse response) {
+    public @ResponseBody AbstractResponse loginUser(@RequestBody UserDTO inputUser, HttpServletResponse response) {
 
         User user = userRepository.findByEmail(inputUser.getEmail());
-
-        if(user != null) {
-            if(passwordAuth.authenticate(inputUser.getPassword().toCharArray(), user.getPassword())){
+        if (user != null) {
+            if (passwordAuth.authenticate(inputUser.getPassword().toCharArray(), user.getPassword())) {
                 // Set the user just registered in the authentication provider
-                String userToken = AuthProvider.getInstance().setUserToken(user.getId());
+                String userToken = authProvider.bindUserToken(user);
                 Logger.debug(UserRESTController.class, "User " + user.getEmail() + " just logged in.");
                 Map<String, Object> resposeData = new HashMap<>();
                 resposeData.put("userToken", userToken);
@@ -70,10 +69,20 @@ public class UserRESTController extends AbstractController {
     }
 
     @CrossOrigin(origins = "*")
+    @RequestMapping(value = "/logoutUser", method = RequestMethod.POST)
+    public @ResponseBody AbstractResponse logoutUser(HttpServletRequest request) {
+        return super.executeSafeTask(request, (user) -> {
+            authProvider.removeUserToken(user);
+            Logger.debug(UserRESTController.class, "Log out of user: " + user.getEmail());
+            return new SuccessResponse(null);
+        });
+    }
+
+    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/updateUserUsername", method = RequestMethod.POST)
     public @ResponseBody AbstractResponse updateUserUsername(@RequestBody UserDTO inputUser, HttpServletRequest request) {
 
-        return super.executeSafeTask(request, (user) ->{
+        return super.executeSafeTask(request, (user) -> {
             userRepository.setUserUsername(inputUser.getUsername(), user.getId());
             Logger.debug(UserRESTController.class, "Updated user " + user.getEmail() + " username.");
             return new SuccessResponse<>(new UserDTO(user));
