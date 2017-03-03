@@ -73,8 +73,8 @@ public class UserRESTController extends AbstractController {
     public @ResponseBody AbstractResponse updateUserUsername(@RequestBody User inputUser, HttpServletRequest request) {
 
         return super.executeSafeTask(request, (user) ->{
-            Logger.error(UserRESTController.class, user.toString());
             userRepository.setUserUsername(inputUser.getUsername(), user.getId());
+            Logger.debug(UserRESTController.class, "Updated user " + user.getEmail() + " username.");
             return new SuccessResponse<>(null);
         });
     }
@@ -83,6 +83,9 @@ public class UserRESTController extends AbstractController {
     @RequestMapping(value = "/tellMeWhoAmI", method = RequestMethod.GET)
     public @ResponseBody AbstractResponse tellMeWhoAmI(HttpServletRequest request) {
 
-        return super.executeSafeTask(request, (user) -> new SuccessResponse(user));
+        return super.executeSafeTask(request, (user) -> {
+            Logger.debug(UserRESTController.class, "TellWhoAmI: " + user.getEmail());
+            return new SuccessResponse(user);
+        });
     }
 }

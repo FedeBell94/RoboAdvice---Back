@@ -41,7 +41,7 @@ public class StrategyRESTController extends AbstractController {
                         .active(true)
                         .startingDate(new Date(Calendar.getInstance().getTimeInMillis())).build();
                 strategyRepository.save(newStrategy);
-                Logger.debug(StrategyRESTController.class, "Insert strategy " + newStrategy);
+                Logger.debug(StrategyRESTController.class, "Inserted strategy " + newStrategy);
             }
             return new SuccessResponse<>(null);
         });
@@ -59,6 +59,7 @@ public class StrategyRESTController extends AbstractController {
             for(Strategy curr : strategy){
                 strategyDTO.add(new StrategyDTO(curr));
             }
+            Logger.debug(StrategyRESTController.class, "Get strategy API called.");
             return new SuccessResponse<>(strategyDTO);
         });
     }
