@@ -114,6 +114,6 @@ public class UserRESTController {
         if(user != null){
             return new SuccessResponse<>(user);
         }
-        return new ErrorResponse(ExchangeError.USER_NOT_FOUND);
+        return new ErrorResponse(ExchangeError.SECURITY_ERROR);
     }
 }
