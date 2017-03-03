@@ -101,7 +101,7 @@ public class Quandl {
 
                 Data dop = dataRepository.findByAssetAndDate(asset, new java.sql.Date(cal.getTimeInMillis()));
                 if (dop == null) {
-                    System.out.println("inserito!");
+                    System.out.println("recorded!");
                     dataRepository.save(d);
                 }
                 return d;

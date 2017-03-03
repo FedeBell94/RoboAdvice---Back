@@ -12,7 +12,7 @@ import java.sql.Date;
 
 @Entity
 @Table(name = "User")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder @ToString
 public class User {
 
     @Id
@@ -30,4 +30,5 @@ public class User {
 
     @Column(name = "registration", nullable = false)
     private Date registration;
+
 }

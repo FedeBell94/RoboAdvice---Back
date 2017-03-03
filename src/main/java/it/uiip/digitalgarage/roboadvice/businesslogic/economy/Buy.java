@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * Created by Simone on 03/03/2017.
@@ -27,7 +28,7 @@ public class Buy {
 
     public void buyAssets(BigDecimal totalMoney, User user) {
 
-        ArrayList<Strategy> str = strategyRepository.findByUserAndActive(user, true);
+        List<Strategy> str = strategyRepository.findByUserAndActiveTrue(user);
         java.sql.Date date = new java.sql.Date(Calendar.getInstance().getTime().getTime());
 
         ArrayList<Asset> acl;

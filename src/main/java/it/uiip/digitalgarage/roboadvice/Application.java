@@ -1,10 +1,12 @@
 package it.uiip.digitalgarage.roboadvice;
 
+import com.jimmoores.quandl.*;
 import it.uiip.digitalgarage.roboadvice.persistence.model.*;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetClassRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
+import it.uiip.digitalgarage.roboadvice.persistence.repository.DataRepository;
 import it.uiip.digitalgarage.roboadvice.utils.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -12,6 +14,8 @@ import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.threeten.bp.DateTimeUtils;
+import org.threeten.bp.LocalDate;
 
 
 import javax.annotation.PostConstruct;
@@ -19,6 +23,9 @@ import java.math.BigDecimal;
 
 import java.io.FileReader;
 import java.io.Reader;
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 
@@ -26,17 +33,11 @@ import java.util.List;
 public class Application {
 
 
-
-
     @Autowired
     private AssetRepository assetRepository;
 
     @Autowired
     private AssetClassRepository assetClassRepository;
-
-
-
-
 
 
     @PostConstruct
@@ -113,6 +114,7 @@ public class Application {
         }
 
     }
+
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);

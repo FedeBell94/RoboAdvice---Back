@@ -15,7 +15,7 @@ import java.sql.Date;
 
 @Entity
 @Table(name = "Portfolio")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder @ToString
 public class Portfolio {
 
     @Id
@@ -42,4 +42,5 @@ public class Portfolio {
 
     @Column(name = "date", nullable = false)
     private Date date;
+
 }
