@@ -1,5 +1,6 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
+import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.UserDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.ErrorResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.ExchangeError;
@@ -26,7 +27,7 @@ public class UserRESTController extends AbstractController {
 
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/registerUser", method = RequestMethod.POST)
-    public @ResponseBody AbstractResponse registerUser(@RequestBody User inputUser) {
+    public @ResponseBody AbstractResponse registerUser(@RequestBody UserDTO inputUser) {
 
         final String hashPassword = passwordAuth.hash(inputUser.getPassword().toCharArray());
 
@@ -41,12 +42,12 @@ public class UserRESTController extends AbstractController {
         }
 
         Logger.debug(UserRESTController.class, "User " + inputUser.getEmail() + " registered successfully");
-        return new SuccessResponse<>(user);
+        return new SuccessResponse<>(new UserDTO(user));
     }
 
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/loginUser", method = RequestMethod.POST)
-    public @ResponseBody AbstractResponse loginUser(@RequestBody User inputUser,
+    public @ResponseBody AbstractResponse loginUser(@RequestBody UserDTO inputUser,
                                                     HttpServletResponse response) {
 
         User user = userRepository.findByEmail(inputUser.getEmail());
@@ -56,10 +57,10 @@ public class UserRESTController extends AbstractController {
                 // Set the user just registered in the authentication provider
                 String userToken = AuthProvider.getInstance().setUserToken(user.getId());
                 Logger.debug(UserRESTController.class, "User " + user.getEmail() + " just logged in.");
-                Map<String, Object> m = new HashMap<>();
-                m.put("userToken", userToken);
-                m.put("user", user);
-                return new SuccessResponse<>(m);
+                Map<String, Object> resposeData = new HashMap<>();
+                resposeData.put("userToken", userToken);
+                resposeData.put("user", new UserDTO(user));
+                return new SuccessResponse<>(resposeData);
             }
             Logger.debug(UserRESTController.class, "User " + user.getEmail() + " tried to log in with wrong password.");
             return new ErrorResponse(ExchangeError.WRONG_PASSWORD);
@@ -70,12 +71,12 @@ public class UserRESTController extends AbstractController {
 
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/updateUserUsername", method = RequestMethod.POST)
-    public @ResponseBody AbstractResponse updateUserUsername(@RequestBody User inputUser, HttpServletRequest request) {
+    public @ResponseBody AbstractResponse updateUserUsername(@RequestBody UserDTO inputUser, HttpServletRequest request) {
 
         return super.executeSafeTask(request, (user) ->{
             userRepository.setUserUsername(inputUser.getUsername(), user.getId());
             Logger.debug(UserRESTController.class, "Updated user " + user.getEmail() + " username.");
-            return new SuccessResponse<>(null);
+            return new SuccessResponse<>(new UserDTO(user));
         });
     }
 
@@ -85,7 +86,7 @@ public class UserRESTController extends AbstractController {
 
         return super.executeSafeTask(request, (user) -> {
             Logger.debug(UserRESTController.class, "TellWhoAmI: " + user.getEmail());
-            return new SuccessResponse(user);
+            return new SuccessResponse<>(new UserDTO(user));
         });
     }
 }
