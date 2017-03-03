@@ -1,4 +1,4 @@
-package it.uiip.digitalgarage.roboadvice.businesslogic.model;
+package it.uiip.digitalgarage.roboadvice.businesslogic.model.response;
 
 public class ErrorResponse extends AbstractResponse<Object> {
 

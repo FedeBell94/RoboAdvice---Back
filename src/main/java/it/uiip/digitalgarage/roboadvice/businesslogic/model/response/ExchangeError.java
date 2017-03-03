@@ -1,4 +1,4 @@
-package it.uiip.digitalgarage.roboadvice.businesslogic.model;
+package it.uiip.digitalgarage.roboadvice.businesslogic.model.response;
 
 public enum ExchangeError {
 	DEFAULT_ERROR_CODE(0, ""), EMAIL_ALREADY_USED(100, "Email already used"),WRONG_EMAIL(101, "Wrong email"),

@@ -1,11 +1,11 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
 
-import it.uiip.digitalgarage.roboadvice.businesslogic.model.AbstractResponse;
-import it.uiip.digitalgarage.roboadvice.businesslogic.model.ErrorResponse;
-import it.uiip.digitalgarage.roboadvice.businesslogic.model.ExchangeError;
-import it.uiip.digitalgarage.roboadvice.businesslogic.model.SuccessResponse;
-import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
+import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.StrategyDTO;
+import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
+import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.ErrorResponse;
+import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.ExchangeError;
+import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
 import it.uiip.digitalgarage.roboadvice.persistence.model.AssetClass;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Strategy;
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.Calendar;
-import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 @RestController
@@ -39,8 +39,9 @@ public class StrategyRESTController {
     private UserRepository userRepository;
 
     @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/updateStrategy", method = RequestMethod.POST)
-    public @ResponseBody AbstractResponse updateStrategy(@RequestBody JSONObject strategyInput, HttpServletRequest request) {
+    @RequestMapping(value = "/strategy", method = RequestMethod.POST)
+    public @ResponseBody AbstractResponse updateStrategy(@RequestBody List<StrategyDTO> strategyInput,
+                                                         HttpServletRequest request) {
         String userToken = request.getHeader("User-Token");
         Integer userId = AuthProvider.getInstance().checkToken(userToken);
         if(userToken == null || userId == null){
@@ -56,18 +57,38 @@ public class StrategyRESTController {
         }
 
         // Insert new strategy
-        Iterable<AssetClass> it = assetClassRepository.findAll();
-        for(AssetClass curr : it){
-            BigDecimal percentage = new BigDecimal((String) strategyInput.get(String.valueOf(curr.getId())));
+        for(StrategyDTO curr: strategyInput){
+            AssetClass assetClass = assetClassRepository.findOne(curr.getAssetClassId());
             Strategy newStrategy = Strategy.builder()
                     .user(user)
-                    .assetClass(curr)
-                    .percentage(percentage)
+                    .assetClass(assetClass)
+                    .percentage(curr.getPercentage())
                     .active(true)
                     .startingDate(new Date(Calendar.getInstance().getTimeInMillis())).build();
             strategyRepository.save(newStrategy);
             Logger.debug(StrategyRESTController.class, "Insert strategy " + newStrategy);
         }
         return new SuccessResponse<>(null);
+    }
+
+
+    @CrossOrigin(origins = "*")
+    @RequestMapping(value = "/strategy", method = RequestMethod.GET)
+    public @ResponseBody AbstractResponse getStrategy(HttpServletRequest request) {
+        String userToken = request.getHeader("User-Token");
+        Integer userId = AuthProvider.getInstance().checkToken(userToken);
+        if(userToken == null || userId == null){
+            Logger.debug(StrategyRESTController.class, "Request with wrong user token.");
+            return new ErrorResponse(ExchangeError.SECURITY_ERROR);
+        }
+        User user = userRepository.findOne(userId);
+
+        // Retrieve the strategies
+        List<Strategy> strategy = strategyRepository.findByUserAndActiveTrue(user);
+        List<StrategyDTO> strategyDTO = new LinkedList<>();
+        for(Strategy curr : strategy){
+            strategyDTO.add(new StrategyDTO(curr));
+        }
+        return new SuccessResponse<>(strategyDTO);
     }
 }
