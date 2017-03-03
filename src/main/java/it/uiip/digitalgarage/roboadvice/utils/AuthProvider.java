@@ -25,7 +25,8 @@ public class AuthProvider {
     /**
      * Private constructor of the class. Singleton pattern.
      */
-    private AuthProvider() {}
+    private AuthProvider() {
+    }
 
     /**
      * Get instance method of Singleton pattern.
@@ -39,6 +40,14 @@ public class AuthProvider {
         return instance;
     }
 
+    /**
+     * Bind a user with a token. Not necessary to send username and password every time.
+     *
+     * @param user
+     *         The user to bind with the new token.
+     *
+     * @return The token associated to the {@link User#}.
+     */
     public String bindUserToken(User user) {
         // Remove the previous token if already set and never logged out
         removeUserToken(user);
@@ -48,6 +57,12 @@ public class AuthProvider {
         return userToken;
     }
 
+    /**
+     * Remove the token associated previously to the {@link User}
+     *
+     * @param user
+     *         The user to remove the token.
+     */
     public void removeUserToken(User user) {
         for (Map.Entry<String, Integer> curr : userTokenMap.entrySet()) {
             if (curr.getValue() == user.getId()) {
@@ -69,6 +84,14 @@ public class AuthProvider {
         return userTokenMap.get(userToken);
     }
 
+    /**
+     * Generates a custom token, based also on the {@link User} properties.
+     *
+     * @param user
+     *         The {@link User used to generate the token}
+     *
+     * @return The token generated.
+     */
     private String generateToken(User user) {
         //return UUID.randomUUID().toString().toUpperCase() + "|" + user.getId();
         return String.valueOf(user.getId());

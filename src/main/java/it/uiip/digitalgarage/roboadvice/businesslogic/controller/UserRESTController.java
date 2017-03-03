@@ -19,6 +19,9 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Class used to create all the API rest used to manage the {@link User}.
+ */
 @RestController
 @SuppressWarnings("unused")
 public class UserRESTController extends AbstractController {
@@ -26,6 +29,15 @@ public class UserRESTController extends AbstractController {
     private final PasswordAuthentication passwordAuth = new PasswordAuthentication(16);
     private final AuthProvider authProvider = AuthProvider.getInstance();
 
+    /**
+     * This mehtod register a new {@link User} on the system.
+     *
+     * @param inputUser
+     *         The {@link User} to store.
+     *
+     * @return A {@link SuccessResponse} if everything has gone right, an {@link ErrorResponse} containing the error
+     * code if something has gone wrong.
+     */
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/registerUser", method = RequestMethod.POST)
     public @ResponseBody AbstractResponse registerUser(@RequestBody UserDTO inputUser) {
