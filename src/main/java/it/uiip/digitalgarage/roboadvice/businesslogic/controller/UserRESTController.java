@@ -8,6 +8,7 @@ import it.uiip.digitalgarage.roboadvice.businesslogic.model.AbstractResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.ErrorResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.ExchangeError;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.SuccessResponse;
+import it.uiip.digitalgarage.roboadvice.persistence.model.AssetClass;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Portfolio;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.PortfolioRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
@@ -71,7 +72,7 @@ public class UserRESTController {
                 // Set the user just registered in the authentication provider
                 String userToken = AuthProvider.getInstance().setUserToken(user.getId());
                 //response.addCookie(new Cookie("userToken", userToken));
-                response.addHeader("User-Token", userToken);
+                //response.addHeader("User-Token", userToken);
                 Logger.debug(UserRESTController.class, "User " + user.getEmail() + " just logged in.");
                 Map<String, Object> m = new HashMap<>();
                 m.put("userToken", userToken);
@@ -81,21 +82,38 @@ public class UserRESTController {
             Logger.debug(UserRESTController.class, "User " + user.getEmail() + " tried to log in with wrong password.");
             return new ErrorResponse(ExchangeError.WRONG_PASSWORD);
         }
-        Logger.debug(UserRESTController.class, "Login: mail " + user.getEmail() + " not found.");
+        Logger.debug(UserRESTController.class, "Login: mail " + inputUser.getEmail() + " not found.");
         return new ErrorResponse(ExchangeError.WRONG_EMAIL);
-
     }
 
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/updateUserUsername", method = RequestMethod.POST)
-    public @ResponseBody AbstractResponse updateUserUsername(@RequestBody User inputUser /* ,
-                                                             @CookieValue("userToken") String userToken*/) {
-//        Integer userId = AuthProvider.getInstance().checkToken(userToken);
-//        if(userToken == null || userId == null){
-//            return new ErrorResponse(ExchangeError.SECURITY_ERROR);
-//        }
+    public @ResponseBody AbstractResponse updateUserUsername(@RequestBody User inputUser, HttpServletRequest request) {
+        String userToken = request.getHeader("User-Token");
+        Integer userId = AuthProvider.getInstance().checkToken(userToken);
+        if(userToken == null || userId == null){
+            Logger.debug(StrategyRESTController.class, "Request with wrong user token.");
+            return new ErrorResponse(ExchangeError.SECURITY_ERROR);
+        }
 
-//        userRepository.setUserUsername(inputUser.getUsername(), userId);
+        userRepository.setUserUsername(inputUser.getUsername(), userId);
         return new SuccessResponse<>(null);
+    }
+
+    @CrossOrigin(origins = "*")
+    @RequestMapping(value = "/tellMeWhoAmI", method = RequestMethod.GET)
+    public @ResponseBody AbstractResponse tellMeWhoAmI(HttpServletRequest request) {
+        String userToken = request.getHeader("User-Token");
+        Integer userId = AuthProvider.getInstance().checkToken(userToken);
+        if(userToken == null || userId == null){
+            Logger.debug(StrategyRESTController.class, "Request with wrong user token.");
+            return new ErrorResponse(ExchangeError.SECURITY_ERROR);
+        }
+
+        User user = userRepository.findOne(userId);
+        if(user != null){
+            return new SuccessResponse<>(user);
+        }
+        return new ErrorResponse(ExchangeError.USER_NOT_FOUND);
     }
 }

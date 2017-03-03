@@ -35,15 +35,16 @@ public class StrategyRESTController {
         String userToken = request.getHeader("User-Token");
         Integer userId = AuthProvider.getInstance().checkToken(userToken);
         if(userToken == null || userId == null){
+            Logger.debug(StrategyRESTController.class, "Request with wrong user token.");
             return new ErrorResponse(ExchangeError.SECURITY_ERROR);
         }
-        Logger.error(StrategyRESTController.class, userToken);
+
 
         Iterable<AssetClass> it = assetClassRepository.findAll();
         for(AssetClass curr : it){
             Logger.error(StrategyRESTController.class, (String)strategyInput.get(String.valueOf(curr.getId())));
+            // TODO persistence!!!
         }
-
         return new SuccessResponse<>(null);
     }
 }
