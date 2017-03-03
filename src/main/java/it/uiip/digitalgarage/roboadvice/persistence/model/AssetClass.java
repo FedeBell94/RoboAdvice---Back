@@ -15,7 +15,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "AssetClass")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder @ToString
 public class AssetClass {
 
 	@Id
@@ -23,4 +23,5 @@ public class AssetClass {
 
 	@Column(name = "name", nullable = false)
 	private String name;
+
 }

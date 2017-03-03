@@ -13,17 +13,11 @@ import java.math.BigDecimal;
 
 @Entity
 @Table(name = "Asset")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder @ToString
 public class Asset {
-
 
 	@Id
 	private int id;
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "asset_class_id")
@@ -43,5 +37,5 @@ public class Asset {
 
 	@Column(name = "fixedPercentage", nullable = false)
 	private BigDecimal fixedPercentage;
-    
+
 }

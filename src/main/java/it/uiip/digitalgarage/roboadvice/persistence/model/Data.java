@@ -12,18 +12,9 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Date;
 
-/**
- *
- * @author Simone
- */
-
 @Entity
 @Table(name = "Data")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder @ToString
 public class Data implements Serializable {
 
     @Id
@@ -42,6 +33,5 @@ public class Data implements Serializable {
 
     @Column(name = "value", nullable = false, precision = 14, scale = 4)
     private BigDecimal value;
-
 
 }

@@ -14,7 +14,7 @@ import java.sql.Date;
 
 @Entity
 @Table(name = "Strategy")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder @ToString
 public class Strategy {
 
     @Id
@@ -37,4 +37,5 @@ public class Strategy {
 
     @Column(name = "starting_date", nullable = false)
     private Date startingDate;
+
 }
