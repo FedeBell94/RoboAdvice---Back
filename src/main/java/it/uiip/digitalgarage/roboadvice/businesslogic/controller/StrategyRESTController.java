@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.Calendar;
+import java.util.LinkedList;
 import java.util.List;
 
 @RestController
@@ -82,12 +83,12 @@ public class StrategyRESTController {
         }
         User user = userRepository.findOne(userId);
 
-//        // Disable the previous active strategy
-//        List<Strategy> previousActive = strategyRepository.findByUserAndActiveTrue(user);
-//        for(Strategy curr: previousActive){
-//            strategyRepository.disactiveStrategy(curr.getId());
-//        }
-
-        return new SuccessResponse<>(null);
+        // Retrieve the strategies
+        List<Strategy> strategy = strategyRepository.findByUserAndActiveTrue(user);
+        List<StrategyDTO> strategyDTO = new LinkedList<>();
+        for(Strategy curr : strategy){
+            strategyDTO.add(new StrategyDTO(curr));
+        }
+        return new SuccessResponse<>(strategyDTO);
     }
 }
