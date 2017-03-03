@@ -1,20 +1,16 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import it.uiip.digitalgarage.roboadvice.businesslogic.model.AbstractResponse;
-import it.uiip.digitalgarage.roboadvice.businesslogic.model.ErrorResponse;
-import it.uiip.digitalgarage.roboadvice.businesslogic.model.ExchangeError;
-import it.uiip.digitalgarage.roboadvice.businesslogic.model.SuccessResponse;
-import it.uiip.digitalgarage.roboadvice.persistence.model.AssetClass;
-import it.uiip.digitalgarage.roboadvice.persistence.model.Portfolio;
+import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
+import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.ErrorResponse;
+import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.ExchangeError;
+import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.PortfolioRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
 import it.uiip.digitalgarage.roboadvice.utils.AuthProvider;
 import it.uiip.digitalgarage.roboadvice.utils.Logger;
-import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
 import it.uiip.digitalgarage.roboadvice.utils.PasswordAuthentication;
 
-import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.Calendar;
 import java.util.HashMap;
