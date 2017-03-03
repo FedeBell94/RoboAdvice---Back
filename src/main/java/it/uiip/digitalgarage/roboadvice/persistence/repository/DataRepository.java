@@ -10,4 +10,6 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 public interface DataRepository  extends PagingAndSortingRepository<Data, Integer> {
 
     Data findByAssetAndDate(Asset asset, java.sql.Date date);
+
+    Data findFirst1ByAssetOrderByDateDesc(Asset asset);
 }
