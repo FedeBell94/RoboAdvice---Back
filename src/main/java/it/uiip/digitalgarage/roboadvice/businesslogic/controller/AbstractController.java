@@ -33,7 +33,7 @@ public class AbstractController {
 
     synchronized protected AbstractResponse executeSafeTask(HttpServletRequest request, TaskLogic task) {
         String userToken = request.getHeader("User-Token");
-        Integer userId = AuthProvider.getInstance().checkToken(userToken);
+        Integer userId = AuthProvider.getInstance().checkUserToken(userToken);
         if(userToken == null || userId == null){
             Logger.debug(StrategyRESTController.class, "Request made with wrong user token.");
             return new ErrorResponse(ExchangeError.SECURITY_ERROR);
