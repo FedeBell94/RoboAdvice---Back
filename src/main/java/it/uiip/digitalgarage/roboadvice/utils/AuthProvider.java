@@ -46,7 +46,7 @@ public class AuthProvider {
      * @param user
      *         The user to bind with the new token.
      *
-     * @return The token associated to the {@link User#}.
+     * @return The token associated to the {@link User}.
      */
     public String bindUserToken(User user) {
         // Remove the previous token if already set and never logged out

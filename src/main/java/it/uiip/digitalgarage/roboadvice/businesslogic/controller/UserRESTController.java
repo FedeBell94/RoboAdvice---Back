@@ -13,7 +13,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.sql.Date;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -30,13 +29,16 @@ public class UserRESTController extends AbstractController {
     private final AuthProvider authProvider = AuthProvider.getInstance();
 
     /**
-     * This mehtod register a new {@link User} on the system.
+     * This method register a new {@link User} on the system.
      *
      * @param inputUser
      *         The {@link User} to store.
      *
-     * @return A {@link SuccessResponse} if everything has gone right, an {@link ErrorResponse} containing the error
-     * code if something has gone wrong.
+     * @return A {@link SuccessResponse} containing the {@link UserDTO} just registered if everything has gone right, or
+     * an {@link ErrorResponse} containing the error code if something has gone wrong. Possible errors are:
+     * EMAIL_ALREADY_USED.
+     *
+     * @see ExchangeError
      */
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/registerUser", method = RequestMethod.POST)
@@ -58,9 +60,21 @@ public class UserRESTController extends AbstractController {
         return new SuccessResponse<>(new UserDTO(user));
     }
 
+    /**
+     * This method perform the login of an user in the system.
+     *
+     * @param inputUser
+     *         The {@link UserDTO} to log-in.
+     *
+     * @return A {@link SuccessResponse} containing the user token and the {@link UserDTO} just logged if everything has
+     * gone right, or an {@link ErrorResponse} containing the error code if something has gone wrong. Possible errors
+     * are: WRONG_PASSWORD, WRONG_EMAIL.
+     *
+     * @see ExchangeError
+     */
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/loginUser", method = RequestMethod.POST)
-    public @ResponseBody AbstractResponse loginUser(@RequestBody UserDTO inputUser, HttpServletResponse response) {
+    public @ResponseBody AbstractResponse loginUser(@RequestBody UserDTO inputUser) {
 
         User user = userRepository.findByEmail(inputUser.getEmail());
         if (user != null) {
@@ -68,10 +82,10 @@ public class UserRESTController extends AbstractController {
                 // Set the user just registered in the authentication provider
                 String userToken = authProvider.bindUserToken(user);
                 Logger.debug(UserRESTController.class, "User " + user.getEmail() + " just logged in.");
-                Map<String, Object> resposeData = new HashMap<>();
-                resposeData.put("userToken", userToken);
-                resposeData.put("user", new UserDTO(user));
-                return new SuccessResponse<>(resposeData);
+                Map<String, Object> responseData = new HashMap<>();
+                responseData.put("userToken", userToken);
+                responseData.put("user", new UserDTO(user));
+                return new SuccessResponse<>(responseData);
             }
             Logger.debug(UserRESTController.class, "User " + user.getEmail() + " tried to log in with wrong password.");
             return new ErrorResponse(ExchangeError.WRONG_PASSWORD);
@@ -80,16 +94,41 @@ public class UserRESTController extends AbstractController {
         return new ErrorResponse(ExchangeError.WRONG_EMAIL);
     }
 
+    /**
+     * This method perform the log-out of the user in the system.
+     *
+     * @param request
+     *         The {@link HttpServletRequest} associated to the servlet.
+     *
+     * @return An empty {@link SuccessResponse} if everything has gone right, or an {@link ErrorResponse} containing the
+     * error code if something has gone wrong. Possible errors are: SECURITY_ERROR.
+     *
+     * @see ExchangeError
+     */
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/logoutUser", method = RequestMethod.POST)
     public @ResponseBody AbstractResponse logoutUser(HttpServletRequest request) {
         return super.executeSafeTask(request, (user) -> {
             authProvider.removeUserToken(user);
             Logger.debug(UserRESTController.class, "Log out of user: " + user.getEmail());
-            return new SuccessResponse(null);
+            return new SuccessResponse<>(null);
         });
     }
 
+    /**
+     * This method update/change the username of an {@link User}.
+     *
+     * @param inputUser
+     *         The {@link UserDTO} to use to change the {@link User} username.
+     * @param request
+     *         The {@link HttpServletRequest} associated to the servlet.
+     *
+     * @return A {@link SuccessResponse} containing the {@link UserDTO} just updated if everything has gone right, or an
+     * {@link ErrorResponse} containing the error code if something has gone wrong. Possible errors are:
+     * SECURITY_ERROR.
+     *
+     * @see ExchangeError
+     */
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/updateUserUsername", method = RequestMethod.POST)
     public @ResponseBody AbstractResponse updateUserUsername(@RequestBody UserDTO inputUser, HttpServletRequest request) {
@@ -101,6 +140,18 @@ public class UserRESTController extends AbstractController {
         });
     }
 
+    /**
+     * This method returns the current {@link UserDTO} associated with the User-Token in the request.
+     *
+     * @param request
+     *         The {@link HttpServletRequest} associated to the servlet.
+     *
+     * @return A {@link SuccessResponse} containing the {@link UserDTO} wanted if everything has gone right, or an
+     * {@link ErrorResponse} containing the error code if something has gone wrong. Possible errors are:
+     * SECURITY_ERROR.
+     *
+     * @see ExchangeError
+     */
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/tellMeWhoAmI", method = RequestMethod.GET)
     public @ResponseBody AbstractResponse tellMeWhoAmI(HttpServletRequest request) {
