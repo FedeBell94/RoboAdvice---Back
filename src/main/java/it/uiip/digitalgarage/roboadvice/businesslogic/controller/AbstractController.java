@@ -31,7 +31,7 @@ public class AbstractController {
     @Autowired
     protected PortfolioRepository portfolioRepository;
 
-    protected AbstractResponse executeSafeTask(HttpServletRequest request, TaskLogic task) {
+    synchronized protected AbstractResponse executeSafeTask(HttpServletRequest request, TaskLogic task) {
         String userToken = request.getHeader("User-Token");
         Integer userId = AuthProvider.getInstance().checkToken(userToken);
         if(userToken == null || userId == null){
