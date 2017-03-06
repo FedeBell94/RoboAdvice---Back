@@ -6,9 +6,12 @@ import it.uiip.digitalgarage.roboadvice.persistence.model.Data;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.DataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.stereotype.Service;
 import org.threeten.bp.DateTimeUtils;
 import org.threeten.bp.LocalDate;
 
+import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.ArrayList;
@@ -17,13 +20,17 @@ import java.util.Calendar;
 /**
  * Created by Simone on 02/03/2017.
  */
+
+
 public class Quandl {
 
     //api key: ydS_4tVLnsPS_bxo3uvd
-    @Autowired
-    private DataRepository dataRepository;
+//    @Autowired
+//    public DataRepository dataRepository;
 
-    public ArrayList<Data> callQuandl(Asset asset, int startYear, int startMonth, int startDay) {
+
+
+    public ArrayList<Data> callQuandl(Asset asset, int startYear, int startMonth, int startDay, DataRepository dataRepository) {
 
         QuandlSession session = QuandlSession.create("ydS_4tVLnsPS_bxo3uvd");
         @SuppressWarnings("deprecation")
@@ -53,7 +60,7 @@ public class Quandl {
         return res;
     }
 
-    public Data callDailyQuandl(Asset asset) {
+    public Data callDailyQuandl(Asset asset, DataRepository dataRepository) {
 
 
         Calendar cal = Calendar.getInstance();

@@ -13,7 +13,10 @@ import org.json.simple.parser.JSONParser;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.aspectj.EnableSpringConfigured;
 import org.threeten.bp.DateTimeUtils;
 import org.threeten.bp.LocalDate;
 
@@ -40,20 +43,20 @@ public class Application {
     private AssetClassRepository assetClassRepository;
 
 
-    @PostConstruct
-    void func() {
-        //  Asset a = assetRepository.findOne(1);
-        //callDailyQuandl(a);
-        // callQuandl(a,2016,5,3);
-        /*Iterator it = assetRepository.findAll().iterator();
-        while (it.hasNext()) {
-            Asset a = (Asset) it.next();
-
-            callQuandl(a, 2012, 3, 2);
-
-
-        }*/
-    }
+//    @PostConstruct
+//    void func() {
+//        //  Asset a = assetRepository.findOne(1);
+//        //callDailyQuandl(a);
+//        // callQuandl(a,2016,5,3);
+//        /*Iterator it = assetRepository.findAll().iterator();
+//        while (it.hasNext()) {
+//            Asset a = (Asset) it.next();
+//
+//            callQuandl(a, 2012, 3, 2);
+//
+//
+//        }*/
+//    }
 
 
     @PostConstruct
