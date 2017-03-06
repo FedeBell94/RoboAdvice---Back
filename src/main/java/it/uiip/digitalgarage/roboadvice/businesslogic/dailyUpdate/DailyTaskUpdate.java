@@ -6,8 +6,11 @@ import it.uiip.digitalgarage.roboadvice.persistence.model.*;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.*;
 import it.uiip.digitalgarage.roboadvice.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
+
 import org.springframework.stereotype.Service;
+
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
@@ -16,7 +19,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 @Service
+@SpringBootApplication
 public class DailyTaskUpdate {
 
 
