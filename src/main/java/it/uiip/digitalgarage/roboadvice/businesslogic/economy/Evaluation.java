@@ -16,26 +16,24 @@ import java.math.BigDecimal;
  */
 public class Evaluation {
 
-    @Autowired
-    private PortfolioRepository portfolioRepository;
-
-    @Autowired
-    private DataRepository dataRepository;
+//    @Autowired
+//    private PortfolioRepository portfolioRepository;
+//
+//    @Autowired
+//    private DataRepository dataRepository;
 
     public BigDecimal evaluatePortfolio(User u){
         //portfolioRepository.findByUserAndDate(u,);
         return null;
     }
 
-    public BigDecimal getLastValue(Asset asset){
+    public BigDecimal getLastValue(Asset asset,PortfolioRepository portfolioRepository,DataRepository dataRepository){
 
         Data data = dataRepository.findFirst1ByAssetOrderByDateDesc(asset);
 
         return data.getValue();
     }
 
-    public static void main(String[] args) {
 
-    }
 
 }
