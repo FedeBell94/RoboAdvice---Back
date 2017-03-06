@@ -2,9 +2,11 @@ package it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate;
 
 import it.uiip.digitalgarage.roboadvice.persistence.model.*;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.*;
+import it.uiip.digitalgarage.roboadvice.utils.Logger;
 import it.uiip.digitalgarage.roboadvice.utils.Utils;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -12,8 +14,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@SpringBootApplication
-public class DailyTaskUpdate {
+@Service
+@SuppressWarnings("unused")
+public class DailyTaskUpdate implements IDailyTaskUpdate {
 
 
     @Autowired
@@ -31,17 +34,7 @@ public class DailyTaskUpdate {
     @Autowired
     private UserRepository userRepository;
 
-//    private static DailyTaskUpdate instance = null;
-//
-//    private DailyTaskUpdate () {}
-//
-//    public static synchronized DailyTaskUpdate getInstance(){
-//        if(instance == null){
-//            instance = new DailyTaskUpdate();
-//        }
-//        return instance;
-//    }
-
+    @Override
     public void executeUpdateTask() {
 
         // Find all assets
@@ -93,8 +86,10 @@ public class DailyTaskUpdate {
 
         for (Strategy currStrategy : userStrategy) {
             for (Asset currAsset : assets) {
+                Hibernate.initialize(currAsset.getAssetClass());
+                Hibernate.initialize(currStrategy.getAssetClass());
                 if (currAsset.getAssetClass().equals(currStrategy.getAssetClass())) {
-
+                    Logger.error(DailyTaskUpdate.class, "ciaoo");
                     /*
                     moneyForAsset = totalMoney*(assetClassStrategyPerc)*(assetDistributionPerc)
 
