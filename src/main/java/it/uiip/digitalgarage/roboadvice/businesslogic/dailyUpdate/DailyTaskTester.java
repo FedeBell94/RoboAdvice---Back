@@ -15,6 +15,6 @@ public class DailyTaskTester {
 
     @PostConstruct
     void executeTest(){
-        task.executeUpdateTask();
+        //task.executeUpdateTask();
     }
 }

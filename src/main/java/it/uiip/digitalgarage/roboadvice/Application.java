@@ -1,37 +1,26 @@
 package it.uiip.digitalgarage.roboadvice;
 
-import com.jimmoores.quandl.*;
-import it.uiip.digitalgarage.roboadvice.persistence.model.*;
-import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
+import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.IDailyTaskUpdate;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
+import it.uiip.digitalgarage.roboadvice.persistence.model.AssetClass;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetClassRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
-import it.uiip.digitalgarage.roboadvice.persistence.repository.DataRepository;
 import it.uiip.digitalgarage.roboadvice.utils.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.aspectj.EnableSpringConfigured;
-import org.threeten.bp.DateTimeUtils;
-import org.threeten.bp.LocalDate;
-
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import javax.annotation.PostConstruct;
-import java.math.BigDecimal;
-
 import java.io.FileReader;
 import java.io.Reader;
-import java.sql.Date;
-import java.util.ArrayList;
-import java.util.Calendar;
+import java.math.BigDecimal;
 import java.util.List;
 
-
+@EnableScheduling
 @SpringBootApplication
 public class Application {
 
@@ -42,22 +31,17 @@ public class Application {
     @Autowired
     private AssetClassRepository assetClassRepository;
 
+    @Autowired
+    private IDailyTaskUpdate task;
 
-//    @PostConstruct
-//    void func() {
-//        //  Asset a = assetRepository.findOne(1);
-//        //callDailyQuandl(a);
-//        // callQuandl(a,2016,5,3);
-//        /*Iterator it = assetRepository.findAll().iterator();
-//        while (it.hasNext()) {
-//            Asset a = (Asset) it.next();
-//
-//            callQuandl(a, 2012, 3, 2);
-//
-//
-//        }*/
-//    }
-
+    @Scheduled(cron = "0 0 10 * * *")
+    public void executeNightTask(){
+        Logger.debug(Application.class, "Night task started.");
+        Long startTime = System.currentTimeMillis();
+        task.executeUpdateTask();
+        Long endTime = System.currentTimeMillis();
+        Logger.debug(Application.class, "Night task ended -> execution time " + (endTime - startTime) + "ms. ");
+    }
 
     @PostConstruct
     public void initDatabaseDefaultValues() {
