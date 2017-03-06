@@ -71,15 +71,25 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
                 List<Strategy> userStrategy = strategyRepository.findByUserAndActiveTrue(currUser);
 
                 // Check if the user strategy was changed yesterday
-                if (userStrategy.get(0).getStartingDate().equals(yesterday)) {
+                if (userStrategy.get(0).getStartingDate().toString().equals(yesterday.toString())) {
                     // #4: compute portfolio for 'old' users which has changed the strategy (same as #2)
-
+                    BigDecimal userWorth = computeWorth(userPortfolio);
+                    createPortfolio(currUser, assets, userWorth, latestPrices);
                 } else {
 
                     // #3: update portfolio for 'old' users
                 }
             }
         }
+    }
+
+    private BigDecimal computeWorth(final Iterable<Portfolio> portfolios){
+        BigDecimal worth = new BigDecimal(0);
+        for(Portfolio currPortfolio : portfolios){
+            worth = worth.add(currPortfolio.getValue());
+
+        }
+        return worth;
     }
 
     /**
@@ -116,10 +126,15 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
 
     /**
      * Creates a new portfolio for the user passed for the strategy passed with the amount of money given.
-     * @param user The user owner of the portfolio
-     * @param assets The list of all assets
-     * @param totalMoney Amount of money to divide into the different assets
-     * @param latestPrices Map containing latest prices for each Asset (key = asset_id, value = last price)
+     *
+     * @param user
+     *         The user owner of the portfolio
+     * @param assets
+     *         The list of all assets
+     * @param totalMoney
+     *         Amount of money to divide into the different assets
+     * @param latestPrices
+     *         Map containing latest prices for each Asset (key = asset_id, value = last price)
      */
     private void createPortfolio(final User user, final Iterable<Asset> assets, final BigDecimal totalMoney,
                                  final Map<Integer, BigDecimal> latestPrices) {
