@@ -8,6 +8,7 @@ import it.uiip.digitalgarage.roboadvice.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Date;
@@ -159,5 +160,7 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
             }
         }
     }
+
+
 
 }
