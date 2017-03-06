@@ -1,13 +1,12 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate;
 
 import it.uiip.digitalgarage.roboadvice.businesslogic.economy.Buy;
-import it.uiip.digitalgarage.roboadvice.businesslogic.quandl.Quandl;
+import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.quandl.Quandl;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Data;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Portfolio;
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.*;
-import it.uiip.digitalgarage.roboadvice.utils.Logger;
 import it.uiip.digitalgarage.roboadvice.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +20,7 @@ import java.util.Map;
 
 
 @Service
+@SuppressWarnings("unused")
 public class DailyTaskUpdate implements IDailyTaskUpdate{
 
 
@@ -42,7 +42,6 @@ public class DailyTaskUpdate implements IDailyTaskUpdate{
 
     @Override
     public void executeUpdateTask() {
-        Logger.error(DailyTaskUpdate.class, "Lo eseguo");
 
         // Find all assets
         Iterable<Asset> assets = assetRepository.findAll();

@@ -34,7 +34,9 @@ public class Application {
     @Autowired
     private IDailyTaskUpdate task;
 
-    @Scheduled(cron = "0 0 10 * * *")
+    // Execution of night task
+    //@Scheduled(cron = "0 0 10 * * MON-FRI")
+    @Scheduled(cron = "*/1 * * * * MON-FRI")
     public void executeNightTask(){
         Logger.debug(Application.class, "Night task started.");
         Long startTime = System.currentTimeMillis();

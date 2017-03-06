@@ -1,17 +1,12 @@
-package it.uiip.digitalgarage.roboadvice.businesslogic.quandl;
+package it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.quandl;
 
 import com.jimmoores.quandl.*;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Data;
-import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.DataRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
-import org.springframework.stereotype.Service;
 import org.threeten.bp.DateTimeUtils;
 import org.threeten.bp.LocalDate;
 
-import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.ArrayList;
@@ -29,8 +24,8 @@ public class Quandl {
 //    public DataRepository dataRepository;
 
 
-
-    public ArrayList<Data> callQuandl(Asset asset, int startYear, int startMonth, int startDay, DataRepository dataRepository) {
+    public ArrayList<Data> callQuandl(Asset asset, int startYear, int startMonth, int startDay,
+                                      DataRepository dataRepository) {
 
         QuandlSession session = QuandlSession.create("ydS_4tVLnsPS_bxo3uvd");
         @SuppressWarnings("deprecation")
@@ -47,7 +42,8 @@ public class Quandl {
             LocalDate ldate = row.getLocalDate("Date");
             Double value = row.getDouble(/*asset.getQuandlKey() + " - " + asset.getQuandlColumn()*/1);
             if (value != null) {
-                Data d = Data.builder().date(DateTimeUtils.toSqlDate(ldate)).value(BigDecimal.valueOf(value)).asset(asset).build();
+                Data d = Data.builder().date(DateTimeUtils.toSqlDate(ldate)).value(BigDecimal.valueOf(value))
+                        .asset(asset).build();
                 res.add(d);
                 Data dop = dataRepository.findByAssetAndDate(asset, DateTimeUtils.toSqlDate(ldate));
                 if (dop == null) {
@@ -83,14 +79,17 @@ public class Quandl {
             }
         }*/
 
-        System.out.println("Asking info for date: " + ddate.toLocalDate().getYear() + " - " + ddate.toLocalDate().getMonthValue() + " - " + ddate.toLocalDate().getDayOfMonth());
+        System.out.println(
+                "Asking info for date: " + ddate.toLocalDate().getYear() + " - " + ddate.toLocalDate().getMonthValue() +
+                        " - " + ddate.toLocalDate().getDayOfMonth());
         @SuppressWarnings("deprecation")
         TabularResult tabularResultMulti = session.getDataSets(
                 MultiDataSetRequest.Builder.of(
                         QuandlCodeRequest.singleColumn(asset.getQuandlKey(), asset.getQuandlId())
                         //QuandlCodeRequest.allColumns("DOE/RWTC")
                 )
-                        .withStartDate(LocalDate.of(ddate.toLocalDate().getYear(), ddate.toLocalDate().getMonthValue(), ddate.toLocalDate().getDayOfMonth()))
+                        .withStartDate(LocalDate.of(ddate.toLocalDate().getYear(), ddate.toLocalDate().getMonthValue(),
+                                ddate.toLocalDate().getDayOfMonth()))
                         .build());
         System.out.println("Header definition: " + tabularResultMulti.getHeaderDefinition());
 
