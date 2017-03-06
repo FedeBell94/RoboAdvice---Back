@@ -4,6 +4,7 @@ import it.uiip.digitalgarage.roboadvice.persistence.model.*;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.*;
 import it.uiip.digitalgarage.roboadvice.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -11,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@RestController
 public class DailyTaskUpdate {
 
 
@@ -29,7 +31,18 @@ public class DailyTaskUpdate {
     @Autowired
     private UserRepository userRepository;
 
-    public void ExecuteUpdateTask() {
+//    private static DailyTaskUpdate instance = null;
+//
+//    private DailyTaskUpdate () {}
+//
+//    public static synchronized DailyTaskUpdate getInstance(){
+//        if(instance == null){
+//            instance = new DailyTaskUpdate();
+//        }
+//        return instance;
+//    }
+
+    public void executeUpdateTask() {
 
         // Find all assets
         final Iterable<Asset> assets = assetRepository.findAll();
