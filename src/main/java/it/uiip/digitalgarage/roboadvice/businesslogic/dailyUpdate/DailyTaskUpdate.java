@@ -40,10 +40,10 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
     @Override
     public void executeUpdateTask() {
 
-        // Find all assets
+        // Finds all assets
         final Iterable<Asset> assets = assetRepository.findAll();
 
-        // Find all users
+        // Finds all users
         final Iterable<User> users = userRepository.findAll();
 
         // For each asset find the latest price
@@ -63,12 +63,20 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
             // Case of brand new user
             if (userPortfolio.size() == 0) {
                 // #2: create portfolio for fresh(new) users
-                createPortfolio(currUser, assets, new BigDecimal(10000), latestPrices, today);
+                createPortfolio(currUser, assets, new BigDecimal(10000), latestPrices);
             } else {
 
-                // #3: update portfolio for 'old' users
+                // Finds the active strategy of the current user
+                List<Strategy> userStrategy = strategyRepository.findByUserAndActiveTrue(currUser);
 
-                // #4: compute portfolio for 'old[ users which has changes the strategy (same as #2)
+                // Check if the user strategy was changed yesterday
+                if (userStrategy.get(0).getStartingDate().equals(yesterday)) {
+                    // #4: compute portfolio for 'old' users which has changed the strategy (same as #2)
+
+                } else {
+
+                    // #3: update portfolio for 'old' users
+                }
             }
         }
     }
@@ -92,36 +100,52 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
         return latestPrices;
     }
 
-    private void updateQuanldData(Iterable<Asset> assets){
+    /**
+     * Update the asset data in the database with Quanld data
+     *
+     * @param assets
+     *         The assets to update.
+     */
+    private void updateQuanldData(Iterable<Asset> assets) {
         Quandl quandl = new Quandl();
         for (Asset asset : assets) {
-            quandl.callDailyQuandl(asset, dataRepository);
+            //quandl.callDailyQuandl(asset, dataRepository);
         }
     }
 
+    /**
+     * Creates a new portfolio for the user passed for the strategy passed with the amount of money given.
+     * @param user The user owner of the portfolio
+     * @param assets The list of all assets
+     * @param totalMoney Amount of money to divide into the different assets
+     * @param latestPrices Map containing latest prices for each Asset (key = asset_id, value = last price)
+     */
     private void createPortfolio(final User user, final Iterable<Asset> assets, final BigDecimal totalMoney,
-                                 final Map<Integer, BigDecimal> latestPrices, final Date currDate) {
-        // Retrieve the active strategy of the user
+                                 final Map<Integer, BigDecimal> latestPrices) {
+
+        final Date currDate = Utils.getToday();
+        // Finds the active strategy of the current user
         List<Strategy> userStrategy = strategyRepository.findByUserAndActiveTrue(user);
+
 
         for (Strategy currStrategy : userStrategy) {
             for (Asset currAsset : assets) {
                 if (currAsset.getAssetClass().equals(currStrategy.getAssetClass())) {
 
                     /*
-                    moneyForAsset = totalMoney*(assetClassStrategyPerc)*(assetDistributionPerc)
-
-                    moneyForAsset = totalMoney*(assetClassStrategy / 100)*(assetDistribution / 100)
-
-                    moneyForAsset = totalMoney*(assetClassStrategy * assetDistribution)/10000
+                     * moneyForAsset = totalMoney*(assetClassStrategyPerc)*(assetDistributionPerc)
+                     *
+                     * moneyForAsset = totalMoney*(assetClassStrategy / 100)*(assetDistribution / 100)
+                     *
+                     * moneyForAsset = totalMoney*(assetClassStrategy * assetDistribution)/10000
                      */
                     BigDecimal assetMoney = totalMoney.multiply(currStrategy.getPercentage())
                             .multiply(currAsset.getFixedPercentage()).divide(new BigDecimal(10000), 4);
 
                     BigDecimal latestAssetPrice = latestPrices.get(currAsset.getId());
-                    BigDecimal assetUnits = assetMoney.divide(latestAssetPrice,2, RoundingMode.HALF_UP);
+                    BigDecimal assetUnits = assetMoney.divide(latestAssetPrice, 2, RoundingMode.HALF_UP);
 
-                    Logger.error(DailyTaskUpdate.class, "" + assetMoney + " " + latestAssetPrice + " " + assetUnits);
+                    Logger.debug(DailyTaskUpdate.class, "" + assetMoney + " " + latestAssetPrice + " " + assetUnits);
 
                     portfolioRepository.save(Portfolio.builder()
                             .user(user)
