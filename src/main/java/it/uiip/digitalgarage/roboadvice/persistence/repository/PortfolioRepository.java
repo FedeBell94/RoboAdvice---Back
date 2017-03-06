@@ -4,13 +4,14 @@ import it.uiip.digitalgarage.roboadvice.persistence.model.Portfolio;
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-import java.util.ArrayList;
+import java.sql.Date;
+import java.util.List;
 
 /**
  * Created by feder on 01/03/2017.
  */
 public interface PortfolioRepository extends PagingAndSortingRepository<Portfolio, Integer> {
 
-    ArrayList<Portfolio> findByUserAndDate(User user, java.sql.Date date);
+    List<Portfolio> findByUserAndDate(User user, Date date);
 
 }

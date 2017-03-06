@@ -9,7 +9,6 @@ import lombok.*;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -18,10 +17,20 @@ import javax.persistence.Table;
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder @ToString
 public class AssetClass {
 
-	@Id
-	private int id;
+    @Id
+    private int id;
 
-	@Column(name = "name", nullable = false)
-	private String name;
+    @Column(name = "name", nullable = false)
+    private String name;
 
+
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof AssetClass) {
+            if (((AssetClass) other).getId() == this.id) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
