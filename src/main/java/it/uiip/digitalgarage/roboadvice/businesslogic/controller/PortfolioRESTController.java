@@ -23,7 +23,7 @@ import java.util.List;
 public class PortfolioRESTController extends AbstractController {
 
     @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/portfolio", method = RequestMethod.POST)
+    @RequestMapping(value = "/portfolio", method = RequestMethod.GET)
     public
     @ResponseBody
     AbstractResponse requestMyData(HttpServletRequest request) {
