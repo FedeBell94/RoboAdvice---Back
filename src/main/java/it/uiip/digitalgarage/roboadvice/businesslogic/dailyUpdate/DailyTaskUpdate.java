@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-// TODO: abstract the quandl data retrieving, multithread
+// TODO: multithreaded??
 
 @Service
 public class DailyTaskUpdate implements IDailyTaskUpdate {
@@ -78,14 +78,14 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
                 if (userStrategy.get(0).getStartingDate().toString().equals(yesterday.toString())) {
 
                     // #4: compute portfolio for 'old' users which has changed the strategy (same as #2)
-                    BigDecimal userWorth = computeWorth(userPortfolio);
+                    BigDecimal userWorth = computeWorth(userPortfolio, latestPrices);
                     createPortfolio(currUser, assets, userWorth, latestPrices);
                 } else {
                     // #3: update portfolio for 'old' users which didn't change the strategy yesterday
 
                     // Check if the user uses and auto-balancing strategy
                     if (currUser.isAutoBalancing()) {
-                        BigDecimal userWorth = computeWorth(userPortfolio);
+                        BigDecimal userWorth = computeWorth(userPortfolio, latestPrices);
                         createPortfolio(currUser, assets, userWorth, latestPrices);
                     } else {
                         updatePortfolio(userPortfolio, latestPrices);
@@ -103,14 +103,11 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
      *
      * @return The worth of the portfolio passed.
      */
-    private BigDecimal computeWorth(final List<Portfolio> portfolios) {
-
-        //TODO questo è il worth di ieri!! ricalcolalo tutto come somma dei value del portfolio per il valore dell'asset
-        // di oggi!!!!
-
+    private BigDecimal computeWorth(final List<Portfolio> portfolios, final Map<Integer, BigDecimal> latestPrices) {
         BigDecimal worth = new BigDecimal(0);
         for (Portfolio currPortfolio : portfolios) {
-            worth = worth.add(currPortfolio.getValue());
+            BigDecimal singleWorth = currPortfolio.getUnit().multiply(latestPrices.get(currPortfolio.getAsset().getId()));
+            worth = worth.add(singleWorth);
         }
         return worth;
     }
