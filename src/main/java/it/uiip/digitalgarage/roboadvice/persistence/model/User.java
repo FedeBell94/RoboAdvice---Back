@@ -31,4 +31,7 @@ public class User {
     @Column(name = "registration", nullable = false)
     private Date registration;
 
+    @Column(name = "autoBalancing", nullable = false, columnDefinition = "boolean default false")
+    private boolean autoBalancing;
+
 }

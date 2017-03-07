@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// TODO: abstract the quandl data retrieving, multithread
 
 @Service
 @SuppressWarnings("unused")
@@ -22,20 +23,24 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
 
 
     @Autowired
-    public StrategyRepository strategyRepository;
+    private StrategyRepository strategyRepository;
 
     @Autowired
-    public PortfolioRepository portfolioRepository;
+    private PortfolioRepository portfolioRepository;
 
     @Autowired
-    public AssetRepository assetRepository;
+    private AssetRepository assetRepository;
 
     @Autowired
-    public DataRepository dataRepository;
+    private DataRepository dataRepository;
 
     @Autowired
-    public UserRepository userRepository;
+    private UserRepository userRepository;
 
+    /**
+     * The default start worth of a user. It is set to 10000.
+     */
+    private static final BigDecimal DEFAULT_START_WORTH = new BigDecimal(10000);
 
     @Override
     public void executeUpdateTask() {
@@ -61,9 +66,9 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
             List<Portfolio> userPortfolio = portfolioRepository.findByUserAndDate(currUser, yesterday);
 
             // Case of brand new user
-            if (userPortfolio.size() == 0) {
+            if (userPortfolio.isEmpty()) {
                 // #2: create portfolio for fresh(new) users
-                createPortfolio(currUser, assets, new BigDecimal(10000), latestPrices);
+                createPortfolio(currUser, assets, DEFAULT_START_WORTH, latestPrices);
             } else {
 
                 // Finds the active strategy of the current user
@@ -71,22 +76,37 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
 
                 // Check if the user strategy was changed yesterday
                 if (userStrategy.get(0).getStartingDate().toString().equals(yesterday.toString())) {
+
                     // #4: compute portfolio for 'old' users which has changed the strategy (same as #2)
                     BigDecimal userWorth = computeWorth(userPortfolio);
                     createPortfolio(currUser, assets, userWorth, latestPrices);
                 } else {
+                    // #3: update portfolio for 'old' users which didn't change the strategy yesterday
 
-                    // #3: update portfolio for 'old' users
+                    // Check if the user uses and auto-balancing strategy
+                    if(currUser.isAutoBalancing()){
+                        BigDecimal userWorth = computeWorth(userPortfolio);
+                        createPortfolio(currUser, assets, userWorth, latestPrices);
+                    } else{
+                        // TODO
+                    }
                 }
             }
         }
     }
 
-    private BigDecimal computeWorth(final Iterable<Portfolio> portfolios){
+    /**
+     * Compute the entire worth of a portfolio.
+     *
+     * @param portfolios
+     *         The portfolio on which compute the total worth.
+     *
+     * @return The worth of the portfolio passed.
+     */
+    private BigDecimal computeWorth(final Iterable<Portfolio> portfolios) {
         BigDecimal worth = new BigDecimal(0);
-        for(Portfolio currPortfolio : portfolios){
+        for (Portfolio currPortfolio : portfolios) {
             worth = worth.add(currPortfolio.getValue());
-
         }
         return worth;
     }
@@ -119,7 +139,7 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
     private void updateQuanldData(Iterable<Asset> assets) {
         Quandl quandl = new Quandl();
         for (Asset asset : assets) {
-            //quandl.callDailyQuandl(asset, dataRepository);
+            quandl.callDailyQuandl(asset, dataRepository);
         }
     }
 
@@ -148,11 +168,11 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
                 if (currAsset.getAssetClass().equals(currStrategy.getAssetClass())) {
 
                     /*
-                     * moneyForAsset = totalMoney*(assetClassStrategyPerc)*(assetDistributionPerc)
+                     * assetMoney = totalMoney*(assetClassStrategyPerc)*(assetDistributionPerc)
                      *
-                     * moneyForAsset = totalMoney*(assetClassStrategy / 100)*(assetDistribution / 100)
+                     * assetMoney = totalMoney*(assetClassStrategy / 100)*(assetDistribution / 100)
                      *
-                     * moneyForAsset = totalMoney*(assetClassStrategy * assetDistribution)/10000
+                     * assetMoney = totalMoney*(assetClassStrategy * assetDistribution)/10000
                      */
                     BigDecimal assetMoney = totalMoney.multiply(currStrategy.getPercentage())
                             .multiply(currAsset.getFixedPercentage()).divide(new BigDecimal(10000), 4);
