@@ -30,12 +30,13 @@ public class PortfolioRESTController extends AbstractController {
 
         return super.executeSafeTask(request, (user) -> {
 
+//            List<Date> dl = portfolioRepository.findDate(user,ddate);
+//            List<BigDecimal> sl = portfolioRepository.findSum(user,ddate);
+
             Calendar cal = Calendar.getInstance();
             cal.add(Calendar.DATE, -91);
             Date ddate = new java.sql.Date(cal.getTimeInMillis());
-            List<Date> dl = portfolioRepository.findDate(user,ddate);
-            List<BigDecimal> sl = portfolioRepository.findSum(user,ddate);
-
+            List<Object[]> ol = portfolioRepository.findData(user, ddate);
             ArrayList<GraphsDTO> gdto = new ArrayList<>();
             gdto.add(GraphsDTO.builder().title("Bonds").valueField("column1").build());
             gdto.add(GraphsDTO.builder().title("Forex").valueField("column2").build());
@@ -43,18 +44,20 @@ public class PortfolioRESTController extends AbstractController {
             gdto.add(GraphsDTO.builder().title("Commodities").valueField("column4").build());
             ArrayList<DataDTO> ddto = new ArrayList<>();
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-            for(int i = 0 ; i< dl.size(); i = i+4){
+            for (int i = 0; i < ol.size(); i = i + 4) {
 
                 ddto.add(DataDTO.builder()
-                        .date(df.format(dl.get(i)))
-                        .column1(sl.get(i))
-                        .column2(sl.get(i+1))
-                        .column3(sl.get(i+2))
-                        .column4(sl.get(i+3))
+                        .date(df.format(ol.get(i)[1]))
+                        .column1((BigDecimal) ol.get(i)[0])
+                        .column2((BigDecimal) ol.get(i + 1)[0])
+                        .column3((BigDecimal) ol.get(i + 2)[0])
+                        .column4((BigDecimal) ol.get(i + 3)[0])
                         .build()
                 );
 
+
             }
+            System.out.println(PortfolioDTO.builder().graphs(gdto).data(ddto).build());
 
             return new SuccessResponse<>(PortfolioDTO.builder().graphs(gdto).data(ddto).build());
         });
