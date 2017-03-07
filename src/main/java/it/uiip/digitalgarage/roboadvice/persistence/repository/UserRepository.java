@@ -18,4 +18,9 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Modifying(clearAutomatically = true)
     @Query("UPDATE User u SET u.username = ?1 WHERE u.id = ?2")
     void setUserUsername(String username, Integer userId);
+
+    @Transactional
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE User u SET u.autoBalancing = ?1 WHERE u.id = ?2")
+    void updateUserAutoBalance(Boolean autoBalancing, Integer userId);
 }

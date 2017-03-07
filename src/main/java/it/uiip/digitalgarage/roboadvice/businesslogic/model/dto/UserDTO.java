@@ -16,9 +16,12 @@ public class UserDTO {
 
     private Date registration;
 
+    private boolean autoBalancing;
+
     public UserDTO(User user){
         this.email = user.getEmail();
         this.username = user.getUsername();
         this.registration = user.getRegistration();
+        this.autoBalancing = user.isAutoBalancing();
     }
 }

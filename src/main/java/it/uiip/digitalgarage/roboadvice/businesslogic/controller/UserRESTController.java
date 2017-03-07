@@ -131,7 +131,8 @@ public class UserRESTController extends AbstractController {
      */
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/updateUserUsername", method = RequestMethod.POST)
-    public @ResponseBody AbstractResponse updateUserUsername(@RequestBody UserDTO inputUser, HttpServletRequest request) {
+    public @ResponseBody AbstractResponse updateUserUsername(@RequestBody UserDTO inputUser,
+                                                             HttpServletRequest request) {
 
         return super.executeSafeTask(request, (user) -> {
             user.setUsername(inputUser.getUsername());
@@ -159,6 +160,52 @@ public class UserRESTController extends AbstractController {
 
         return super.executeSafeTask(request, (user) -> {
             Logger.debug(UserRESTController.class, "TellWhoAmI: " + user.getEmail());
+            return new SuccessResponse<>(new UserDTO(user));
+        });
+    }
+
+    /**
+     * Set the auto balance strategy for the current {@link User}
+     *
+     * @param request
+     *         The {@link HttpServletRequest} associated to the servlet.
+     *
+     * @return A {@link SuccessResponse} containing the {@link UserDTO} if everything has gone right, or an {@link
+     * ErrorResponse} containing the error code if something has gone wrong. Possible errors are: SECURITY_ERROR.
+     *
+     * @see ExchangeError
+     */
+    @CrossOrigin(origins = "*")
+    @RequestMapping(value = "/setAutoBalance", method = RequestMethod.POST)
+    public @ResponseBody AbstractResponse setAutoBalance(HttpServletRequest request) {
+
+        return super.executeSafeTask(request, (user) -> {
+            Logger.debug(UserRESTController.class, "Auto balance set for user: " + user.getEmail());
+            userRepository.updateUserAutoBalance(true, user.getId());
+            user.setAutoBalancing(true);
+            return new SuccessResponse<>(new UserDTO(user));
+        });
+    }
+
+    /**
+     * Remove the auto balance strategy for the current {@link User}
+     *
+     * @param request
+     *         The {@link HttpServletRequest} associated to the servlet.
+     *
+     * @return A {@link SuccessResponse} containing the {@link UserDTO} if everything has gone right, or an {@link
+     * ErrorResponse} containing the error code if something has gone wrong. Possible errors are: SECURITY_ERROR.
+     *
+     * @see ExchangeError
+     */
+    @CrossOrigin(origins = "*")
+    @RequestMapping(value = "/setAutoBalance", method = RequestMethod.DELETE)
+    public @ResponseBody AbstractResponse removeAutoBalance(HttpServletRequest request) {
+
+        return super.executeSafeTask(request, (user) -> {
+            Logger.debug(UserRESTController.class, "Auto balance removed for user: " + user.getEmail());
+            userRepository.updateUserAutoBalance(false, user.getId());
+            user.setAutoBalancing(false);
             return new SuccessResponse<>(new UserDTO(user));
         });
     }
