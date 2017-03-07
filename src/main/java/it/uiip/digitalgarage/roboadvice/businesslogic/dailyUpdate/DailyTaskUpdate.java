@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Date;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,15 +51,15 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
         // Finds all users
         final Iterable<User> users = userRepository.findAll();
 
-        // For each asset find the latest price
-        final Map<Integer, BigDecimal> latestPrices = findAssetsLatestPrice(assets);
-
         // Dates
         final Date today = Utils.getToday();
         final Date yesterday = Utils.getYesterday();
 
         // #1: update quandl data
         updateQuanldData(assets);
+
+        // For each asset find the latest price
+        final Map<Integer, BigDecimal> latestPrices = findAssetsLatestPrice(assets);
 
         for (User currUser : users) {
             // Find the portfolio of yesterday for the current user
@@ -105,6 +104,10 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
      * @return The worth of the portfolio passed.
      */
     private BigDecimal computeWorth(final Iterable<Portfolio> portfolios) {
+
+        //TODO questo è il worth di ieri!! ricalcolalo tutto come somma dei value del portfolio per il valore dell'asset
+        // di oggi!!!!
+
         BigDecimal worth = new BigDecimal(0);
         for (Portfolio currPortfolio : portfolios) {
             worth = worth.add(currPortfolio.getValue());
@@ -121,7 +124,7 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
      *         The latest assets prices.
      */
     private void updatePortfolio(final Iterable<Portfolio> portfolios, Map<Integer, BigDecimal> latestPrices) {
-        List<Asset> assetsList = new ArrayList<>();
+
 
         final Date currDate = Utils.getToday();
         for (Portfolio currPortfolio : portfolios) {
@@ -168,7 +171,7 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
     private void updateQuanldData(Iterable<Asset> assets) {
         Quandl quandl = new Quandl();
         for (Asset asset : assets) {
-            //quandl.callDailyQuandl(asset, dataRepository);
+            quandl.callDailyQuandl(asset, dataRepository);
         }
     }
 
@@ -207,7 +210,7 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
                             .multiply(currAsset.getFixedPercentage()).divide(new BigDecimal(10000), 4);
 
                     BigDecimal latestAssetPrice = latestPrices.get(currAsset.getId());
-                    BigDecimal assetUnits = assetMoney.divide(latestAssetPrice, 4, RoundingMode.HALF_UP);
+                    BigDecimal assetUnits = assetMoney.divide(latestAssetPrice, 8, RoundingMode.HALF_DOWN);
 
                     Logger.debug(DailyTaskUpdate.class, "" + assetMoney + " " + latestAssetPrice + " " + assetUnits);
 
@@ -223,6 +226,5 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
             }
         }
     }
-
 
 }

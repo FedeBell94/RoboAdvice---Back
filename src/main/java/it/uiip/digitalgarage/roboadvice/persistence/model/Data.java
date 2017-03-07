@@ -21,9 +21,6 @@ public class Data implements Serializable {
     @GeneratedValue
     private int id;
 
-    /*@Column(name = "assetId", nullable = false)
-    private int assetId;*/
-
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "asset_id")
     private Asset asset;

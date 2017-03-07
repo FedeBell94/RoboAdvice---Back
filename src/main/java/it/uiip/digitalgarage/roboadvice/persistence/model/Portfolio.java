@@ -10,7 +10,6 @@ import lombok.*;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.sql.Date;
 
 
@@ -35,7 +34,7 @@ public class Portfolio implements Serializable{
     @JoinColumn(name="asset_id")
     private Asset asset;
 
-    @Column(name = "unit", nullable = false, precision = 14, scale = 4)
+    @Column(name = "unit", nullable = false, precision = 18, scale = 8)
     private BigDecimal unit;
 
     @Column(name = "value", nullable = false, precision = 14, scale = 4)
