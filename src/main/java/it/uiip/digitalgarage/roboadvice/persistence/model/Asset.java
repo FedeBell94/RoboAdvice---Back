@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "Asset")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder @ToString
-public class Asset {
+public class Asset implements Serializable{
 
 	@Id
 	private int id;

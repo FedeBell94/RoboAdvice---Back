@@ -3,15 +3,14 @@ package it.uiip.digitalgarage.roboadvice.persistence.repository;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Strategy;
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.PagingAndSortingRepository;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
 
-public interface StrategyRepository  extends PagingAndSortingRepository<Strategy, Integer> {
+public interface StrategyRepository extends JpaRepository<Strategy, Integer> {
 
     List<Strategy> findByUserAndActiveTrue(User user);
 

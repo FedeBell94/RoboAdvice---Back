@@ -8,12 +8,13 @@ package it.uiip.digitalgarage.roboadvice.persistence.model;
 import lombok.*;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.sql.Date;
 
 @Entity
 @Table(name = "User")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder @ToString
-public class User {
+public class User implements Serializable {
 
     @Id
     @GeneratedValue

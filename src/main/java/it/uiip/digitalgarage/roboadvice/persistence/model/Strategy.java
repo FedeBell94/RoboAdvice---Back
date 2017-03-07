@@ -15,7 +15,7 @@ import java.sql.Date;
 @Entity
 @Table(name = "Strategy")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder @ToString
-public class Strategy {
+public class Strategy implements Serializable{
 
     @Id
     @GeneratedValue

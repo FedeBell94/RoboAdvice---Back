@@ -195,4 +195,6 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
         }
     }
 
+
+
 }
