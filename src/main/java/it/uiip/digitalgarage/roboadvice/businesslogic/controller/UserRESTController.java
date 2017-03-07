@@ -134,6 +134,7 @@ public class UserRESTController extends AbstractController {
     public @ResponseBody AbstractResponse updateUserUsername(@RequestBody UserDTO inputUser, HttpServletRequest request) {
 
         return super.executeSafeTask(request, (user) -> {
+            user.setUsername(inputUser.getUsername());
             userRepository.setUserUsername(inputUser.getUsername(), user.getId());
             Logger.debug(UserRESTController.class, "Updated user " + user.getEmail() + " username.");
             return new SuccessResponse<>(new UserDTO(user));
