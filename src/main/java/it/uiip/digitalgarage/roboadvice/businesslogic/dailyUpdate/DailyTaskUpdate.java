@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,11 +85,11 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
                     // #3: update portfolio for 'old' users which didn't change the strategy yesterday
 
                     // Check if the user uses and auto-balancing strategy
-                    if(currUser.isAutoBalancing()){
+                    if (currUser.isAutoBalancing()) {
                         BigDecimal userWorth = computeWorth(userPortfolio);
                         createPortfolio(currUser, assets, userWorth, latestPrices);
-                    } else{
-                        // TODO
+                    } else {
+                        updatePortfolio(userPortfolio, latestPrices);
                     }
                 }
             }
@@ -109,6 +110,34 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
             worth = worth.add(currPortfolio.getValue());
         }
         return worth;
+    }
+
+    /**
+     * Update the portfolio passed with the current data assets passed in lateste price.
+     *
+     * @param portfolios
+     *         The portfolio to update.
+     * @param latestPrices
+     *         The latest assets prices.
+     */
+    private void updatePortfolio(final Iterable<Portfolio> portfolios, Map<Integer, BigDecimal> latestPrices) {
+        List<Asset> assetsList = new ArrayList<>();
+
+        final Date currDate = Utils.getToday();
+        for (Portfolio currPortfolio : portfolios) {
+
+            BigDecimal currAssetPrice = latestPrices.get(currPortfolio.getAsset().getId());
+            BigDecimal assetMoney = currPortfolio.getUnit().multiply(currAssetPrice);
+
+            portfolioRepository.save(Portfolio.builder()
+                    .user(currPortfolio.getUser())
+                    .assetClass(currPortfolio.getAssetClass())
+                    .asset(currPortfolio.getAsset())
+                    .unit(currPortfolio.getUnit())
+                    .value(assetMoney)
+                    .date(currDate)
+                    .build());
+        }
     }
 
     /**
@@ -139,7 +168,7 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
     private void updateQuanldData(Iterable<Asset> assets) {
         Quandl quandl = new Quandl();
         for (Asset asset : assets) {
-            quandl.callDailyQuandl(asset, dataRepository);
+            //quandl.callDailyQuandl(asset, dataRepository);
         }
     }
 
@@ -194,7 +223,6 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
             }
         }
     }
-
 
 
 }
