@@ -207,7 +207,7 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
                             .multiply(currAsset.getFixedPercentage()).divide(new BigDecimal(10000), 4);
 
                     BigDecimal latestAssetPrice = latestPrices.get(currAsset.getId());
-                    BigDecimal assetUnits = assetMoney.divide(latestAssetPrice, 2, RoundingMode.HALF_UP);
+                    BigDecimal assetUnits = assetMoney.divide(latestAssetPrice, 4, RoundingMode.HALF_UP);
 
                     Logger.debug(DailyTaskUpdate.class, "" + assetMoney + " " + latestAssetPrice + " " + assetUnits);
 
