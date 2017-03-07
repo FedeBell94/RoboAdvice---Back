@@ -32,15 +32,15 @@ public class Application {
     private AssetClassRepository assetClassRepository;
 
     @Autowired
-    private IDailyTaskUpdate task;
+    private IDailyTaskUpdate dailyTask;
 
     // Execution of night task
-    @Scheduled(cron = "0 0 10 * * MON-FRI")
-    //@Scheduled(cron = "*/5 * * * * MON-FRI")
+    //@Scheduled(cron = "0 0 10 * * MON-FRI")
+    @Scheduled(cron = "*/5 * * * * MON-FRI")
     public void executeNightTask(){
         Logger.debug(Application.class, "Night task started.");
         Long startTime = System.currentTimeMillis();
-        task.executeUpdateTask();
+        dailyTask.executeUpdateTask();
         Long endTime = System.currentTimeMillis();
         Logger.debug(Application.class, "Night task ended -> execution time " + (endTime - startTime) + "ms. ");
     }
