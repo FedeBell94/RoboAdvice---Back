@@ -21,7 +21,7 @@ public class Data implements Serializable {
     @GeneratedValue
     private int id;
 
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "asset_id")
     private Asset asset;
 
@@ -30,5 +30,11 @@ public class Data implements Serializable {
 
     @Column(name = "value", nullable = false, precision = 14, scale = 4)
     private BigDecimal value;
+
+    @Override
+    public String toString() {
+        return "Data(id=" + this.id + ", assetId=" + this.asset.getId() + ", date=" + this.date.toLocalDate() +
+                ", value=" + value + ")";
+    }
 
 }

@@ -1,6 +1,6 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate;
 
-import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.quandl.Quandl;
+import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dataUpdater.IDataUpdater;
 import it.uiip.digitalgarage.roboadvice.persistence.model.*;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.*;
 import it.uiip.digitalgarage.roboadvice.utils.Logger;
@@ -17,10 +17,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-// TODO: abstract the quandl data retrieving, multithread
+// TODO: multithreaded??
 
 @Service
-@SuppressWarnings("unused")
 public class DailyTaskUpdate implements IDailyTaskUpdate {
 
 
@@ -39,6 +38,10 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
     @Autowired
     private UserRepository userRepository;
 
+    // Autowire with data updater
+    @Autowired
+    private IDataUpdater dataUpdater;
+
     /**
      * The default start worth of a user. It is set to 10000.
      */
@@ -47,22 +50,19 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
     @Override
     public void executeUpdateTask() {
 
-        // Finds all assets
-        final Iterable<Asset> assets = assetRepository.findAll();
-
-        // Finds all users
-        final Iterable<User> users = userRepository.findAll();
-
         // Dates
-        final Date today = Utils.getToday();
         final Date yesterday = Utils.getYesterday();
 
-        // #1: update quandl data
-        updateQuanldData(assets);
+        // #1: update data
+        dataUpdater.updateDailyData();
 
+        // Finds all assets
+        final List<Asset> assets = assetRepository.findAll();
         // For each asset find the latest price
         final Map<Integer, BigDecimal> latestPrices = findAssetsLatestPrice(assets);
 
+        // Finds all users
+        final Iterable<User> users = userRepository.findAll();
         for (User currUser : users) {
             // Find the portfolio of yesterday for the current user
             List<Portfolio> userPortfolio = portfolioRepository.findByUserAndDate(currUser, yesterday);
@@ -80,14 +80,14 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
                 if (userStrategy.get(0).getStartingDate().toString().equals(yesterday.toString())) {
 
                     // #4: compute portfolio for 'old' users which has changed the strategy (same as #2)
-                    BigDecimal userWorth = computeWorth(userPortfolio);
+                    BigDecimal userWorth = computeWorth(userPortfolio, latestPrices);
                     createPortfolio(currUser, assets, userWorth, latestPrices);
                 } else {
                     // #3: update portfolio for 'old' users which didn't change the strategy yesterday
 
                     // Check if the user uses and auto-balancing strategy
                     if (currUser.isAutoBalancing()) {
-                        BigDecimal userWorth = computeWorth(userPortfolio);
+                        BigDecimal userWorth = computeWorth(userPortfolio, latestPrices);
                         createPortfolio(currUser, assets, userWorth, latestPrices);
                     } else {
                         updatePortfolio(userPortfolio, latestPrices);
@@ -103,14 +103,11 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
      * @param portfolios The portfolio on which compute the total worth.
      * @return The worth of the portfolio passed.
      */
-    private BigDecimal computeWorth(final Iterable<Portfolio> portfolios) {
-
-        //TODO questo è il worth di ieri!! ricalcolalo tutto come somma dei value del portfolio per il valore dell'asset
-        // di oggi!!!!
-
+    private BigDecimal computeWorth(final List<Portfolio> portfolios, final Map<Integer, BigDecimal> latestPrices) {
         BigDecimal worth = new BigDecimal(0);
         for (Portfolio currPortfolio : portfolios) {
-            worth = worth.add(currPortfolio.getValue());
+            BigDecimal singleWorth = currPortfolio.getUnit().multiply(latestPrices.get(currPortfolio.getAsset().getId()));
+            worth = worth.add(singleWorth);
         }
         return worth;
     }
@@ -121,8 +118,7 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
      * @param portfolios   The portfolio to update.
      * @param latestPrices The latest assets prices.
      */
-    private void updatePortfolio(final Iterable<Portfolio> portfolios, Map<Integer, BigDecimal> latestPrices) {
-
+    private void updatePortfolio(final List<Portfolio> portfolios, Map<Integer, BigDecimal> latestPrices) {
 
         final Date currDate = Utils.getToday();
         for (Portfolio currPortfolio : portfolios) {
@@ -175,7 +171,7 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
      * @return A {@link Map} containing the {@link Asset} id for key, and the latest price found into the database as
      * value.
      */
-    private Map<Integer, BigDecimal> findAssetsLatestPrice(final Iterable<Asset> assets) {
+    private Map<Integer, BigDecimal> findAssetsLatestPrice(final List<Asset> assets) {
         Map<Integer, BigDecimal> latestPrices = new HashMap<>();
         for (Asset curr : assets) {
             Data data = dataRepository.findFirst1ByAssetOrderByDateDesc(curr);
@@ -214,17 +210,7 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
         return prices;
     }
 
-    /**
-     * Update the asset data in the database with Quanld data
-     *
-     * @param assets The assets to update.
-     */
-    private void updateQuanldData(Iterable<Asset> assets) {
-        Quandl quandl = new Quandl();
-        for (Asset asset : assets) {
-            quandl.callDailyQuandl(asset, dataRepository);
-        }
-    }
+
 
     /**
      * Creates a new portfolio for the user passed for the strategy passed with the amount of money given.
@@ -234,7 +220,7 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
      * @param totalMoney   Amount of money to divide into the different assets
      * @param latestPrices Map containing latest prices for each Asset (key = asset_id, value = last price)
      */
-    private void createPortfolio(final User user, final Iterable<Asset> assets, final BigDecimal totalMoney,
+    private void createPortfolio(final User user, final List<Asset> assets, final BigDecimal totalMoney,
                                  final Map<Integer, BigDecimal> latestPrices) {
 
         final Date currDate = Utils.getToday();
