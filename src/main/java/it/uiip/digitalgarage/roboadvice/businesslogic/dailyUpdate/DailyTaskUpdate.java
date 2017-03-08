@@ -8,9 +8,11 @@ import it.uiip.digitalgarage.roboadvice.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Date;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -98,9 +100,7 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
     /**
      * Compute the entire worth of a portfolio.
      *
-     * @param portfolios
-     *         The portfolio on which compute the total worth.
-     *
+     * @param portfolios The portfolio on which compute the total worth.
      * @return The worth of the portfolio passed.
      */
     private BigDecimal computeWorth(final Iterable<Portfolio> portfolios) {
@@ -118,10 +118,8 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
     /**
      * Update the portfolio passed with the current data assets passed in lateste price.
      *
-     * @param portfolios
-     *         The portfolio to update.
-     * @param latestPrices
-     *         The latest assets prices.
+     * @param portfolios   The portfolio to update.
+     * @param latestPrices The latest assets prices.
      */
     private void updatePortfolio(final Iterable<Portfolio> portfolios, Map<Integer, BigDecimal> latestPrices) {
 
@@ -144,12 +142,36 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
     }
 
     /**
+     * Update the portfolio passed with the simulated data.
+     *
+     * @param portfolios   The portfolio to update.
+     * @param latestPrices The latest assets prices.
+     * @param currDate     The simulation date.
+     */
+    private void updateSimulatedPortfolio(final Iterable<Portfolio> portfolios, Map<Integer, BigDecimal> latestPrices, Date currDate) {
+
+        for (Portfolio currPortfolio : portfolios) {
+
+            BigDecimal currAssetPrice = latestPrices.get(currPortfolio.getAsset().getId());
+            BigDecimal assetMoney = currPortfolio.getUnit().multiply(currAssetPrice);
+
+            portfolioRepository.save(Portfolio.builder()
+                    .user(currPortfolio.getUser())
+                    .assetClass(currPortfolio.getAssetClass())
+                    .asset(currPortfolio.getAsset())
+                    .unit(currPortfolio.getUnit())
+                    .value(assetMoney)
+                    .date(currDate)
+                    .build());
+        }
+    }
+
+
+    /**
      * Finds the latest price for each asset. Used to evaluate the first portfolio for a user and when a strategy
      * changes.
      *
-     * @param assets
-     *         Assets to find.
-     *
+     * @param assets Assets to find.
      * @return A {@link Map} containing the {@link Asset} id for key, and the latest price found into the database as
      * value.
      */
@@ -163,10 +185,39 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
     }
 
     /**
+     * Finds the price for each asset at a defined date.
+     *
+     * @param assets Assets to find.
+     * @param day    The date of interest.
+     * @return A {@link Map} containing the {@link Asset} id for key, and the price found in database as value.
+     */
+    private Map<Integer, BigDecimal> findAssetsPriceByDate(final Iterable<Asset> assets, Calendar day) {
+
+        Map<Integer, BigDecimal> prices = new HashMap<>();
+        Date date = new java.sql.Date(day.getTimeInMillis());
+        for (Asset curr : assets) {
+            Data data = dataRepository.findByAssetAndDate(curr, date);
+            if (data != null) {
+                prices.put(data.getAsset().getId(), data.getValue());
+            } else {
+                int count = 0;
+                while (data == null) {
+                    count++;
+                    day.add(Calendar.DATE, -1);
+                    date = new java.sql.Date(day.getTimeInMillis());
+                    data = dataRepository.findByAssetAndDate(curr, date);
+                }
+                day.add(Calendar.DATE, +count);
+                prices.put(data.getAsset().getId(), data.getValue());
+            }
+        }
+        return prices;
+    }
+
+    /**
      * Update the asset data in the database with Quanld data
      *
-     * @param assets
-     *         The assets to update.
+     * @param assets The assets to update.
      */
     private void updateQuanldData(Iterable<Asset> assets) {
         Quandl quandl = new Quandl();
@@ -178,14 +229,10 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
     /**
      * Creates a new portfolio for the user passed for the strategy passed with the amount of money given.
      *
-     * @param user
-     *         The user owner of the portfolio
-     * @param assets
-     *         The list of all assets
-     * @param totalMoney
-     *         Amount of money to divide into the different assets
-     * @param latestPrices
-     *         Map containing latest prices for each Asset (key = asset_id, value = last price)
+     * @param user         The user owner of the portfolio
+     * @param assets       The list of all assets
+     * @param totalMoney   Amount of money to divide into the different assets
+     * @param latestPrices Map containing latest prices for each Asset (key = asset_id, value = last price)
      */
     private void createPortfolio(final User user, final Iterable<Asset> assets, final BigDecimal totalMoney,
                                  final Map<Integer, BigDecimal> latestPrices) {
@@ -226,5 +273,88 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
             }
         }
     }
+
+    /**
+     * Creates a new portfolio for the user passed for the strategy passed with the amount of money given in the given
+     * date.
+     *
+     * @param user         The user owner of the portfolio
+     * @param assets       The list of all assets
+     * @param totalMoney   Amount of money to divide into the different assets
+     * @param latestPrices Map containing latest prices for each Asset (key = asset_id, value = last price)
+     * @param currDate     The date of the simulated portfolio
+     */
+    private void createPortfolioInDate(final User user, final Iterable<Asset> assets, final BigDecimal totalMoney,
+                                       final Map<Integer, BigDecimal> latestPrices, Date currDate) {
+
+        List<Strategy> userStrategy = strategyRepository.findByUserAndActiveTrue(user);
+
+        for (Strategy currStrategy : userStrategy) {
+            for (Asset currAsset : assets) {
+                if (currAsset.getAssetClass().equals(currStrategy.getAssetClass())) {
+
+                    BigDecimal assetMoney = totalMoney.multiply(currStrategy.getPercentage())
+                            .multiply(currAsset.getFixedPercentage()).divide(new BigDecimal(10000), 4);
+
+                    BigDecimal latestAssetPrice = latestPrices.get(currAsset.getId());
+                    BigDecimal assetUnits = assetMoney.divide(latestAssetPrice, 8, RoundingMode.HALF_DOWN);
+
+                    Logger.debug(DailyTaskUpdate.class, "" + assetMoney + " " + latestAssetPrice + " " + assetUnits);
+
+                    portfolioRepository.save(Portfolio.builder()
+                            .user(user)
+                            .assetClass(currAsset.getAssetClass())
+                            .asset(currAsset)
+                            .unit(assetUnits)
+                            .value(assetMoney)
+                            .date(currDate)
+                            .build());
+                }
+            }
+        }
+    }
+
+    public void SimulateHistory(int daysOfHistory) {
+
+        final Iterable<Asset> assets = assetRepository.findAll();
+
+        final Iterable<User> users = userRepository.findAll();
+
+        final Date today = Utils.getToday();
+
+        for (User currUser : users) {
+
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.DATE, -daysOfHistory);
+            Date day = new java.sql.Date(cal.getTimeInMillis());
+            int dayCount = 1;
+
+            while (dayCount < daysOfHistory) {
+                System.out.println("curr date: " + day.toLocalDate().toString());
+                final Map<Integer, BigDecimal> prices = findAssetsPriceByDate(assets, cal);
+                cal.add(Calendar.DATE, -1);
+                day = new java.sql.Date(cal.getTimeInMillis());
+
+                List<Portfolio> userPortfolio = portfolioRepository.findFirst13ByUserOrderByDateDesc(currUser);
+
+                if (userPortfolio.isEmpty()) {
+
+                    createPortfolioInDate(currUser, assets, DEFAULT_START_WORTH, prices, day);
+                } else {
+                    updateSimulatedPortfolio(userPortfolio, prices,day);
+
+                }
+                cal.add(Calendar.DATE, +2);
+                day = new java.sql.Date(cal.getTimeInMillis());
+                dayCount++;
+            }
+
+        }
+    }
+
+//    @PostConstruct
+//    public void func() {
+//        SimulateHistory(100);
+//    }
 
 }
