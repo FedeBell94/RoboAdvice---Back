@@ -38,4 +38,5 @@ public class Asset implements Serializable{
 	@Column(name = "fixedPercentage", nullable = false)
 	private BigDecimal fixedPercentage;
 
+
 }
