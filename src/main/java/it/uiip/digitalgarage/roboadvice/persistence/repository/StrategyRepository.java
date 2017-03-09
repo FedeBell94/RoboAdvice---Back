@@ -14,6 +14,8 @@ public interface StrategyRepository extends JpaRepository<Strategy, Integer> {
 
     List<Strategy> findByUserAndActiveTrue(User user);
 
+    List<Strategy> findByUser(User user);
+
     @Transactional
     @Modifying(clearAutomatically = true)
     @Query("UPDATE Strategy s SET s.active = false WHERE s.id = ?1")

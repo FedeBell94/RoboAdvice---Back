@@ -5,7 +5,9 @@ import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractRes
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.ErrorResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.ExchangeError;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
+import it.uiip.digitalgarage.roboadvice.persistence.model.Strategy;
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
+import it.uiip.digitalgarage.roboadvice.persistence.repository.StrategyRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
 import it.uiip.digitalgarage.roboadvice.utils.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.Date;
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * Class used to create all the API rest used to manage the {@link User}.
@@ -30,6 +33,10 @@ public class UserRESTController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private StrategyRepository strategyRepository;
+
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -83,5 +90,16 @@ public class UserRESTController {
         User user = userRepository.findByUsername(authentication.getName());
         Logger.debug(UserRESTController.class, "TellWhoAmI: " + user.getUsername());
         return new SuccessResponse<>(new UserDTO(user));
+    }
+
+    @CrossOrigin(origins = "*")
+    @RequestMapping(value = "/isUserNew", method = RequestMethod.GET)
+    public @ResponseBody AbstractResponse isUserNew(Authentication authentication) {
+        User user = userRepository.findByUsername(authentication.getName());
+        List<Strategy> strategyList = strategyRepository.findByUser(user);
+        if(strategyList.isEmpty()){
+            return new SuccessResponse<>(true);
+        }
+        return new SuccessResponse<>(false);
     }
 }
