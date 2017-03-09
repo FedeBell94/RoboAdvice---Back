@@ -36,7 +36,7 @@ public class AbstractController {
         Integer userId = AuthProvider.getInstance().checkUserToken(userToken);
         if(userToken == null || userId == null){
             Logger.debug(StrategyRESTController.class, "Request made with wrong user token.");
-            return new ErrorResponse(ExchangeError.SECURITY_ERROR);
+            return new ErrorResponse(ExchangeError.DEFAULT_ERROR_CODE);
         }
 
         User currUser = userRepository.findOne(userId);

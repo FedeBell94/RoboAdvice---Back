@@ -8,7 +8,6 @@ import java.sql.Date;
 @Getter @Setter @AllArgsConstructor @NoArgsConstructor @Builder @ToString
 public class UserDTO {
 
-
     private String username;
 
     private String password;
