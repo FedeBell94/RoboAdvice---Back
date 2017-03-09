@@ -34,7 +34,7 @@ public class Portfolio implements Serializable{
     @JoinColumn(name="asset_id")
     private Asset asset;
 
-    @Column(name = "unit", nullable = false, precision = 18, scale = 8)
+    @Column(name = "unit", nullable = false, precision = 14, scale = 4)
     private BigDecimal unit;
 
     @Column(name = "value", nullable = false, precision = 14, scale = 4)
