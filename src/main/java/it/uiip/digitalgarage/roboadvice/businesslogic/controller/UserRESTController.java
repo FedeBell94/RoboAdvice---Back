@@ -25,6 +25,7 @@ import java.util.Calendar;
  * Class used to create all the API rest used to manage the {@link User}.
  */
 @RestController
+@RequestMapping(value = "securedApi")
 public class UserRESTController {
 
     @Autowired
@@ -34,7 +35,7 @@ public class UserRESTController {
 
 
     @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/securedApi/registerUser", method = RequestMethod.POST)
+    @RequestMapping(value = "/registerUser", method = RequestMethod.POST)
     public @ResponseBody AbstractResponse registerUser(@RequestBody UserDTO inputUser) {
 
         final String hashPassword = passwordEncoder.encode(inputUser.getPassword());
@@ -60,21 +61,24 @@ public class UserRESTController {
     }
 
     @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/securedApi/loginUser", method = RequestMethod.POST)
+    @RequestMapping(value = "/loginUser", method = RequestMethod.POST)
     public @ResponseBody AbstractResponse loginUser(Authentication authentication) {
         User user = userRepository.findByUsername(authentication.getName());
+        Logger.debug(UserRESTController.class, "User " + user.getUsername() + " just logged in.");
         return new SuccessResponse<>(new UserDTO(user));
     }
 
     @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/securedApi/logoutUser", method = RequestMethod.POST)
-    public void logoutUser(Authentication authentication, HttpServletRequest request, HttpServletResponse response) {
+    @RequestMapping(value = "/logoutUser", method = RequestMethod.POST)
+    public @ResponseBody AbstractResponse logoutUser(Authentication authentication, HttpServletRequest request, HttpServletResponse response) {
+        Logger.debug(UserRESTController.class, "User " + authentication.getName() + " just logged out.");
         new SecurityContextLogoutHandler().logout(request, response, authentication);
         SecurityContextHolder.getContext().setAuthentication(null);
+        return new SuccessResponse<>(null);
     }
 
     @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/securedApi/tellMeWhoAmI", method = RequestMethod.GET)
+    @RequestMapping(value = "/tellMeWhoAmI", method = RequestMethod.GET)
     public @ResponseBody AbstractResponse tellMeWhoAmI(Authentication authentication) {
         User user = userRepository.findByUsername(authentication.getName());
         Logger.debug(UserRESTController.class, "TellWhoAmI: " + user.getUsername());
