@@ -23,7 +23,9 @@ public class QuandlDataSource implements IDataSource {
         TabularResult tabularResultMulti = session.getDataSets(
                 MultiDataSetRequest
                         .Builder
-                        .of(QuandlCodeRequest.singleColumn(asset.getQuandlKey(), asset.getQuandlId()))
+                        .of(QuandlCodeRequest.singleColumn(
+                                asset.getQuandlKey(),
+                                asset.getQuandlId()))
                         .withStartDate(LocalDate.of(date.toLocalDate().getYear(), date.toLocalDate().getMonthValue(),
                                 date.toLocalDate().getDayOfMonth()))
                         .build()

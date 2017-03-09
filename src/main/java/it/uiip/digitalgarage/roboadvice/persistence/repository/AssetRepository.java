@@ -12,5 +12,7 @@ import java.util.ArrayList;
  */
 public interface AssetRepository extends JpaRepository<Asset, Integer> {
 
+    Asset findById (int id);
+
     ArrayList<Asset> findByAssetClass(AssetClass assetClass);
 }
