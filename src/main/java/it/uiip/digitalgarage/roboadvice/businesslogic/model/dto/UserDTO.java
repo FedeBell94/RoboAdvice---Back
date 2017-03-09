@@ -8,19 +8,19 @@ import java.sql.Date;
 @Getter @Setter @AllArgsConstructor @NoArgsConstructor @Builder @ToString
 public class UserDTO {
 
-    private String email;
+    private String username;
 
     private String password;
 
-    private String username;
+    private String nickname;
 
     private Date registration;
 
     private boolean autoBalancing;
 
     public UserDTO(User user){
-        this.email = user.getEmail();
         this.username = user.getUsername();
+        this.nickname = user.getNickname();
         this.registration = user.getRegistration();
         this.autoBalancing = user.isAutoBalancing();
     }

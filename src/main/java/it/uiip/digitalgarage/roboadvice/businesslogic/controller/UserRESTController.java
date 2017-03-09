@@ -6,48 +6,48 @@ import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.ErrorRespon
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.ExchangeError;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
-import it.uiip.digitalgarage.roboadvice.utils.AuthProvider;
+import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
 import it.uiip.digitalgarage.roboadvice.utils.Logger;
-import it.uiip.digitalgarage.roboadvice.utils.PasswordAuthentication;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.sql.Date;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Class used to create all the API rest used to manage the {@link User}.
  */
 @RestController
-@SuppressWarnings("unused")
-public class UserRESTController extends AbstractController {
+@RequestMapping(value = "securedApi")
+public class UserRESTController {
 
-    private final PasswordAuthentication passwordAuth = new PasswordAuthentication(16);
-    private final AuthProvider authProvider = AuthProvider.getInstance();
+    @Autowired
+    private UserRepository userRepository;
 
-    /**
-     * This method register a new {@link User} on the system.
-     *
-     * @param inputUser
-     *         The {@link User} to store.
-     *
-     * @return A {@link SuccessResponse} containing the {@link UserDTO} just registered if everything has gone right, or
-     * an {@link ErrorResponse} containing the error code if something has gone wrong. Possible errors are:
-     * EMAIL_ALREADY_USED.
-     *
-     * @see ExchangeError
-     */
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/registerUser", method = RequestMethod.POST)
     public @ResponseBody AbstractResponse registerUser(@RequestBody UserDTO inputUser) {
 
-        final String hashPassword = passwordAuth.hash(inputUser.getPassword().toCharArray());
+        final String hashPassword = passwordEncoder.encode(inputUser.getPassword());
 
-        final User user = User.builder().email(inputUser.getEmail()).password(hashPassword)
-                .registration(new Date(Calendar.getInstance().getTime().getTime())).build();
+        final User user = User.builder()
+                .username(inputUser.getUsername())
+                .password(hashPassword)
+                .nickname(inputUser.getNickname())
+                .registration(new Date(Calendar.getInstance().getTime().getTime()))
+                .enabled(true)
+                .autoBalancing(false)
+                .build();
 
         try {
             userRepository.save(user);
@@ -56,157 +56,32 @@ public class UserRESTController extends AbstractController {
             return new ErrorResponse(ExchangeError.EMAIL_ALREADY_USED);
         }
 
-        Logger.debug(UserRESTController.class, "User " + inputUser.getEmail() + " registered successfully");
+        Logger.debug(UserRESTController.class, "User " + inputUser.getUsername() + " registered successfully");
         return new SuccessResponse<>(new UserDTO(user));
     }
 
-    /**
-     * This method perform the login of an user in the system.
-     *
-     * @param inputUser
-     *         The {@link UserDTO} to log-in.
-     *
-     * @return A {@link SuccessResponse} containing the user token and the {@link UserDTO} just logged if everything has
-     * gone right, or an {@link ErrorResponse} containing the error code if something has gone wrong. Possible errors
-     * are: WRONG_PASSWORD, WRONG_EMAIL.
-     *
-     * @see ExchangeError
-     */
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/loginUser", method = RequestMethod.POST)
-    public @ResponseBody AbstractResponse loginUser(@RequestBody UserDTO inputUser) {
-
-        User user = userRepository.findByEmail(inputUser.getEmail());
-        if (user != null) {
-            if (passwordAuth.authenticate(inputUser.getPassword().toCharArray(), user.getPassword())) {
-                // Set the user just registered in the authentication provider
-                String userToken = authProvider.bindUserToken(user);
-                Logger.debug(UserRESTController.class, "User " + user.getEmail() + " just logged in.");
-                Map<String, Object> responseData = new HashMap<>();
-                responseData.put("userToken", userToken);
-                responseData.put("user", new UserDTO(user));
-                return new SuccessResponse<>(responseData);
-            }
-            Logger.debug(UserRESTController.class, "User " + user.getEmail() + " tried to log in with wrong password.");
-            return new ErrorResponse(ExchangeError.WRONG_PASSWORD);
-        }
-        Logger.debug(UserRESTController.class, "Login: mail " + inputUser.getEmail() + " not found.");
-        return new ErrorResponse(ExchangeError.WRONG_EMAIL);
+    public @ResponseBody AbstractResponse loginUser(Authentication authentication) {
+        User user = userRepository.findByUsername(authentication.getName());
+        Logger.debug(UserRESTController.class, "User " + user.getUsername() + " just logged in.");
+        return new SuccessResponse<>(new UserDTO(user));
     }
 
-    /**
-     * This method perform the log-out of the user in the system.
-     *
-     * @param request
-     *         The {@link HttpServletRequest} associated to the servlet.
-     *
-     * @return An empty {@link SuccessResponse} if everything has gone right, or an {@link ErrorResponse} containing the
-     * error code if something has gone wrong. Possible errors are: SECURITY_ERROR.
-     *
-     * @see ExchangeError
-     */
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/logoutUser", method = RequestMethod.POST)
-    public @ResponseBody AbstractResponse logoutUser(HttpServletRequest request) {
-        return super.executeSafeTask(request, (user) -> {
-            authProvider.removeUserToken(user);
-            Logger.debug(UserRESTController.class, "Log out of user: " + user.getEmail());
-            return new SuccessResponse<>(null);
-        });
+    public @ResponseBody AbstractResponse logoutUser(Authentication authentication, HttpServletRequest request, HttpServletResponse response) {
+        Logger.debug(UserRESTController.class, "User " + authentication.getName() + " just logged out.");
+        new SecurityContextLogoutHandler().logout(request, response, authentication);
+        SecurityContextHolder.getContext().setAuthentication(null);
+        return new SuccessResponse<>(null);
     }
 
-    /**
-     * This method update/change the username of an {@link User}.
-     *
-     * @param inputUser
-     *         The {@link UserDTO} to use to change the {@link User} username.
-     * @param request
-     *         The {@link HttpServletRequest} associated to the servlet.
-     *
-     * @return A {@link SuccessResponse} containing the {@link UserDTO} just updated if everything has gone right, or an
-     * {@link ErrorResponse} containing the error code if something has gone wrong. Possible errors are:
-     * SECURITY_ERROR.
-     *
-     * @see ExchangeError
-     */
-    @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/updateUserUsername", method = RequestMethod.POST)
-    public @ResponseBody AbstractResponse updateUserUsername(@RequestBody UserDTO inputUser,
-                                                             HttpServletRequest request) {
-
-        return super.executeSafeTask(request, (user) -> {
-            user.setUsername(inputUser.getUsername());
-            userRepository.setUserUsername(inputUser.getUsername(), user.getId());
-            Logger.debug(UserRESTController.class, "Updated user " + user.getEmail() + " username.");
-            return new SuccessResponse<>(new UserDTO(user));
-        });
-    }
-
-    /**
-     * This method returns the current {@link UserDTO} associated with the User-Token in the request.
-     *
-     * @param request
-     *         The {@link HttpServletRequest} associated to the servlet.
-     *
-     * @return A {@link SuccessResponse} containing the {@link UserDTO} wanted if everything has gone right, or an
-     * {@link ErrorResponse} containing the error code if something has gone wrong. Possible errors are:
-     * SECURITY_ERROR.
-     *
-     * @see ExchangeError
-     */
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/tellMeWhoAmI", method = RequestMethod.GET)
-    public @ResponseBody AbstractResponse tellMeWhoAmI(HttpServletRequest request) {
-
-        return super.executeSafeTask(request, (user) -> {
-            Logger.debug(UserRESTController.class, "TellWhoAmI: " + user.getEmail());
-            return new SuccessResponse<>(new UserDTO(user));
-        });
-    }
-
-    /**
-     * Set the auto balance strategy for the current {@link User}
-     *
-     * @param request
-     *         The {@link HttpServletRequest} associated to the servlet.
-     *
-     * @return A {@link SuccessResponse} containing the {@link UserDTO} if everything has gone right, or an {@link
-     * ErrorResponse} containing the error code if something has gone wrong. Possible errors are: SECURITY_ERROR.
-     *
-     * @see ExchangeError
-     */
-    @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/setAutoBalance", method = RequestMethod.POST)
-    public @ResponseBody AbstractResponse setAutoBalance(HttpServletRequest request) {
-
-        return super.executeSafeTask(request, (user) -> {
-            Logger.debug(UserRESTController.class, "Auto balance set for user: " + user.getEmail());
-            userRepository.updateUserAutoBalance(true, user.getId());
-            user.setAutoBalancing(true);
-            return new SuccessResponse<>(new UserDTO(user));
-        });
-    }
-
-    /**
-     * Remove the auto balance strategy for the current {@link User}
-     *
-     * @param request
-     *         The {@link HttpServletRequest} associated to the servlet.
-     *
-     * @return A {@link SuccessResponse} containing the {@link UserDTO} if everything has gone right, or an {@link
-     * ErrorResponse} containing the error code if something has gone wrong. Possible errors are: SECURITY_ERROR.
-     *
-     * @see ExchangeError
-     */
-    @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/setAutoBalance", method = RequestMethod.DELETE)
-    public @ResponseBody AbstractResponse removeAutoBalance(HttpServletRequest request) {
-
-        return super.executeSafeTask(request, (user) -> {
-            Logger.debug(UserRESTController.class, "Auto balance removed for user: " + user.getEmail());
-            userRepository.updateUserAutoBalance(false, user.getId());
-            user.setAutoBalancing(false);
-            return new SuccessResponse<>(new UserDTO(user));
-        });
+    public @ResponseBody AbstractResponse tellMeWhoAmI(Authentication authentication) {
+        User user = userRepository.findByUsername(authentication.getName());
+        Logger.debug(UserRESTController.class, "TellWhoAmI: " + user.getUsername());
+        return new SuccessResponse<>(new UserDTO(user));
     }
 }

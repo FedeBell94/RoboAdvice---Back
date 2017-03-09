@@ -20,19 +20,30 @@ public class User implements Serializable {
     @GeneratedValue
     private int id;
 
-    @Column(name = "email", nullable = false, unique = true)
-    private String email;
+    @Column(name = "username", nullable = false, unique = true)
+    private String username;
 
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "username")
-    private String username;
+    @Column(name = "nickname")
+    private String nickname;
+
+    @Column(name = "enabled", nullable = false)
+    private boolean enabled;
 
     @Column(name = "registration", nullable = false)
     private Date registration;
 
-    @Column(name = "autoBalancing", nullable = false, columnDefinition = "boolean default false")
+    @Column(name = "autoBalancing", nullable = false)
     private boolean autoBalancing;
 
+    public User(User user){
+        this.id = user.getId();
+        this.password = user.getPassword();
+        this.username = user.getUsername();
+        this.enabled = user.isEnabled();
+        this.registration = user.getRegistration();
+        this.autoBalancing = user.isAutoBalancing();
+    }
 }

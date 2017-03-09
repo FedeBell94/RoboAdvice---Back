@@ -14,10 +14,10 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "Asset")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder @ToString
-public class Asset implements Serializable{
+public class Asset implements Serializable {
 
-	@Id
-	private int id;
+    @Id
+    private int id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "asset_class_id")
@@ -32,11 +32,11 @@ public class Asset implements Serializable{
     @Column(name = "quandlId", nullable = false)
     private int quandlId;
 
-	@Column(name = "quandlColumn", nullable = false)
-	private String quandlColumn;
+    @Column(name = "quandlColumn", nullable = false)
+    private String quandlColumn;
 
-	@Column(name = "fixedPercentage", nullable = false)
-	private BigDecimal fixedPercentage;
+    @Column(name = "fixedPercentage", nullable = false)
+    private BigDecimal fixedPercentage;
 
 
 }
