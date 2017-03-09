@@ -44,12 +44,11 @@ public class UserTests {
 
         AssertAnnotations.assertField(User.class, "id", Id.class, GeneratedValue.class);
 
-        AssertAnnotations.assertField(User.class, "email", Column.class);
+        AssertAnnotations.assertField(User.class, "username", Column.class);
 
         AssertAnnotations.assertField(User.class, "password", Column.class);
-        ;
 
-        AssertAnnotations.assertField(User.class, "username", Column.class);
+        AssertAnnotations.assertField(User.class, "nickname", Column.class);
 
         AssertAnnotations.assertField(User.class, "registration", Column.class);
 
@@ -64,11 +63,11 @@ public class UserTests {
 
         AssertAnnotations.assertMethod(User.class, "getId");
 
-        AssertAnnotations.assertMethod(User.class, "getEmail");
+        AssertAnnotations.assertMethod(User.class, "getUsername");
 
         AssertAnnotations.assertMethod(User.class, "getPassword");
 
-        AssertAnnotations.assertMethod(User.class, "getUsername");
+        AssertAnnotations.assertMethod(User.class, "getNickname");
 
         AssertAnnotations.assertMethod(User.class, "getRegistration");
 
