@@ -1,6 +1,5 @@
 package it.uiip.digitalgarage.roboadvice.tests;
 
-import it.uiip.digitalgarage.roboadvice.persistence.model.Strategy;
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
 import org.junit.Assert;
 import org.junit.Test;
