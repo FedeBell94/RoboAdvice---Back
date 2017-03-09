@@ -30,6 +30,14 @@
         </dependency>
 
 
+        <!-- Dependencies for Spring Security -->
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+
         <!-- Dependencies for Spring Data JPA -->
 
         <dependency>
