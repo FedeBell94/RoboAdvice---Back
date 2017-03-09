@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -20,13 +21,15 @@ public class AuthProvider implements AuthenticationProvider {
     @Autowired
     UserRepository userRepository;
 
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        Iterable<User> userList = userRepository.findAll();
+        Iterable<User> userList = userRepository.findAll(); // TODO migliora!!!
 
         for(User curr: userList){
             if(curr.getUsername().equals(authentication.getName())){
-                if(curr.getPassword().equals(authentication.getCredentials().toString())){
+                if(passwordEncoder.matches(authentication.getCredentials().toString(), curr.getPassword())){
                     String name = authentication.getName();
                     String password = authentication.getCredentials().toString();
                     List<GrantedAuthority> grantedAuths = new ArrayList<>();
