@@ -57,7 +57,7 @@ public class QuandlDataSourceTests {
 
     @Test
     public void testAssetSearch() {
-        asset = assetRepository.findById(assetId);
+        asset = assetRepository.findOne(assetId);
         assertEquals(
                 assetId,
                 asset.getId()
@@ -67,7 +67,7 @@ public class QuandlDataSourceTests {
     @Test
     public void testGetData() {
 
-        asset = assetRepository.findById(assetId);
+        asset = assetRepository.findOne(assetId);
         data = quandlDataSource.getData(
                 asset,
                 yesterday

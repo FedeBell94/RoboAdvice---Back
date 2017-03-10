@@ -62,7 +62,8 @@ public class StrategyRESTController {
         // Disable the previous active strategy
         List<Strategy> previousActive = strategyRepository.findByUserAndActiveTrue(user);
         for (Strategy curr : previousActive) {
-            strategyRepository.disactiveStrategy(curr.getId());
+            curr.setActive(false);
+            strategyRepository.save(curr);
         }
 
         // Insert new strategy
