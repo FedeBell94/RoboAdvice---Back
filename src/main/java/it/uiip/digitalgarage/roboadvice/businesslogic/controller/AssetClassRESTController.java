@@ -1,5 +1,7 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.AssetClassDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
@@ -16,9 +18,7 @@ import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Simone on 10/03/2017.
@@ -41,7 +41,7 @@ public class AssetClassRESTController {
     @RequestMapping(value = "/assetClassHistory", method = RequestMethod.GET)
     public
     @ResponseBody
-    AbstractResponse requestAssetClassData(@RequestParam int assetClassId, Authentication authentication) {
+    AbstractResponse requestAssetClassData(@RequestParam int assetClassId/*, Authentication authentication*/) {
 
         AssetClass assetClass = assetClassRepository.findOne(assetClassId);
 
@@ -61,7 +61,7 @@ public class AssetClassRESTController {
 
 
             for (int j = 0; j < assetData.size(); j++) {
-                
+
                 if (hm.get(assetData.get(j).getDate()) == null) {
                     hm.put(assetData.get(j).getDate().toLocalDate(), assetData.get(j).getValue()
                             .multiply(assetData.get(j).getAsset().getFixedPercentage()).divide(new BigDecimal("100")));
@@ -75,7 +75,22 @@ public class AssetClassRESTController {
 
         }
 
-        return new SuccessResponse<>(hm);
+        Iterator it = hm.entrySet().iterator();
+        ArrayList<AssetClassDTO> result = new ArrayList();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            result.add(AssetClassDTO.builder()
+                    .date((java.time.LocalDate)pair.getKey())
+                    .value((BigDecimal) pair.getValue()).build());
+            it.remove();
+        }
+
+        return new SuccessResponse<>(result);
+    }
+
+    @PostConstruct
+    public void func(){
+        requestAssetClassData(1);
     }
 
 }
