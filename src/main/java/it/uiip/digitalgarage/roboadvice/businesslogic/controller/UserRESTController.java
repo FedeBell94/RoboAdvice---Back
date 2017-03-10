@@ -10,7 +10,6 @@ import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -63,9 +62,12 @@ public class UserRESTController {
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/registerUser", method = RequestMethod.POST)
     public @ResponseBody AbstractResponse registerUser(@RequestBody UserDTO inputUser) {
+        if(userRepository.findByUsername(inputUser.getUsername()) != null) {
+            LOGGER.debug("Email already used for this user");
+            return new ErrorResponse(ExchangeError.EMAIL_ALREADY_USED);
+        }
 
         final String hashPassword = passwordEncoder.encode(inputUser.getPassword());
-
         final User user = User.builder()
                 .username(inputUser.getUsername())
                 .password(hashPassword)
@@ -75,13 +77,7 @@ public class UserRESTController {
                 .autoBalancing(false)
                 .newUser(true)
                 .build();
-
-        try {
-            userRepository.save(user);
-        } catch (DataIntegrityViolationException e) {
-            LOGGER.debug("Email already used for this user");
-            return new ErrorResponse(ExchangeError.EMAIL_ALREADY_USED);
-        }
+        userRepository.save(user);
 
         LOGGER.debug("User " + inputUser.getUsername() + " registered successfully");
         return new SuccessResponse<>(new UserDTO(user));
