@@ -31,7 +31,6 @@ public class PortfolioRESTController {
     @Autowired
     private UserRepository userRepository;
 
-
     @Autowired
     private PortfolioRepository portfolioRepository;
 
@@ -64,8 +63,20 @@ public class PortfolioRESTController {
 
 
         }
-        //System.out.println(PortfolioDTO.builder().graphs(gdto).data(ddto).build());
         return new SuccessResponse<>(PortfolioDTO.builder().graphs(gdto).data(ddto).build());
+    }
+
+    @CrossOrigin(origins = "*")
+    @RequestMapping(value = "/worth", method = RequestMethod.GET)
+    public @ResponseBody AbstractResponse requestMyWorth(Authentication authentication) {
+        User user = userRepository.findByUsername(authentication.getName());
+
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -360);
+        Date startDate = new java.sql.Date(cal.getTimeInMillis());
+        List<Object[]> wl = portfolioRepository.findWorth(user, startDate);
+
+        return new SuccessResponse<>(wl);
     }
 
 }
