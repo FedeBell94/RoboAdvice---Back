@@ -27,7 +27,7 @@ public class AssetRESTController {
     private AssetRepository assetRepository;
 
     @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/asset", method = RequestMethod.GET)
+    @RequestMapping(value = "/assetHistory", method = RequestMethod.GET)
     public
     @ResponseBody
     AbstractResponse requestAssetData(@RequestParam int assetId,  Authentication authentication) {
