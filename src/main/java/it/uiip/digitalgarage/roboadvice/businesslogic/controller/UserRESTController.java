@@ -1,5 +1,7 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
+import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.DateProvider.LiarDateProvider;
+import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.IDailyTaskUpdate;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.UserDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.ErrorResponse;
@@ -19,7 +21,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * Class used to create all the API rest used to manage the {@link User}.
@@ -81,5 +85,31 @@ public class UserRESTController {
 
         LOGGER.debug("User " + inputUser.getUsername() + " registered successfully");
         return new SuccessResponse<>(new UserDTO(user));
+    }
+
+
+
+    //     DEMOOOOOO!!!!
+    @Autowired
+    private IDailyTaskUpdate dailyTaskUpdate;
+    @CrossOrigin(origins = "*")
+    @RequestMapping(value = "/computePortfolioDemo", method = RequestMethod.GET)
+    public @ResponseBody AbstractResponse registerUser() {
+        LOGGER.debug("Night task started.");
+        Long startTime = System.currentTimeMillis();
+
+        User user = userRepository.findOne(26);
+        List<User> userList = new ArrayList<>();
+        userList.add(user);
+        LiarDateProvider liarDateProvider = new LiarDateProvider("2013-01-01");
+        for(int i = 0; i<356; i++) {
+            dailyTaskUpdate.executeUpdateTask(liarDateProvider, userList);
+            liarDateProvider.goNextDay();
+        }
+
+        Long endTime = System.currentTimeMillis();
+        LOGGER.debug("Night task ended -> execution time " + (endTime - startTime) + "ms. ");
+
+        return new SuccessResponse(null);
     }
 }

@@ -2,12 +2,13 @@ package it.uiip.digitalgarage.roboadvice;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
-import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.IDailyTaskUpdate;
 import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.DateProvider.DateProvider;
+import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.IDailyTaskUpdate;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.AssetClass;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetClassRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
+import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONObject;
@@ -28,6 +29,8 @@ import java.util.List;
 @SpringBootApplication
 public class Application {
 
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private AssetRepository assetRepository;
@@ -48,7 +51,7 @@ public class Application {
         LOGGER.debug("Night task started.");
         Long startTime = System.currentTimeMillis();
         DateProvider dateProvider = new DateProvider();
-        dailyTask.executeUpdateTask(dateProvider);
+        dailyTask.executeUpdateTask(dateProvider, userRepository.findAll());
         Long endTime = System.currentTimeMillis();
         LOGGER.debug("Night task ended -> execution time " + (endTime - startTime) + "ms. ");
     }
@@ -117,7 +120,6 @@ public class Application {
         Logger logger = (Logger) LoggerFactory.getLogger("it.uiip.digitalgarage.roboadvice");
         logger.setLevel(Level.DEBUG);
     }
-
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
