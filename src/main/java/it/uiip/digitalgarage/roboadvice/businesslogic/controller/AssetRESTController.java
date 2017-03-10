@@ -32,7 +32,7 @@ public class AssetRESTController {
     @ResponseBody
     AbstractResponse requestAssetData(@RequestParam int assetId,  Authentication authentication) {
 
-        Asset asset = assetRepository.findById(assetId);
+        Asset asset = assetRepository.findOne(assetId);
 
         List<Data> assetData = dataRepository.findFirst360ByAssetOrderByDateAsc(asset);
 

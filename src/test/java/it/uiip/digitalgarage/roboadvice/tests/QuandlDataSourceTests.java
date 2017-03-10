@@ -1,12 +1,13 @@
 package it.uiip.digitalgarage.roboadvice.tests;
 
+import it.uiip.digitalgarage.roboadvice.Application;
 import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dataUpdater.Quandl.QuandlDataSource;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Data;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
-import it.uiip.digitalgarage.roboadvice.utils.Logger;
 import it.uiip.digitalgarage.roboadvice.utils.Utils;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class,
-        TransactionalTestExecutionListener.class})
+                                TransactionalTestExecutionListener.class})
 public class QuandlDataSourceTests {
 
     @Autowired
@@ -37,6 +38,8 @@ public class QuandlDataSourceTests {
 
     @Autowired
     private AssetRepository assetRepository;
+
+    private static final Log LOGGER = LogFactory.getLog(Application.class);
 
     private int assetId = 1;
     private Asset asset;
@@ -54,7 +57,7 @@ public class QuandlDataSourceTests {
 
     @Test
     public void testAssetSearch() {
-        asset = assetRepository.findById(assetId);
+        asset = assetRepository.findOne(assetId);
         assertEquals(
                 assetId,
                 asset.getId()
@@ -64,16 +67,16 @@ public class QuandlDataSourceTests {
     @Test
     public void testGetData() {
 
-        asset = assetRepository.findById(assetId);
+        asset = assetRepository.findOne(assetId);
         data = quandlDataSource.getData(
                 asset,
                 yesterday
         );
-        if(data == null){
-            Logger.debug(QuandlDataSource.class,
-                    "The test for Quandl asset " + asset + " can't be performed extensively for the date (" + yesterday + ")");
+        if (data == null) {
+            LOGGER.debug("The test for Quandl asset " + asset + " can't be performed extensively for the date (" +
+                    yesterday + ")");
             assertTrue(true);
-        }else{
+        } else {
             assertEquals(
                     yesterday,
                     data.getDate()

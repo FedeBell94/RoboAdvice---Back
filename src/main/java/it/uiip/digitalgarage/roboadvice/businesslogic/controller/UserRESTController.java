@@ -5,11 +5,10 @@ import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractRes
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.ErrorResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.ExchangeError;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
-import it.uiip.digitalgarage.roboadvice.persistence.model.Strategy;
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
-import it.uiip.digitalgarage.roboadvice.persistence.repository.StrategyRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
-import it.uiip.digitalgarage.roboadvice.utils.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.Authentication;
@@ -22,7 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.Date;
 import java.util.Calendar;
-import java.util.List;
 
 /**
  * Class used to create all the API rest used to manage the {@link User}.
@@ -34,12 +32,33 @@ public class UserRESTController {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private StrategyRepository strategyRepository;
-
-
+    private static final Log LOGGER = LogFactory.getLog(UserRESTController.class);
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
+    @CrossOrigin(origins = "*")
+    @RequestMapping(value = "/loginUser", method = RequestMethod.POST)
+    public @ResponseBody AbstractResponse loginUser(Authentication authentication) {
+        User user = userRepository.findByUsername(authentication.getName());
+        LOGGER.debug("User " + user.getUsername() + " just logged in.");
+        return new SuccessResponse<>(new UserDTO(user));
+    }
+
+    @CrossOrigin(origins = "*")
+    @RequestMapping(value = "/logoutUser", method = RequestMethod.POST)
+    public @ResponseBody AbstractResponse logoutUser(Authentication authentication, HttpServletRequest request, HttpServletResponse response) {
+        LOGGER.debug("User " + authentication.getName() + " just logged out.");
+        new SecurityContextLogoutHandler().logout(request, response, authentication);
+        SecurityContextHolder.getContext().setAuthentication(null);
+        return new SuccessResponse<>(null);
+    }
+
+    @CrossOrigin(origins = "*")
+    @RequestMapping(value = "/tellMeWhoAmI", method = RequestMethod.GET)
+    public @ResponseBody AbstractResponse tellMeWhoAmI(Authentication authentication) {
+        User user = userRepository.findByUsername(authentication.getName());
+        LOGGER.debug("TellWhoAmI: " + user.getUsername());
+        return new SuccessResponse<>(new UserDTO(user));
+    }
 
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/registerUser", method = RequestMethod.POST)
@@ -54,52 +73,17 @@ public class UserRESTController {
                 .registration(new Date(Calendar.getInstance().getTime().getTime()))
                 .enabled(true)
                 .autoBalancing(false)
+                .newUser(true)
                 .build();
 
         try {
             userRepository.save(user);
         } catch (DataIntegrityViolationException e) {
-            Logger.debug(UserRESTController.class, "Mail already used - user not registered");
+            LOGGER.debug("Email already used for this user");
             return new ErrorResponse(ExchangeError.EMAIL_ALREADY_USED);
         }
 
-        Logger.debug(UserRESTController.class, "User " + inputUser.getUsername() + " registered successfully");
+        LOGGER.debug("User " + inputUser.getUsername() + " registered successfully");
         return new SuccessResponse<>(new UserDTO(user));
-    }
-
-    @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/loginUser", method = RequestMethod.POST)
-    public @ResponseBody AbstractResponse loginUser(Authentication authentication) {
-        User user = userRepository.findByUsername(authentication.getName());
-        Logger.debug(UserRESTController.class, "User " + user.getUsername() + " just logged in.");
-        return new SuccessResponse<>(new UserDTO(user));
-    }
-
-    @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/logoutUser", method = RequestMethod.POST)
-    public @ResponseBody AbstractResponse logoutUser(Authentication authentication, HttpServletRequest request, HttpServletResponse response) {
-        Logger.debug(UserRESTController.class, "User " + authentication.getName() + " just logged out.");
-        new SecurityContextLogoutHandler().logout(request, response, authentication);
-        SecurityContextHolder.getContext().setAuthentication(null);
-        return new SuccessResponse<>(null);
-    }
-
-    @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/tellMeWhoAmI", method = RequestMethod.GET)
-    public @ResponseBody AbstractResponse tellMeWhoAmI(Authentication authentication) {
-        User user = userRepository.findByUsername(authentication.getName());
-        Logger.debug(UserRESTController.class, "TellWhoAmI: " + user.getUsername());
-        return new SuccessResponse<>(new UserDTO(user));
-    }
-
-    @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/isUserNew", method = RequestMethod.GET)
-    public @ResponseBody AbstractResponse isUserNew(Authentication authentication) {
-        User user = userRepository.findByUsername(authentication.getName());
-        List<Strategy> strategyList = strategyRepository.findByUser(user);
-        if(strategyList.isEmpty()){
-            return new SuccessResponse<>(true);
-        }
-        return new SuccessResponse<>(false);
     }
 }
