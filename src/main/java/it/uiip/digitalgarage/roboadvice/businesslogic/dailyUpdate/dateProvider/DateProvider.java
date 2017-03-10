@@ -1,4 +1,4 @@
-package it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.DateProvider;
+package it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dateProvider;
 
 import java.sql.Date;
 import java.util.Calendar;

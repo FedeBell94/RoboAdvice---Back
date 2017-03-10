@@ -1,4 +1,4 @@
-package it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.DateProvider;
+package it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dateProvider;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
