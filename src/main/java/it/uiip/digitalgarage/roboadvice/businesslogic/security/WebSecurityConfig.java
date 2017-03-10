@@ -25,14 +25,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers(HttpMethod.OPTIONS, "/**")
-                .and().ignoring().antMatchers("/securedApi/registerUser");;
+                .and().ignoring().antMatchers("/securedApi/registerUser");
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
-                .authorizeRequests()
-                .antMatchers("/securedApi/**").hasRole("USER")
+                .authorizeRequests().antMatchers("/securedApi/**").hasRole("USER")
                 .and().httpBasic().authenticationEntryPoint(authenticationEntryPoint)
                 .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
     }

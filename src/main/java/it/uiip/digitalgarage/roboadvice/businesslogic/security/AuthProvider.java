@@ -19,25 +19,20 @@ import java.util.List;
 public class AuthProvider implements AuthenticationProvider {
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        Iterable<User> userList = userRepository.findAll(); // TODO migliora!!!
+        String username = authentication.getName();
+        String password = authentication.getCredentials().toString();
+        User user = userRepository.findByUsername(username);
 
-        for(User curr: userList){
-            if(curr.getUsername().equals(authentication.getName())){
-                if(passwordEncoder.matches(authentication.getCredentials().toString(), curr.getPassword())){
-                    String name = authentication.getName();
-                    String password = authentication.getCredentials().toString();
-                    List<GrantedAuthority> grantedAuths = new ArrayList<>();
-                    grantedAuths.add(new SimpleGrantedAuthority("ROLE_USER"));
-                    Authentication auth = new UsernamePasswordAuthenticationToken(name, password, grantedAuths);
-                    return auth;
-                }
-            }
+        if(passwordEncoder.matches(authentication.getCredentials().toString(), user.getPassword())){
+            List<GrantedAuthority> grantedAuths = new ArrayList<>();
+            grantedAuths.add(new SimpleGrantedAuthority("ROLE_USER"));
+            return new UsernamePasswordAuthenticationToken(username, password, grantedAuths);
         }
         return null;
     }
