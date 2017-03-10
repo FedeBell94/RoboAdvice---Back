@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Date;
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -34,7 +36,11 @@ public class AssetRESTController {
 
         Asset asset = assetRepository.findOne(assetId);
 
-        List<Data> assetData = dataRepository.findFirst360ByAssetOrderByDateAsc(asset);
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -360);
+        Date startDate = new java.sql.Date(cal.getTimeInMillis());
+
+        List<Data> assetData = dataRepository.findByAssetAndDateAfter(asset,startDate);
 
         return new SuccessResponse<>(assetData);
     }
