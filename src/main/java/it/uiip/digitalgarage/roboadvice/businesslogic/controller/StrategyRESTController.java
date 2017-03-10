@@ -10,7 +10,8 @@ import it.uiip.digitalgarage.roboadvice.persistence.model.User;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetClassRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.StrategyRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
-import it.uiip.digitalgarage.roboadvice.utils.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -36,6 +37,7 @@ public class StrategyRESTController {
     @Autowired
     private AssetClassRepository assetClassRepository;
 
+    private static final Log LOGGER = LogFactory.getLog(StrategyRESTController.class);
 
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/strategy", method = RequestMethod.GET)
@@ -47,7 +49,7 @@ public class StrategyRESTController {
         for (Strategy curr : strategy) {
             strategyDTO.add(new StrategyDTO(curr));
         }
-        Logger.debug(StrategyRESTController.class, "Get strategy API called.");
+        LOGGER.debug("Get strategy API called.");
         return new SuccessResponse<>(strategyDTO);
     }
 
@@ -73,7 +75,7 @@ public class StrategyRESTController {
                     .active(true)
                     .startingDate(new Date(Calendar.getInstance().getTimeInMillis())).build();
             strategyRepository.save(newStrategy);
-            Logger.debug(StrategyRESTController.class, "Inserted strategy " + newStrategy);
+            LOGGER.debug("Inserted strategy " + newStrategy);
         }
 
         // Set user as not new

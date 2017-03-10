@@ -4,8 +4,9 @@ import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Data;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.DataRepository;
-import it.uiip.digitalgarage.roboadvice.utils.Logger;
 import it.uiip.digitalgarage.roboadvice.utils.Utils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,13 +26,15 @@ public class DataUpdater implements IDataUpdater {
     @Autowired
     private IDataSource dataSource;
 
+    private static final Log LOGGER = LogFactory.getLog(DataUpdater.class);
+
     @Override
     public void updateDailyData() {
         List<Asset> assets = assetRepository.findAll();
         for(Asset currAsset : assets){
             Data data = dataSource.getData(currAsset, Utils.getYesterday());
             if(data != null){
-                Logger.debug(DataUpdater.class, "Inserted in data : " + data.toString());
+                LOGGER.debug("Inserted in data : " + data.toString());
                 dataRepository.save(data);
             }
         }

@@ -3,12 +3,12 @@ package it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate;
 import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dataUpdater.IDataUpdater;
 import it.uiip.digitalgarage.roboadvice.persistence.model.*;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.*;
-import it.uiip.digitalgarage.roboadvice.utils.Logger;
 import it.uiip.digitalgarage.roboadvice.utils.Utils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Date;
@@ -41,6 +41,8 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
     // Autowire with data updater
     @Autowired
     private IDataUpdater dataUpdater;
+
+    private static final Log LOGGER = LogFactory.getLog(DailyTaskUpdate.class);
 
     /**
      * The default start worth of a user. It is set to 10000.
@@ -245,7 +247,7 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
                     BigDecimal latestAssetPrice = latestPrices.get(currAsset.getId());
                     BigDecimal assetUnits = assetMoney.divide(latestAssetPrice, 4, RoundingMode.HALF_UP);
 
-                    Logger.debug(DailyTaskUpdate.class, "" + assetMoney + " " + latestAssetPrice + " " + assetUnits);
+                    LOGGER.debug(assetMoney + " " + latestAssetPrice + " " + assetUnits);
 
                     portfolioRepository.save(Portfolio.builder()
                             .user(user)
@@ -285,7 +287,7 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
                     BigDecimal latestAssetPrice = latestPrices.get(currAsset.getId());
                     BigDecimal assetUnits = assetMoney.divide(latestAssetPrice, 8, RoundingMode.HALF_DOWN);
 
-                    Logger.debug(DailyTaskUpdate.class, "" + assetMoney + " " + latestAssetPrice + " " + assetUnits);
+                    LOGGER.debug(assetMoney + " " + latestAssetPrice + " " + assetUnits);
 
                     portfolioRepository.save(Portfolio.builder()
                             .user(user)

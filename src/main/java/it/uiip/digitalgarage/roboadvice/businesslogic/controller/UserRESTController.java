@@ -39,14 +39,14 @@ public class UserRESTController {
     @RequestMapping(value = "/loginUser", method = RequestMethod.POST)
     public @ResponseBody AbstractResponse loginUser(Authentication authentication) {
         User user = userRepository.findByUsername(authentication.getName());
-        LOGGER.debug( "User " + user.getUsername() + " just logged in.");
+        LOGGER.debug("User " + user.getUsername() + " just logged in.");
         return new SuccessResponse<>(new UserDTO(user));
     }
 
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/logoutUser", method = RequestMethod.POST)
     public @ResponseBody AbstractResponse logoutUser(Authentication authentication, HttpServletRequest request, HttpServletResponse response) {
-        LOGGER.debug( "User " + authentication.getName() + " just logged out.");
+        LOGGER.debug("User " + authentication.getName() + " just logged out.");
         new SecurityContextLogoutHandler().logout(request, response, authentication);
         SecurityContextHolder.getContext().setAuthentication(null);
         return new SuccessResponse<>(null);
@@ -56,7 +56,7 @@ public class UserRESTController {
     @RequestMapping(value = "/tellMeWhoAmI", method = RequestMethod.GET)
     public @ResponseBody AbstractResponse tellMeWhoAmI(Authentication authentication) {
         User user = userRepository.findByUsername(authentication.getName());
-        LOGGER.debug( "TellWhoAmI: " + user.getUsername());
+        LOGGER.debug("TellWhoAmI: " + user.getUsername());
         return new SuccessResponse<>(new UserDTO(user));
     }
 
@@ -83,7 +83,7 @@ public class UserRESTController {
             return new ErrorResponse(ExchangeError.EMAIL_ALREADY_USED);
         }
 
-        LOGGER.debug( "User " + inputUser.getUsername() + " registered successfully");
+        LOGGER.debug("User " + inputUser.getUsername() + " registered successfully");
         return new SuccessResponse<>(new UserDTO(user));
     }
 }
