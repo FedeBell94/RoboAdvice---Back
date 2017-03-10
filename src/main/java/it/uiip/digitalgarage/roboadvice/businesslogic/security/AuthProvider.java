@@ -29,7 +29,7 @@ public class AuthProvider implements AuthenticationProvider {
         String password = authentication.getCredentials().toString();
         User user = userRepository.findByUsername(username);
 
-        if(passwordEncoder.matches(authentication.getCredentials().toString(), user.getPassword())){
+        if (user != null && passwordEncoder.matches(authentication.getCredentials().toString(), user.getPassword())) {
             List<GrantedAuthority> grantedAuths = new ArrayList<>();
             grantedAuths.add(new SimpleGrantedAuthority("ROLE_USER"));
             return new UsernamePasswordAuthenticationToken(username, password, grantedAuths);

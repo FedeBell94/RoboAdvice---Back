@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface DataRepository extends JpaRepository<Data, Integer> {
 
-    Data findByAssetAndDate(Asset asset, java.sql.Date date);
+    Data findByAssetAndDate(Asset asset, Date date);
 
     Data findFirst1ByAssetOrderByDateDesc(Asset asset);
 
