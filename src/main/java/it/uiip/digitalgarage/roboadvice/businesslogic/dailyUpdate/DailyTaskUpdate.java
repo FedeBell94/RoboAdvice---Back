@@ -1,6 +1,6 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate;
 
-import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dataUpdater.DateProvider.DateProvider;
+import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.DateProvider.DateProvider;
 import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dataUpdater.IDataUpdater;
 import it.uiip.digitalgarage.roboadvice.persistence.model.*;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.*;

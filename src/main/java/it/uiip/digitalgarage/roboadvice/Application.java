@@ -3,7 +3,7 @@ package it.uiip.digitalgarage.roboadvice;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.IDailyTaskUpdate;
-import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dataUpdater.DateProvider.DateProvider;
+import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.DateProvider.DateProvider;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.AssetClass;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetClassRepository;
