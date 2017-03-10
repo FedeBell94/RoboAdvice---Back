@@ -38,6 +38,9 @@ public class User implements Serializable {
     @Column(name = "autoBalancing", nullable = false)
     private boolean autoBalancing;
 
+    @Column(name = "newUser", nullable = false)
+    private boolean newUser;
+
     public User(User user){
         this.id = user.getId();
         this.password = user.getPassword();
@@ -45,5 +48,6 @@ public class User implements Serializable {
         this.enabled = user.isEnabled();
         this.registration = user.getRegistration();
         this.autoBalancing = user.isAutoBalancing();
+        this.newUser = user.isNewUser();
     }
 }

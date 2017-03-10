@@ -18,10 +18,13 @@ public class UserDTO {
 
     private boolean autoBalancing;
 
+    private boolean newUser;
+
     public UserDTO(User user){
         this.username = user.getUsername();
         this.nickname = user.getNickname();
         this.registration = user.getRegistration();
         this.autoBalancing = user.isAutoBalancing();
+        this.newUser = user.isNewUser();
     }
 }

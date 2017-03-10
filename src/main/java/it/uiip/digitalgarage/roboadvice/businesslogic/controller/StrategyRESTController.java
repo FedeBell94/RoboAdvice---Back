@@ -38,6 +38,20 @@ public class StrategyRESTController {
 
 
     @CrossOrigin(origins = "*")
+    @RequestMapping(value = "/strategy", method = RequestMethod.GET)
+    public @ResponseBody AbstractResponse getStrategy(Authentication authentication) {
+        User user = userRepository.findByUsername(authentication.getName());
+        // Retrieve the strategies
+        List<Strategy> strategy = strategyRepository.findByUserAndActiveTrue(user);
+        List<StrategyDTO> strategyDTO = new LinkedList<>();
+        for (Strategy curr : strategy) {
+            strategyDTO.add(new StrategyDTO(curr));
+        }
+        Logger.debug(StrategyRESTController.class, "Get strategy API called.");
+        return new SuccessResponse<>(strategyDTO);
+    }
+
+    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/strategy", method = RequestMethod.POST)
     public @ResponseBody AbstractResponse updateStrategy(@RequestBody List<StrategyDTO> strategyInput,
                                                          Authentication authentication) {
@@ -61,21 +75,13 @@ public class StrategyRESTController {
             strategyRepository.save(newStrategy);
             Logger.debug(StrategyRESTController.class, "Inserted strategy " + newStrategy);
         }
-        return new SuccessResponse<>(null);
-    }
 
-
-    @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/strategy", method = RequestMethod.GET)
-    public @ResponseBody AbstractResponse getStrategy(Authentication authentication) {
-        User user = userRepository.findByUsername(authentication.getName());
-        // Retrieve the strategies
-        List<Strategy> strategy = strategyRepository.findByUserAndActiveTrue(user);
-        List<StrategyDTO> strategyDTO = new LinkedList<>();
-        for (Strategy curr : strategy) {
-            strategyDTO.add(new StrategyDTO(curr));
+        // Set user as not new
+        if(user.isNewUser()){
+            user.setNewUser(false);
+            userRepository.save(user);
         }
-        Logger.debug(StrategyRESTController.class, "Get strategy API called.");
-        return new SuccessResponse<>(strategyDTO);
+
+        return new SuccessResponse<>(null);
     }
 }

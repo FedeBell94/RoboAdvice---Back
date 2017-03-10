@@ -5,9 +5,7 @@ import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractRes
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.ErrorResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.ExchangeError;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
-import it.uiip.digitalgarage.roboadvice.persistence.model.Strategy;
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
-import it.uiip.digitalgarage.roboadvice.persistence.repository.StrategyRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,7 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.Date;
 import java.util.Calendar;
-import java.util.List;
 
 /**
  * Class used to create all the API rest used to manage the {@link User}.
@@ -35,39 +32,8 @@ public class UserRESTController {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private StrategyRepository strategyRepository;
-
-
     private static final Log LOGGER = LogFactory.getLog(UserRESTController.class);
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
-
-    @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/registerUser", method = RequestMethod.POST)
-    public @ResponseBody AbstractResponse registerUser(@RequestBody UserDTO inputUser) {
-
-        final String hashPassword = passwordEncoder.encode(inputUser.getPassword());
-
-        final User user = User.builder()
-                .username(inputUser.getUsername())
-                .password(hashPassword)
-                .nickname(inputUser.getNickname())
-                .registration(new Date(Calendar.getInstance().getTime().getTime()))
-                .enabled(true)
-                .autoBalancing(false)
-                .build();
-
-        try {
-            userRepository.save(user);
-        } catch (DataIntegrityViolationException e) {
-            LOGGER.debug("Email already used for this user");
-            return new ErrorResponse(ExchangeError.EMAIL_ALREADY_USED);
-        }
-
-        LOGGER.debug( "User " + inputUser.getUsername() + " registered successfully");
-        return new SuccessResponse<>(new UserDTO(user));
-    }
 
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/loginUser", method = RequestMethod.POST)
@@ -95,14 +61,29 @@ public class UserRESTController {
     }
 
     @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/isUserNew", method = RequestMethod.GET)
-    public @ResponseBody AbstractResponse isUserNew(Authentication authentication) {
-        User user = userRepository.findByUsername(authentication.getName());
-        LOGGER.debug( "Is user new called: " + user.getUsername());
-        List<Strategy> strategyList = strategyRepository.findByUser(user);
-        if(strategyList.isEmpty()){
-            return new SuccessResponse<>(true);
+    @RequestMapping(value = "/registerUser", method = RequestMethod.POST)
+    public @ResponseBody AbstractResponse registerUser(@RequestBody UserDTO inputUser) {
+
+        final String hashPassword = passwordEncoder.encode(inputUser.getPassword());
+
+        final User user = User.builder()
+                .username(inputUser.getUsername())
+                .password(hashPassword)
+                .nickname(inputUser.getNickname())
+                .registration(new Date(Calendar.getInstance().getTime().getTime()))
+                .enabled(true)
+                .autoBalancing(false)
+                .newUser(true)
+                .build();
+
+        try {
+            userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            LOGGER.debug("Email already used for this user");
+            return new ErrorResponse(ExchangeError.EMAIL_ALREADY_USED);
         }
-        return new SuccessResponse<>(false);
+
+        LOGGER.debug( "User " + inputUser.getUsername() + " registered successfully");
+        return new SuccessResponse<>(new UserDTO(user));
     }
 }
