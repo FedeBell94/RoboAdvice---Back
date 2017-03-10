@@ -1,6 +1,7 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.net.httpserver.Authenticator;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.AssetClassDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
@@ -80,11 +81,16 @@ public class AssetClassRESTController {
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
             result.add(AssetClassDTO.builder()
-                    .date((java.time.LocalDate)pair.getKey())
+                    .date(pair.getKey().toString())
                     .value((BigDecimal) pair.getValue()).build());
             it.remove();
         }
-
+        result.sort(new Comparator<AssetClassDTO>() {
+            @Override
+            public int compare(AssetClassDTO o1, AssetClassDTO o2) {
+                return o1.getDate().compareTo(o2.getDate());
+            }
+        });
         return new SuccessResponse<>(result);
     }
 

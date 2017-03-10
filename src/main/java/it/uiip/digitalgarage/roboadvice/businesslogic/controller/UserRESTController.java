@@ -101,11 +101,11 @@ public class UserRESTController {
         LOGGER.debug("Night task started.");
         Long startTime = System.currentTimeMillis();
 
-        User user = userRepository.findOne(26);
+        User user = userRepository.findOne(1);
         List<User> userList = new ArrayList<>();
         userList.add(user);
-        LiarDateProvider liarDateProvider = new LiarDateProvider("2014-01-01");
-        for(int i = 0; i<356; i++) {
+        LiarDateProvider liarDateProvider = new LiarDateProvider("2017-02-01");
+        for(int i = 0; i<15; i++) {
             dailyTaskUpdate.executeUpdateTask(liarDateProvider, userList);
             liarDateProvider.goNextDay();
         }

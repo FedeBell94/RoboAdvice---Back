@@ -30,14 +30,6 @@
         </dependency>
 
 
-        <!-- Dependencies for Spring Security -->
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
-
-
         <!-- Dependencies for Spring Data JPA -->
 
         <dependency>
@@ -86,6 +78,17 @@
             <artifactId>javax.interceptor-api</artifactId>
             <version>1.2</version>
         </dependency>
+
+
+        <!-- Dependencies for Spring Security -->
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+            <version>RELEASE</version>
+        </dependency>
+
+
 
     </dependencies>
 

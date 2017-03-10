@@ -18,6 +18,6 @@ import java.util.List;
 public class AssetClassDTO {
 
 
-    private LocalDate date;
+    private String date;
     private BigDecimal value;
 }
