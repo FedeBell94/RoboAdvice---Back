@@ -1,13 +1,17 @@
 package it.uiip.digitalgarage.roboadvice;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.IDailyTaskUpdate;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.AssetClass;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetClassRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
-import it.uiip.digitalgarage.roboadvice.utils.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -33,20 +37,23 @@ public class Application {
     @Autowired
     private IDailyTaskUpdate dailyTask;
 
+
+    private static final Log LOGGER = LogFactory.getLog(Application.class);
+
     // Execution of night task
     //@Scheduled(cron = "0 0 10 * * MON-FRI")
     //@Scheduled(cron = "*/5 * * * * MON-FRI")
     public void executeNightTask(){
-        Logger.debug(Application.class, "Night task started.");
+        LOGGER.debug("Night task started.");
         Long startTime = System.currentTimeMillis();
         dailyTask.executeUpdateTask();
         Long endTime = System.currentTimeMillis();
-        Logger.debug(Application.class, "Night task ended -> execution time " + (endTime - startTime) + "ms. ");
+        LOGGER.debug("Night task ended -> execution time " + (endTime - startTime) + "ms. ");
     }
 
     @PostConstruct
     public void initDatabaseDefaultValues() {
-        Logger.debug(Application.class, "Database default values checking and inserting");
+        LOGGER.debug("Database default values checking and inserting");
 
         JSONParser jsonParser = new JSONParser();
         try {
@@ -70,12 +77,12 @@ public class Application {
 
         } catch (Exception e) {
             e.printStackTrace();
-            Logger.error(Application.class, "Failed to add default data in database.");
+            LOGGER.error("Failed to add default data in database.");
         }
     }
 
     private void insertDefaultAssetClasses(List<JSONObject> assetClassList) {
-        Logger.debug(Application.class, "Writing default asset class in database");
+        LOGGER.debug("Writing default asset class in database");
         assetClassRepository.deleteAll();
         for (JSONObject curr : assetClassList) {
             assetClassRepository.save(AssetClass.builder()
@@ -86,7 +93,7 @@ public class Application {
     }
 
     private void insertDefaultAssets(List<JSONObject> assetList) {
-        Logger.debug(Application.class, "Writing asset in database");
+        LOGGER.debug("Writing asset in database");
         assetRepository.deleteAll();
         for (JSONObject curr : assetList) {
             Asset a = Asset.builder()
@@ -101,6 +108,12 @@ public class Application {
             assetRepository.save(a);
         }
 
+    }
+
+    @PostConstruct
+    private void initLogger(){
+        Logger logger = (Logger) LoggerFactory.getLogger("it.uiip.digitalgarage.roboadvice");
+        logger.setLevel(Level.DEBUG);
     }
 
 
