@@ -1,6 +1,6 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
-import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.DateProvider.LiarDateProvider;
+import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dateProvider.LiarDateProvider;
 import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.IDailyTaskUpdate;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.UserDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
@@ -87,11 +87,14 @@ public class UserRESTController {
         return new SuccessResponse<>(new UserDTO(user));
     }
 
-
-
-    //     DEMOOOOOO!!!!
+    /***************************************************************************
+     *                                                                         *
+     *                                 DEMO                                    *
+     *                                                                         *
+    ***************************************************************************/
     @Autowired
     private IDailyTaskUpdate dailyTaskUpdate;
+
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/computePortfolioDemo", method = RequestMethod.GET)
     public @ResponseBody AbstractResponse registerUser() {
@@ -101,7 +104,7 @@ public class UserRESTController {
         User user = userRepository.findOne(26);
         List<User> userList = new ArrayList<>();
         userList.add(user);
-        LiarDateProvider liarDateProvider = new LiarDateProvider("2013-01-01");
+        LiarDateProvider liarDateProvider = new LiarDateProvider("2014-01-01");
         for(int i = 0; i<356; i++) {
             dailyTaskUpdate.executeUpdateTask(liarDateProvider, userList);
             liarDateProvider.goNextDay();

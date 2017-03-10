@@ -1,7 +1,7 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate;
 
-import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.DateProvider.DateProvider;
-import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.DateProvider.LiarDateProvider;
+import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dateProvider.DateProvider;
+import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dateProvider.LiarDateProvider;
 import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dataUpdater.IDataUpdater;
 import it.uiip.digitalgarage.roboadvice.persistence.model.*;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
@@ -63,7 +63,7 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
         // Finds all assets
         final List<Asset> assets = assetRepository.findAll();
         // For each asset find the latest price
-        final Map<Integer, BigDecimal> latestPrices = findAssetsLatestPrice(assets);
+        final Map<Integer, BigDecimal> latestPrices = findAssetsPrice(assets, dateProvider);
 
         for (User currUser : users) {
             // Find the portfolio of yesterday for the current user
@@ -146,20 +146,10 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
     }
 
 
-    /**
-     * Finds the latest price for each asset. Used to evaluate the first portfolio for a user and when a strategy
-     * changes.
-     *
-     * @param assets
-     *         Assets to find.
-     *
-     * @return A {@link Map} containing the {@link Asset} id for key, and the latest price found into the database as
-     * value.
-     */
-    private Map<Integer, BigDecimal> findAssetsLatestPrice(final List<Asset> assets) {
+    private Map<Integer, BigDecimal> findAssetsPrice(final List<Asset> assets, final DateProvider dateProvider) {
         Map<Integer, BigDecimal> latestPrices = new HashMap<>();
         for (Asset curr : assets) {
-            Data data = dataRepository.findFirst1ByAssetOrderByDateDesc(curr);
+            Data data = dataRepository.findTop1ByDateBeforeAndAssetOrderByDateDesc(dateProvider.getToday(), curr);
             latestPrices.put(data.getAsset().getId(), data.getValue());
         }
         return latestPrices;
