@@ -16,19 +16,13 @@ import java.util.List;
 public interface PortfolioRepository extends JpaRepository<Portfolio, Integer> {
 
     List<Portfolio> findByUserAndDate(User user, Date date);
-//    List<Portfolio> findByUser(User user);
+
     List<Portfolio> findFirst13ByUserOrderByDateDesc(User user);
-//    List<Portfolio> findByUserAndStartDate(User user, Date startDate);
-//    List<Portfolio> findByUserAndStartDateGroupByDateAndAssetClassId(User user, Date date);
-
-
-//    @org.springframework.data.jpa.repository.Query("SELECT SUM(p.value) AS sum FROM Portfolio p WHERE p.user = ?1 AND p.date > ?2 group by p.assetClass")
-//    List<BigDecimal> findSum(User user, Date date);
-//
-//    @org.springframework.data.jpa.repository.Query("SELECT p.date as date FROM Portfolio p WHERE p.user = ?1 AND p.date > ?2 group by p.assetClass")
-//    List<Date> findDate(User user, Date date);
 
     @org.springframework.data.jpa.repository.Query("SELECT SUM(p.value) AS sum,p.date as date FROM Portfolio p WHERE p.user = ?1 AND p.date > ?2 group by date, p.assetClass")
     List<Object[]> findData(User user, Date date);
+
+    @org.springframework.data.jpa.repository.Query("SELECT SUM(p.value) AS sum,p.date as date FROM Portfolio p WHERE p.user = ?1 AND p.date > ?2 group by date")
+    List<Object[]> findWorth(User user, Date date);
 
 }
