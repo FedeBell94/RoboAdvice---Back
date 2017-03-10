@@ -12,8 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -46,7 +48,7 @@ public class AssetClassRESTController {
         List<Asset> assets = assetRepository.findByAssetClass(assetClass);
 
 
-        HashMap<Date, BigDecimal> hm = new HashMap<>();
+        HashMap<LocalDate, BigDecimal> hm = new HashMap<>();
 
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, -360);
@@ -59,12 +61,12 @@ public class AssetClassRESTController {
 
 
             for (int j = 0; j < assetData.size(); j++) {
-
+                
                 if (hm.get(assetData.get(j).getDate()) == null) {
-                    hm.put(assetData.get(j).getDate(), assetData.get(j).getValue()
+                    hm.put(assetData.get(j).getDate().toLocalDate(), assetData.get(j).getValue()
                             .multiply(assetData.get(j).getAsset().getFixedPercentage()).divide(new BigDecimal("100")));
                 } else {
-                    hm.put(assetData.get(j).getDate(), hm.get(assetData.get(j).getDate())
+                    hm.put(assetData.get(j).getDate().toLocalDate(), hm.get(assetData.get(j).getDate())
                             .add(assetData.get(j).getValue()
                                     .multiply(assetData.get(j).getAsset().getFixedPercentage()).divide(new BigDecimal("100"))));
                 }
