@@ -3,6 +3,7 @@ package it.uiip.digitalgarage.roboadvice;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.IDailyTaskUpdate;
+import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dataUpdater.DateProvider.DateProvider;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.AssetClass;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetClassRepository;
@@ -46,7 +47,8 @@ public class Application {
     public void executeNightTask(){
         LOGGER.debug("Night task started.");
         Long startTime = System.currentTimeMillis();
-        dailyTask.executeUpdateTask();
+        DateProvider dateProvider = new DateProvider();
+        dailyTask.executeUpdateTask(dateProvider);
         Long endTime = System.currentTimeMillis();
         LOGGER.debug("Night task ended -> execution time " + (endTime - startTime) + "ms. ");
     }

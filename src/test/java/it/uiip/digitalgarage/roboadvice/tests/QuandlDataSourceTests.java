@@ -1,11 +1,11 @@
 package it.uiip.digitalgarage.roboadvice.tests;
 
 import it.uiip.digitalgarage.roboadvice.Application;
+import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dataUpdater.DateProvider.DateProvider;
 import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dataUpdater.Quandl.QuandlDataSource;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Data;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
-import it.uiip.digitalgarage.roboadvice.utils.Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
@@ -44,7 +44,7 @@ public class QuandlDataSourceTests {
     private int assetId = 1;
     private Asset asset;
     private Data data;
-    private Date yesterday = Utils.getYesterday();
+    private Date yesterday = new DateProvider().getYesterday();
 
     @Test
     public void testQuandlDataSource() {
