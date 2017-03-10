@@ -64,7 +64,7 @@ public class PortfolioRESTController {
 
 
         }
-        System.out.println(PortfolioDTO.builder().graphs(gdto).data(ddto).build());
+        //System.out.println(PortfolioDTO.builder().graphs(gdto).data(ddto).build());
         return new SuccessResponse<>(PortfolioDTO.builder().graphs(gdto).data(ddto).build());
     }
 
