@@ -20,7 +20,7 @@ public class Portfolio implements Serializable{
 
     @Id
     @GeneratedValue
-    private int id;
+    private Integer id;
 
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="user_id")

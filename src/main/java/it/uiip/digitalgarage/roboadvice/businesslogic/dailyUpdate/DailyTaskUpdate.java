@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,26 +53,28 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
     @Override
     public void executeUpdateTask(final DateProvider dateProvider, final List<User> users) {
 
-        // Date
-        final Date yesterday = dateProvider.getYesterday();
-
         // #1: update data (only if not in demo mode)
-        if(!(dateProvider instanceof LiarDateProvider)){
+        if (!(dateProvider instanceof LiarDateProvider)) {
             dataUpdater.updateDailyData();
         }
 
         // Finds all assets
         final List<Asset> assets = assetRepository.findAll();
-        // For each asset find the latest price
-        final Map<Integer, BigDecimal> latestPrices = findAssetsPrice(assets, dateProvider);
+
+
+        // Finds the assets changed today
+        final List<Data> todayNewPrices = dataRepository.findByDate(dateProvider.getYesterday());
 
         for (User currUser : users) {
             // Find the portfolio of yesterday for the current user
-            List<Portfolio> userPortfolio = portfolioRepository.findByUserAndDate(currUser, yesterday);
+            List<Portfolio> userPortfolio =
+                    portfolioRepository.findByUserAndDate(currUser, dateProvider.getYesterday());
 
             // Case of brand new user
             if (userPortfolio.isEmpty()) {
                 // #2: create portfolio for fresh(new) users
+                // For each asset finds the latest price
+                final Map<Integer, BigDecimal> latestPrices = findAssetsPrice(assets, dateProvider);
                 createPortfolio(dateProvider, currUser, assets, DEFAULT_START_WORTH, latestPrices);
             } else {
 
@@ -79,9 +82,12 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
                 List<Strategy> userStrategy = strategyRepository.findByUserAndActiveTrue(currUser);
 
                 // Check if the user strategy was changed yesterday
-                if (userStrategy.get(0).getStartingDate().toString().equals(yesterday.toString())) {
+                // TODO make it better
+                if (userStrategy.get(0).getStartingDate().toString().equals(dateProvider.getYesterday().toString())) {
 
                     // #4: compute portfolio for 'old' users which has changed the strategy (same as #2)
+                    // For each asset finds the latest price
+                    final Map<Integer, BigDecimal> latestPrices = findAssetsPrice(assets, dateProvider);
                     BigDecimal userWorth = computeWorth(userPortfolio, latestPrices);
                     createPortfolio(dateProvider, currUser, assets, userWorth, latestPrices);
                 } else {
@@ -89,10 +95,12 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
 
                     // Check if the user uses and auto-balancing strategy
                     if (currUser.isAutoBalancing()) {
+                        // For each asset finds the latest price
+                        final Map<Integer, BigDecimal> latestPrices = findAssetsPrice(assets, dateProvider);
                         BigDecimal userWorth = computeWorth(userPortfolio, latestPrices);
                         createPortfolio(dateProvider, currUser, assets, userWorth, latestPrices);
                     } else {
-                        updatePortfolio(dateProvider, userPortfolio, latestPrices);
+                        updatePortfolio(dateProvider, userPortfolio, todayNewPrices);
                     }
                 }
             }
@@ -117,32 +125,45 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
         return worth;
     }
 
-    /**
-     * Update the portfolio passed with the current data assets passed in lateste price.
-     *
-     * @param portfolios
-     *         The portfolio to update.
-     * @param latestPrices
-     *         The latest assets prices.
-     */
     private void updatePortfolio(final DateProvider dateProvider, final List<Portfolio> portfolios,
-                                 final Map<Integer, BigDecimal> latestPrices) {
+                                 final List<Data> todayNewPrices) {
 
         final Date currDate = dateProvider.getToday();
+
+
+        List<Portfolio> insertList = new ArrayList<>();
         for (Portfolio currPortfolio : portfolios) {
 
-            BigDecimal currAssetPrice = latestPrices.get(currPortfolio.getAsset().getId());
-            BigDecimal assetMoney = currPortfolio.getUnit().multiply(currAssetPrice);
+            Data latestAssetPrice = null;
+            for(Data currData : todayNewPrices){
+                if(currData.getAsset().getId() == currPortfolio.getAsset().getId()){
+                    latestAssetPrice = currData;
+                }
+            }
 
-            portfolioRepository.save(Portfolio.builder()
-                    .user(currPortfolio.getUser())
-                    .assetClass(currPortfolio.getAssetClass())
-                    .asset(currPortfolio.getAsset())
-                    .unit(currPortfolio.getUnit())
-                    .value(assetMoney)
-                    .date(currDate)
-                    .build());
+            if(latestAssetPrice != null) {
+                BigDecimal assetMoney = currPortfolio.getUnit().multiply(latestAssetPrice.getValue());
+
+                insertList.add(Portfolio.builder()
+                        .user(currPortfolio.getUser())
+                        .assetClass(currPortfolio.getAssetClass())
+                        .asset(currPortfolio.getAsset())
+                        .unit(currPortfolio.getUnit())
+                        .value(assetMoney)
+                        .date(currDate)
+                        .build());
+            } else{
+                insertList.add(Portfolio.builder()
+                        .user(currPortfolio.getUser())
+                        .assetClass(currPortfolio.getAssetClass())
+                        .asset(currPortfolio.getAsset())
+                        .unit(currPortfolio.getUnit())
+                        .value(currPortfolio.getValue())
+                        .date(currDate)
+                        .build());
+            }
         }
+        portfolioRepository.save(insertList);
     }
 
 
@@ -156,18 +177,6 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
     }
 
 
-    /**
-     * Creates a new portfolio for the user passed for the strategy passed with the amount of money given.
-     *
-     * @param user
-     *         The user owner of the portfolio
-     * @param assets
-     *         The list of all assets
-     * @param totalMoney
-     *         Amount of money to divide into the different assets
-     * @param latestPrices
-     *         Map containing latest prices for each Asset (key = asset_id, value = last price)
-     */
     private void createPortfolio(final DateProvider dateProvider, final User user, final List<Asset> assets,
                                  final BigDecimal totalMoney, final Map<Integer, BigDecimal> latestPrices) {
 
@@ -175,7 +184,7 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
         // Finds the active strategy of the current user
         List<Strategy> userStrategy = strategyRepository.findByUserAndActiveTrue(user);
 
-
+        List<Portfolio> insertList = new ArrayList<>();
         for (Strategy currStrategy : userStrategy) {
             for (Asset currAsset : assets) {
                 if (currAsset.getAssetClass().equals(currStrategy.getAssetClass())) {
@@ -195,7 +204,7 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
 
                     //LOGGER.debug(assetMoney + " " + latestAssetPrice + " " + assetUnits);
 
-                    portfolioRepository.save(Portfolio.builder()
+                    insertList.add(Portfolio.builder()
                             .user(user)
                             .assetClass(currAsset.getAssetClass())
                             .asset(currAsset)
@@ -206,5 +215,6 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
                 }
             }
         }
+        portfolioRepository.save(insertList);
     }
 }

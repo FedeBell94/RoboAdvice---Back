@@ -16,4 +16,6 @@ public interface DataRepository extends JpaRepository<Data, Integer> {
     //List<Data> findFirst360ByAssetOrderByDateDesc(Asset asset);
 
     List<Data> findByAssetAndDateAfter(Asset asset, Date date);
+
+    List<Data> findByDate(Date date);
 }

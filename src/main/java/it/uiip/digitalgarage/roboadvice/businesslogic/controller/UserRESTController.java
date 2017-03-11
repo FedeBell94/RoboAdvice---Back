@@ -11,6 +11,7 @@ import it.uiip.digitalgarage.roboadvice.persistence.model.User;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -96,16 +97,16 @@ public class UserRESTController {
     private IDailyTaskUpdate dailyTaskUpdate;
 
     @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/computePortfolioDemo", method = RequestMethod.GET)
-    public @ResponseBody AbstractResponse registerUser() {
+    @RequestMapping(value = "/computePortfolioDemo", method = RequestMethod.POST)
+    public @ResponseBody AbstractResponse registerUser(@RequestBody JSONObject inputObject) {
         LOGGER.debug("Night task started.");
         Long startTime = System.currentTimeMillis();
 
-        User user = userRepository.findOne(1);
+        User user = userRepository.findOne((Integer)inputObject.get("user_id"));
         List<User> userList = new ArrayList<>();
         userList.add(user);
-        LiarDateProvider liarDateProvider = new LiarDateProvider("2017-02-01");
-        for(int i = 0; i<15; i++) {
+        LiarDateProvider liarDateProvider = new LiarDateProvider((String)inputObject.get("from"));
+        for(int i = 0; i<(Integer)inputObject.get("days"); i++) {
             dailyTaskUpdate.executeUpdateTask(liarDateProvider, userList);
             liarDateProvider.goNextDay();
         }
@@ -113,6 +114,6 @@ public class UserRESTController {
         Long endTime = System.currentTimeMillis();
         LOGGER.debug("Night task ended -> execution time " + (endTime - startTime) + "ms. ");
 
-        return new SuccessResponse(null);
+        return new SuccessResponse<>(null);
     }
 }
