@@ -2,9 +2,9 @@ package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
 import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dateProvider.DateProvider;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.DailyWorthDTO;
-import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.DataDTO;
-import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.GraphsDTO;
-import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.PortfolioDTO;
+import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.GraphPortfolioHistoryDTO;
+import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.GraphSettingsDTO;
+import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.PortfolioHistoryDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.sql.Date;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @RestController
@@ -35,37 +33,6 @@ public class PortfolioRESTController {
 
     private static final Log LOGGER = LogFactory.getLog(PortfolioRepository.class);
 
-    @RequestMapping(value = "/portfolio", method = RequestMethod.GET)
-    public @ResponseBody AbstractResponse requestMyData(Authentication authentication) {
-        User user = userRepository.findByUsername(authentication.getName());
-
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -91);
-        Date ddate = new java.sql.Date(cal.getTimeInMillis());
-        List<Object[]> ol = portfolioRepository.findData(user, ddate);
-        ArrayList<GraphsDTO> gdto = new ArrayList<>();
-        gdto.add(GraphsDTO.builder().title("Bonds").valueField("column1").build());
-        gdto.add(GraphsDTO.builder().title("Forex").valueField("column2").build());
-        gdto.add(GraphsDTO.builder().title("Stocks").valueField("column3").build());
-        gdto.add(GraphsDTO.builder().title("Commodities").valueField("column4").build());
-        ArrayList<DataDTO> ddto = new ArrayList<>();
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-        for (int i = 0; i < ol.size(); i = i + 4) {
-
-            ddto.add(DataDTO.builder()
-                    .date(df.format(ol.get(i)[1]))
-                    .column1((BigDecimal) ol.get(i)[0])
-                    .column2((BigDecimal) ol.get(i + 1)[0])
-                    .column3((BigDecimal) ol.get(i + 2)[0])
-                    .column4((BigDecimal) ol.get(i + 3)[0])
-                    .build()
-            );
-
-
-        }
-        return new SuccessResponse<>(PortfolioDTO.builder().graphs(gdto).data(ddto).build());
-    }
-
     /**
      * Returns the worth history for the {@link User} in the required format.
      *
@@ -79,13 +46,13 @@ public class PortfolioRESTController {
         User user = userRepository.findByUsername(authentication.getName());
 
         DateProvider dateProvider = new DateProvider();
-        List<Map<?, ?>> worthPerDay = portfolioRepository
+        List<Map<Object, Object>> worthPerDay = portfolioRepository
                 .findWorthPerDay(user, dateProvider.getDayFromToday(-365), dateProvider.getToday());
 
         Map<String, Object> returnResponse = new HashMap<>();
         returnResponse.put("data", worthPerDay);
         List<Object> graphsConfig = new LinkedList<>();
-        graphsConfig.add(GraphsDTO.builder().valueField("value").title("Daily worth").build());
+        graphsConfig.add(GraphSettingsDTO.builder().valueField("value").title("Daily worth").build());
         returnResponse.put("graphs", graphsConfig);
 
         LOGGER.debug("User: " + user.getUsername() + " - Worth history called.");
@@ -105,14 +72,15 @@ public class PortfolioRESTController {
         User user = userRepository.findByUsername(authentication.getName());
 
         DateProvider dateProvider = new DateProvider();
-        List<Map<?, ?>> todayWorth = portfolioRepository.findWorthDayPerAssetClass(user, dateProvider.getToday());
-        List<Map<?, ?>> yesterdayWorth =
+        List<Map<Object, Object>> todayWorth =
+                portfolioRepository.findWorthDayPerAssetClass(user, dateProvider.getToday());
+        List<Map<Object, Object>> yesterdayWorth =
                 portfolioRepository.findWorthDayPerAssetClass(user, dateProvider.getYesterday());
 
         List<DailyWorthDTO> returnResponse = new LinkedList<>();
-        for (Map<?, ?> curr : todayWorth) {
-            Map<?, ?> yesterday = null;
-            for (Map<?, ?> currYesterday : yesterdayWorth) {
+        for (Map<Object, Object> curr : todayWorth) {
+            Map<Object, Object> yesterday = null;
+            for (Map<Object, Object> currYesterday : yesterdayWorth) {
                 if (currYesterday.get("assetClass").equals(curr.get("assetClass"))) {
                     yesterday = currYesterday;
                     break;
@@ -136,5 +104,48 @@ public class PortfolioRESTController {
 
         LOGGER.debug("User: " + user.getUsername() + " - Worth day called.");
         return new SuccessResponse<>(returnResponse);
+    }
+
+    /**
+     * This method returns the history of the portfolio of the caller {@link User}.
+     *
+     * @param authentication
+     *         Represents the token for an authentication request or for an authenticated {@link User}.
+     *
+     * @return The history of the portfolio of the caller {@link User}
+     */
+    @RequestMapping(value = "/portfolio", method = RequestMethod.GET)
+    public @ResponseBody AbstractResponse requestMyData(Authentication authentication) {
+        User user = userRepository.findByUsername(authentication.getName());
+
+        DateProvider dateProvider = new DateProvider();
+        List<Map<Object, Object>> portfolioHistory = portfolioRepository
+                .findPortfolioHistory(user, dateProvider.getDayFromToday(-91), dateProvider.getToday());
+
+        // Compute the portfolio part
+        List<GraphPortfolioHistoryDTO> portfolioList = new ArrayList<>();
+        Iterator<Map<Object, Object>> portfolioIt = portfolioHistory.iterator();
+        while (portfolioIt.hasNext()) {
+            Map<Object, Object> first = portfolioIt.next();
+            GraphPortfolioHistoryDTO graph = GraphPortfolioHistoryDTO.builder()
+                    .date((Date) first.get("date"))
+                    .bonds((BigDecimal) first.get("value"))
+                    .forex((BigDecimal) portfolioIt.next().get("value"))
+                    .stocks((BigDecimal) portfolioIt.next().get("value"))
+                    .commodities((BigDecimal) portfolioIt.next().get("value")).build();
+            portfolioList.add(graph);
+        }
+
+        // Set the graph settings
+        List<GraphSettingsDTO> graphSettings = new ArrayList<>();
+        graphSettings.add(GraphSettingsDTO.builder().title("Bonds").valueField("bonds").build());
+        graphSettings.add(GraphSettingsDTO.builder().title("Forex").valueField("forex").build());
+        graphSettings.add(GraphSettingsDTO.builder().title("Stocks").valueField("stocks").build());
+        graphSettings.add(GraphSettingsDTO.builder().title("Commodities").valueField("commodities").build());
+
+        PortfolioHistoryDTO returnData = PortfolioHistoryDTO.builder()
+                .data(portfolioList).graphs(graphSettings).build();
+        LOGGER.debug("User: " + user.getUsername() + " - Worth history called.");
+        return new SuccessResponse<>(returnData);
     }
 }

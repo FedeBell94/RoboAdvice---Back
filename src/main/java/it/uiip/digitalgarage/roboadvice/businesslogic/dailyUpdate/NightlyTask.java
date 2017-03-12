@@ -24,7 +24,7 @@ import java.util.Map;
 // TODO: multithreaded??
 
 @Service
-public class DailyTaskUpdate implements IDailyTaskUpdate {
+public class NightlyTask implements INightlyTask {
 
 
     @Autowired
@@ -43,7 +43,7 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
     @Autowired
     private IDataUpdater dataUpdater;
 
-    private static final Log LOGGER = LogFactory.getLog(DailyTaskUpdate.class);
+    private static final Log LOGGER = LogFactory.getLog(NightlyTask.class);
 
     /**
      * The default start worth of a user. It is set to 10000.
@@ -51,7 +51,7 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
     private static final BigDecimal DEFAULT_START_WORTH = new BigDecimal(10000);
 
     @Override
-    public void executeUpdateTask(final DateProvider dateProvider, final List<User> users) {
+    public void executeNightlyTask(final DateProvider dateProvider, final List<User> users) {
 
         // #1: update data (only if not in demo mode)
         if (!(dateProvider instanceof LiarDateProvider)) {
@@ -60,6 +60,9 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
 
         // Finds all assets
         final List<Asset> assets = assetRepository.findAll();
+
+        // For each asset finds the latest price
+        final Map<Integer, BigDecimal> latestPrices = findAssetsPrice(assets, dateProvider);
 
 
         // Finds the assets changed today
@@ -73,9 +76,6 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
             // Case of brand new user
             if (userPortfolio.isEmpty()) {
                 // #2: create portfolio for fresh(new) users
-                // TODO remove
-                // For each asset finds the latest price
-                final Map<Integer, BigDecimal> latestPrices = findAssetsPrice(assets, dateProvider);
                 createPortfolio(dateProvider, currUser, assets, DEFAULT_START_WORTH, latestPrices);
             } else {
 
@@ -86,10 +86,6 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
                 if (userStrategy.get(0).getStartingDate().getTime() == dateProvider.getYesterday().getTime()) {
 
                     // #4: compute portfolio for 'old' users which has changed the strategy (same as #2)
-
-                    // TODO remove
-                    // For each asset finds the latest price
-                    final Map<Integer, BigDecimal> latestPrices = findAssetsPrice(assets, dateProvider);
                     BigDecimal userWorth = computeWorth(userPortfolio, latestPrices);
                     createPortfolio(dateProvider, currUser, assets, userWorth, latestPrices);
                 } else {
@@ -97,9 +93,6 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
 
                     // Check if the user uses and auto-balancing strategy
                     if (currUser.isAutoBalancing()) {
-                        // TODO remove
-                        // For each asset finds the latest price
-                        final Map<Integer, BigDecimal> latestPrices = findAssetsPrice(assets, dateProvider);
                         BigDecimal userWorth = computeWorth(userPortfolio, latestPrices);
                         createPortfolio(dateProvider, currUser, assets, userWorth, latestPrices);
                     } else {

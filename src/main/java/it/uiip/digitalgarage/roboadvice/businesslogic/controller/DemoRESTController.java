@@ -1,6 +1,6 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
-import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.IDailyTaskUpdate;
+import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.INightlyTask;
 import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dateProvider.LiarDateProvider;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
@@ -21,11 +21,10 @@ import java.util.List;
  */
 @RestController
 @CrossOrigin(origins = "*")
-@RequestMapping(value = "securedApi")
 public class DemoRESTController {
 
     @Autowired
-    private IDailyTaskUpdate dailyTaskUpdate;
+    private INightlyTask nightlyTask;
 
     @Autowired
     private UserRepository userRepository;
@@ -42,7 +41,7 @@ public class DemoRESTController {
         userList.add(user);
         LiarDateProvider liarDateProvider = new LiarDateProvider((String) inputObject.get("from"));
         for (int i = 0; i < (Integer) inputObject.get("days"); i++) {
-            dailyTaskUpdate.executeUpdateTask(liarDateProvider, userList);
+            nightlyTask.executeNightlyTask(liarDateProvider, userList);
             liarDateProvider.goNextDay();
         }
 
