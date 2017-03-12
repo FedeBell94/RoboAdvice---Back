@@ -1,6 +1,7 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
 import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dateProvider.DateProvider;
+import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.DailyWorthDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.DataDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.GraphsDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.PortfolioDTO;
@@ -9,6 +10,8 @@ import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResp
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.PortfolioRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -19,9 +22,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-/**
- * Created by Simone on 06/03/2017.
- */
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping(value = "securedApi")
@@ -32,6 +32,8 @@ public class PortfolioRESTController {
 
     @Autowired
     private PortfolioRepository portfolioRepository;
+
+    private static final Log LOGGER = LogFactory.getLog(PortfolioRepository.class);
 
     @RequestMapping(value = "/portfolio", method = RequestMethod.GET)
     public @ResponseBody AbstractResponse requestMyData(Authentication authentication) {
@@ -70,10 +72,10 @@ public class PortfolioRESTController {
      * @param authentication
      *         Represents the token for an authentication request or for an authenticated {@link User}.
      *
-     * @return The history of the worth history in the format required.
+     * @return The history of the worth in the format required.
      */
     @RequestMapping(value = "/worthHistory", method = RequestMethod.GET)
-    public @ResponseBody AbstractResponse requestMyWorth(Authentication authentication) {
+    public @ResponseBody AbstractResponse worthHistory(Authentication authentication) {
         User user = userRepository.findByUsername(authentication.getName());
 
         DateProvider dateProvider = new DateProvider();
@@ -82,8 +84,57 @@ public class PortfolioRESTController {
 
         Map<String, Object> returnResponse = new HashMap<>();
         returnResponse.put("data", worthPerDay);
-        returnResponse.put("graphs", GraphsDTO.builder().valueField("value").title("Daily worth").build());
+        List<Object> graphsConfig = new LinkedList<>();
+        graphsConfig.add(GraphsDTO.builder().valueField("value").title("Daily worth").build());
+        returnResponse.put("graphs", graphsConfig);
+
+        LOGGER.debug("User: " + user.getUsername() + " - Worth history called.");
         return new SuccessResponse<>(returnResponse);
     }
 
+    /**
+     * Returns the worth for today for the {@link User} in the required format.
+     *
+     * @param authentication
+     *         Represents the token for an authentication request or for an authenticated {@link User}.
+     *
+     * @return The worth of today for the caller user in the format required.
+     */
+    @RequestMapping(value = "/worthDay", method = RequestMethod.GET)
+    public @ResponseBody AbstractResponse worthDay(Authentication authentication) {
+        User user = userRepository.findByUsername(authentication.getName());
+
+        DateProvider dateProvider = new DateProvider();
+        List<Map<?, ?>> todayWorth = portfolioRepository.findWorthDayPerAssetClass(user, dateProvider.getToday());
+        List<Map<?, ?>> yesterdayWorth =
+                portfolioRepository.findWorthDayPerAssetClass(user, dateProvider.getYesterday());
+
+        List<DailyWorthDTO> returnResponse = new LinkedList<>();
+        for (Map<?, ?> curr : todayWorth) {
+            Map<?, ?> yesterday = null;
+            for (Map<?, ?> currYesterday : yesterdayWorth) {
+                if (currYesterday.get("assetClass").equals(curr.get("assetClass"))) {
+                    yesterday = currYesterday;
+                    break;
+                }
+            }
+
+            BigDecimal percentage = null;
+            BigDecimal todayValue = (BigDecimal) curr.get("value");
+            BigDecimal yesterdayValue = (BigDecimal) yesterday.get("value");
+            if (yesterdayValue.compareTo(BigDecimal.ZERO) != 0) {
+                percentage = todayValue.divide(yesterdayValue, 4).subtract(BigDecimal.valueOf(1));
+            }
+            BigDecimal profLoss = todayValue.subtract(yesterdayValue);
+
+            returnResponse.add(DailyWorthDTO.builder()
+                    .assetClass((String) curr.get("assetClass"))
+                    .value((BigDecimal) curr.get("value"))
+                    .percentage(percentage)
+                    .profLoss(profLoss).build());
+        }
+
+        LOGGER.debug("User: " + user.getUsername() + " - Worth day called.");
+        return new SuccessResponse<>(returnResponse);
+    }
 }

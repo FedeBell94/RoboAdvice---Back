@@ -6,13 +6,11 @@ import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResp
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.AssetClass;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Data;
-import it.uiip.digitalgarage.roboadvice.persistence.model.User;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetClassRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.DataRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -93,15 +91,6 @@ public class AssetClassRESTController {
             }
         });
         return new SuccessResponse<>(result);
-    }
-
-    @RequestMapping(value = "/worthPerAssetClass", method = RequestMethod.GET)
-    public @ResponseBody AbstractResponse worthPerAssetClass(Authentication authentication) {
-        User user = userRepository.findByUsername(authentication.getName());
-
-
-
-        return new SuccessResponse<>(null);
     }
 
 }
