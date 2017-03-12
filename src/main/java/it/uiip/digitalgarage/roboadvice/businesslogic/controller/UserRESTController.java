@@ -1,7 +1,6 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
-import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dateProvider.LiarDateProvider;
-import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.IDailyTaskUpdate;
+import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dateProvider.DateProvider;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.UserDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.ErrorResponse;
@@ -11,7 +10,6 @@ import it.uiip.digitalgarage.roboadvice.persistence.model.User;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,10 +19,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.sql.Date;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
 
 /**
  * Class used to create all the API rest used to manage the {@link User}.
@@ -40,6 +34,14 @@ public class UserRESTController {
     private static final Log LOGGER = LogFactory.getLog(UserRESTController.class);
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
+    /**
+     * Perform the login of the user into the platform.
+     *
+     * @param authentication
+     *         Represents the token for an authentication request or for an authenticated {@link User}.
+     *
+     * @return A {@link SuccessResponse} containing the {@link UserDTO} who asked for the login.
+     */
     @RequestMapping(value = "/loginUser", method = RequestMethod.POST)
     public @ResponseBody AbstractResponse loginUser(Authentication authentication) {
         User user = userRepository.findByUsername(authentication.getName());
@@ -47,14 +49,35 @@ public class UserRESTController {
         return new SuccessResponse<>(new UserDTO(user));
     }
 
+    /**
+     * Performs the logout of the caller user fom the platform.
+     *
+     * @param authentication
+     *         Represents the token for an authentication request or for an authenticated {@link User}.
+     * @param request
+     *         The {@link HttpServletRequest} of the servlet.
+     * @param response
+     *         The {@link HttpServletResponse} of the servlet.
+     *
+     * @return An empty {@link SuccessResponse}.
+     */
     @RequestMapping(value = "/logoutUser", method = RequestMethod.POST)
-    public @ResponseBody AbstractResponse logoutUser(Authentication authentication, HttpServletRequest request, HttpServletResponse response) {
-        LOGGER.debug("User " + authentication.getName() + " just logged out.");
+    public @ResponseBody AbstractResponse logoutUser(Authentication authentication, HttpServletRequest request,
+                                                     HttpServletResponse response) {
         new SecurityContextLogoutHandler().logout(request, response, authentication);
         SecurityContextHolder.getContext().setAuthentication(null);
+        LOGGER.debug("User " + authentication.getName() + " just logged out.");
         return new SuccessResponse<>(null);
     }
 
+    /**
+     * Returns to the caller his identity (as {@link User}).
+     *
+     * @param authentication
+     *         Represents the token for an authentication request or for an authenticated {@link User}.
+     *
+     * @return Returns the {@link User} which has called this method.
+     */
     @RequestMapping(value = "/tellMeWhoAmI", method = RequestMethod.GET)
     public @ResponseBody AbstractResponse tellMeWhoAmI(Authentication authentication) {
         User user = userRepository.findByUsername(authentication.getName());
@@ -62,9 +85,18 @@ public class UserRESTController {
         return new SuccessResponse<>(new UserDTO(user));
     }
 
+    /**
+     * Register the {@link User} in the platform. This API is not secured.
+     *
+     * @param inputUser
+     *         The {@link UserDTO} user to register.
+     *
+     * @return A {@link SuccessResponse} containing the user created, an {@link ErrorResponse} containing the error code
+     * if something goes wrong during the registration.
+     */
     @RequestMapping(value = "/registerUser", method = RequestMethod.POST)
     public @ResponseBody AbstractResponse registerUser(@RequestBody UserDTO inputUser) {
-        if(userRepository.findByUsername(inputUser.getUsername()) != null) {
+        if (userRepository.findByUsername(inputUser.getUsername()) != null) {
             LOGGER.debug("Email already used for this user");
             return new ErrorResponse(ExchangeError.EMAIL_ALREADY_USED);
         }
@@ -74,7 +106,7 @@ public class UserRESTController {
                 .username(inputUser.getUsername())
                 .password(hashPassword)
                 .nickname(inputUser.getNickname())
-                .registration(new Date(Calendar.getInstance().getTime().getTime()))
+                .registration(new DateProvider().getToday())
                 .enabled(true)
                 .autoBalancing(false)
                 .newUser(true)
@@ -85,32 +117,4 @@ public class UserRESTController {
         return new SuccessResponse<>(new UserDTO(user));
     }
 
-    /***************************************************************************
-     *                                                                         *
-     *                                 DEMO                                    *
-     *                                                                         *
-    ***************************************************************************/
-    @Autowired
-    private IDailyTaskUpdate dailyTaskUpdate;
-
-    @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/computePortfolioDemo", method = RequestMethod.POST)
-    public @ResponseBody AbstractResponse registerUser(@RequestBody JSONObject inputObject) {
-        LOGGER.debug("Night task started.");
-        Long startTime = System.currentTimeMillis();
-
-        User user = userRepository.findOne((Integer)inputObject.get("user_id"));
-        List<User> userList = new ArrayList<>();
-        userList.add(user);
-        LiarDateProvider liarDateProvider = new LiarDateProvider((String)inputObject.get("from"));
-        for(int i = 0; i<(Integer)inputObject.get("days"); i++) {
-            dailyTaskUpdate.executeUpdateTask(liarDateProvider, userList);
-            liarDateProvider.goNextDay();
-        }
-
-        Long endTime = System.currentTimeMillis();
-        LOGGER.debug("Night task ended -> execution time " + (endTime - startTime) + "ms. ");
-
-        return new SuccessResponse<>(null);
-    }
 }
