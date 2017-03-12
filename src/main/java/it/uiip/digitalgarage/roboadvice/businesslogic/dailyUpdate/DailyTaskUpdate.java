@@ -73,6 +73,7 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
             // Case of brand new user
             if (userPortfolio.isEmpty()) {
                 // #2: create portfolio for fresh(new) users
+                // TODO remove
                 // For each asset finds the latest price
                 final Map<Integer, BigDecimal> latestPrices = findAssetsPrice(assets, dateProvider);
                 createPortfolio(dateProvider, currUser, assets, DEFAULT_START_WORTH, latestPrices);
@@ -82,10 +83,11 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
                 List<Strategy> userStrategy = strategyRepository.findByUserAndActiveTrue(currUser);
 
                 // Check if the user strategy was changed yesterday
-                // TODO make it better
-                if (userStrategy.get(0).getStartingDate().toString().equals(dateProvider.getYesterday().toString())) {
+                if (userStrategy.get(0).getStartingDate().getTime() == dateProvider.getYesterday().getTime()) {
 
                     // #4: compute portfolio for 'old' users which has changed the strategy (same as #2)
+
+                    // TODO remove
                     // For each asset finds the latest price
                     final Map<Integer, BigDecimal> latestPrices = findAssetsPrice(assets, dateProvider);
                     BigDecimal userWorth = computeWorth(userPortfolio, latestPrices);
@@ -95,6 +97,7 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
 
                     // Check if the user uses and auto-balancing strategy
                     if (currUser.isAutoBalancing()) {
+                        // TODO remove
                         // For each asset finds the latest price
                         final Map<Integer, BigDecimal> latestPrices = findAssetsPrice(assets, dateProvider);
                         BigDecimal userWorth = computeWorth(userPortfolio, latestPrices);
@@ -107,14 +110,6 @@ public class DailyTaskUpdate implements IDailyTaskUpdate {
         }
     }
 
-    /**
-     * Compute the entire worth of a portfolio.
-     *
-     * @param portfolios
-     *         The portfolio on which compute the total worth.
-     *
-     * @return The worth of the portfolio passed.
-     */
     private BigDecimal computeWorth(final List<Portfolio> portfolios, final Map<Integer, BigDecimal> latestPrices) {
         BigDecimal worth = new BigDecimal(0);
         for (Portfolio currPortfolio : portfolios) {

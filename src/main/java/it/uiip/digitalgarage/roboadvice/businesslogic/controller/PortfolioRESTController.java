@@ -1,5 +1,6 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
+import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dateProvider.DateProvider;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.DataDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.GraphsDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.PortfolioDTO;
@@ -16,17 +17,15 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Simone on 06/03/2017.
  */
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping(value = "securedApi")
 public class PortfolioRESTController {
-
 
     @Autowired
     private UserRepository userRepository;
@@ -34,7 +33,6 @@ public class PortfolioRESTController {
     @Autowired
     private PortfolioRepository portfolioRepository;
 
-    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/portfolio", method = RequestMethod.GET)
     public @ResponseBody AbstractResponse requestMyData(Authentication authentication) {
         User user = userRepository.findByUsername(authentication.getName());
@@ -66,17 +64,26 @@ public class PortfolioRESTController {
         return new SuccessResponse<>(PortfolioDTO.builder().graphs(gdto).data(ddto).build());
     }
 
-    @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/worth", method = RequestMethod.GET)
+    /**
+     * Returns the worth history for the {@link User} in the required format.
+     *
+     * @param authentication
+     *         Represents the token for an authentication request or for an authenticated {@link User}.
+     *
+     * @return The history of the worth history in the format required.
+     */
+    @RequestMapping(value = "/worthHistory", method = RequestMethod.GET)
     public @ResponseBody AbstractResponse requestMyWorth(Authentication authentication) {
         User user = userRepository.findByUsername(authentication.getName());
 
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -360);
-        Date startDate = new java.sql.Date(cal.getTimeInMillis());
-        List<Object[]> wl = portfolioRepository.findWorth(user, startDate);
+        DateProvider dateProvider = new DateProvider();
+        List<Map<?, ?>> worthPerDay = portfolioRepository
+                .findWorthPerDay(user, dateProvider.getDayFromToday(-365), dateProvider.getToday());
 
-        return new SuccessResponse<>(wl);
+        Map<String, Object> returnResponse = new HashMap<>();
+        returnResponse.put("data", worthPerDay);
+        returnResponse.put("graphs", GraphsDTO.builder().valueField("value").title("Daily worth").build());
+        return new SuccessResponse<>(returnResponse);
     }
 
 }

@@ -14,4 +14,10 @@ public class DateProvider {
         calendar.add(Calendar.DATE, -1);
         return new Date(calendar.getTime().getTime());
     }
+
+    public Date getDayFromToday(int amount){
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, amount);
+        return new Date(calendar.getTime().getTime());
+    }
 }

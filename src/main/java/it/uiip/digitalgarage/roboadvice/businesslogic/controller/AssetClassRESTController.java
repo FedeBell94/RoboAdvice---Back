@@ -1,21 +1,20 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.net.httpserver.Authenticator;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.AssetClassDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.AssetClass;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Data;
+import it.uiip.digitalgarage.roboadvice.persistence.model.User;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetClassRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.DataRepository;
+import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDate;
@@ -26,6 +25,7 @@ import java.util.*;
  */
 
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping(value = "securedApi")
 public class AssetClassRESTController {
 
@@ -33,16 +33,16 @@ public class AssetClassRESTController {
     private DataRepository dataRepository;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private AssetRepository assetRepository;
 
     @Autowired
     private AssetClassRepository assetClassRepository;
 
-    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/assetClassHistory", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    AbstractResponse requestAssetClassData(@RequestParam int assetClassId/*, Authentication authentication*/) {
+    public @ResponseBody AbstractResponse requestAssetClassData(@RequestParam int assetClassId) {
 
         AssetClass assetClass = assetClassRepository.findOne(assetClassId);
 
@@ -69,7 +69,8 @@ public class AssetClassRESTController {
                 } else {
                     hm.put(assetData.get(j).getDate().toLocalDate(), hm.get(assetData.get(j).getDate())
                             .add(assetData.get(j).getValue()
-                                    .multiply(assetData.get(j).getAsset().getFixedPercentage()).divide(new BigDecimal("100"))));
+                                    .multiply(assetData.get(j).getAsset().getFixedPercentage())
+                                    .divide(new BigDecimal("100"))));
                 }
 
             }
@@ -79,7 +80,7 @@ public class AssetClassRESTController {
         Iterator it = hm.entrySet().iterator();
         ArrayList<AssetClassDTO> result = new ArrayList();
         while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
+            Map.Entry pair = (Map.Entry) it.next();
             result.add(AssetClassDTO.builder()
                     .date(pair.getKey().toString())
                     .value((BigDecimal) pair.getValue()).build());
@@ -94,9 +95,13 @@ public class AssetClassRESTController {
         return new SuccessResponse<>(result);
     }
 
-    @PostConstruct
-    public void func(){
-        requestAssetClassData(1);
+    @RequestMapping(value = "/worthPerAssetClass", method = RequestMethod.GET)
+    public @ResponseBody AbstractResponse worthPerAssetClass(Authentication authentication) {
+        User user = userRepository.findByUsername(authentication.getName());
+
+
+
+        return new SuccessResponse<>(null);
     }
 
 }

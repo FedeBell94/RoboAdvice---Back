@@ -45,8 +45,8 @@ public class Application {
     private static final Log LOGGER = LogFactory.getLog(Application.class);
 
     // Execution of night task
-    //@Scheduled(cron = "0 0 10 * * MON-FRI")
-    //@Scheduled(cron = "*/5 * * * * MON-FRI")
+    //@Scheduled(cron = "0 0 10 * * TUE-SAT")
+    //@Scheduled(cron = "*/5 * * * * TUE-SAT")
     public void executeNightTask(){
         LOGGER.debug("Night task started.");
         Long startTime = System.currentTimeMillis();

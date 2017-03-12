@@ -30,6 +30,7 @@ import java.util.List;
  * Class used to create all the API rest used to manage the {@link User}.
  */
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping(value = "securedApi")
 public class UserRESTController {
 
@@ -39,7 +40,6 @@ public class UserRESTController {
     private static final Log LOGGER = LogFactory.getLog(UserRESTController.class);
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/loginUser", method = RequestMethod.POST)
     public @ResponseBody AbstractResponse loginUser(Authentication authentication) {
         User user = userRepository.findByUsername(authentication.getName());
@@ -47,7 +47,6 @@ public class UserRESTController {
         return new SuccessResponse<>(new UserDTO(user));
     }
 
-    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/logoutUser", method = RequestMethod.POST)
     public @ResponseBody AbstractResponse logoutUser(Authentication authentication, HttpServletRequest request, HttpServletResponse response) {
         LOGGER.debug("User " + authentication.getName() + " just logged out.");
@@ -56,7 +55,6 @@ public class UserRESTController {
         return new SuccessResponse<>(null);
     }
 
-    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/tellMeWhoAmI", method = RequestMethod.GET)
     public @ResponseBody AbstractResponse tellMeWhoAmI(Authentication authentication) {
         User user = userRepository.findByUsername(authentication.getName());
@@ -64,7 +62,6 @@ public class UserRESTController {
         return new SuccessResponse<>(new UserDTO(user));
     }
 
-    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/registerUser", method = RequestMethod.POST)
     public @ResponseBody AbstractResponse registerUser(@RequestBody UserDTO inputUser) {
         if(userRepository.findByUsername(inputUser.getUsername()) != null) {

@@ -13,6 +13,4 @@ public class PortfolioDTO {
 
     private List<GraphsDTO> graphs;
     private List<DataDTO> data;
-
-
 }
