@@ -9,9 +9,11 @@ import java.util.List;
 
 public interface DataRepository extends JpaRepository<Data, Integer> {
 
-    //Data findByAssetAndDate(Asset asset, Date date);
+    Data findByAssetAndDate(Asset asset, Date date);
 
     Data findTop1ByDateBeforeAndAssetOrderByDateDesc(Date date, Asset asset);
+
+    Data findTop1ByAssetOrderByDateDesc(Asset asset);
 
     //List<Data> findFirst360ByAssetOrderByDateDesc(Asset asset);
 

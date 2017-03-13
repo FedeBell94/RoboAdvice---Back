@@ -20,4 +20,10 @@ public class DateProvider {
         calendar.add(Calendar.DATE, amount);
         return new Date(calendar.getTime().getTime());
     }
+
+    public Date getDayBeforeToday(int amount){
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, -amount);
+        return new Date(calendar.getTime().getTime());
+    }
 }

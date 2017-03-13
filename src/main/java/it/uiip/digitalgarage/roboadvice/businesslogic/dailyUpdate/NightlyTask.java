@@ -1,5 +1,6 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate;
 
+import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dataUpdater.IDataSource;
 import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dateProvider.DateProvider;
 import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dateProvider.LiarDateProvider;
 import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dataUpdater.IDataUpdater;
@@ -13,9 +14,11 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +46,9 @@ public class NightlyTask implements INightlyTask {
     @Autowired
     private IDataUpdater dataUpdater;
 
+    @Autowired
+    private IDataSource DataSource;
+
     private static final Log LOGGER = LogFactory.getLog(NightlyTask.class);
 
     /**
@@ -55,7 +61,8 @@ public class NightlyTask implements INightlyTask {
 
         // #1: update data (only if not in demo mode)
         if (!(dateProvider instanceof LiarDateProvider)) {
-            dataUpdater.updateDailyData();
+            //dataUpdater.updateDailyData();
+            dataConsistency();
         }
 
         // Finds all assets
@@ -205,4 +212,24 @@ public class NightlyTask implements INightlyTask {
         }
         portfolioRepository.save(insertList);
     }
+
+    public void dataConsistency(){
+
+        List<Asset> assets = assetRepository.findAll();
+        DateProvider dateProvider = new DateProvider();
+        LocalDate lastDate = dateProvider.getYesterday().toLocalDate();
+
+        for(int x = 0 ; x < assets.size() ; x++){
+            Data data = dataRepository.findTop1ByAssetOrderByDateDesc(assets.get(x));
+
+            DataSource.getHistoricalData(assets.get(x),data.getDate().toLocalDate().getYear(),data.getDate().toLocalDate().getMonthValue(),data.getDate().toLocalDate().getDayOfMonth());
+
+        }
+
+    }
+
+    /*@PostConstruct
+    public void func(){
+        dataConsistency();
+    }*/
 }
