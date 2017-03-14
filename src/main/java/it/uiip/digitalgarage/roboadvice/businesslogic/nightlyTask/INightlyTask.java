@@ -1,6 +1,6 @@
-package it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate;
+package it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask;
 
-import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dateProvider.DateProvider;
+import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dateProvider.DateProvider;
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
 
 public interface INightlyTask {

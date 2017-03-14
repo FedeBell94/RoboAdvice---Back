@@ -1,9 +1,8 @@
-package it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate;
+package it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask;
 
-import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dataUpdater.IDataSource;
-import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dataUpdater.IDataUpdater;
-import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dateProvider.DateProvider;
-import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dateProvider.LiarDateProvider;
+import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dataUpdater.IDataUpdater;
+import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dateProvider.DateProvider;
+import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dateProvider.LiarDateProvider;
 import it.uiip.digitalgarage.roboadvice.persistence.model.*;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.DataRepository;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Date;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,27 +26,27 @@ import java.util.Map;
 @Service
 public class NightlyTask implements INightlyTask {
 
-
-    @Autowired
-    private StrategyRepository strategyRepository;
-
-    @Autowired
-    private PortfolioRepository portfolioRepository;
-
-    @Autowired
-    private AssetRepository assetRepository;
-
-    @Autowired
-    private DataRepository dataRepository;
-
-    // Autowire with data updater
-    @Autowired
-    private IDataUpdater dataUpdater;
-
-    @Autowired
-    private IDataSource DataSource;
-
     private static final Log LOGGER = LogFactory.getLog(NightlyTask.class);
+
+    private final StrategyRepository strategyRepository;
+    private final PortfolioRepository portfolioRepository;
+    private final AssetRepository assetRepository;
+    private final DataRepository dataRepository;
+
+    private final IDataUpdater dataUpdater;
+   // private final IDataSource dataSource;
+
+    @Autowired
+    public NightlyTask(final StrategyRepository strategyRepository, final PortfolioRepository portfolioRepository,
+                       final AssetRepository assetRepository, final DataRepository dataRepository,
+                       final IDataUpdater dataUpdater) {
+        this.strategyRepository = strategyRepository;
+        this.portfolioRepository = portfolioRepository;
+        this.assetRepository = assetRepository;
+        this.dataRepository = dataRepository;
+        this.dataUpdater = dataUpdater;
+    }
+
 
     /**
      * The default start worth of a user. It is set to 10000.
@@ -208,17 +206,17 @@ public class NightlyTask implements INightlyTask {
 
     public void dataConsistency() {
 
-        Iterable<Asset> assets = assetRepository.findAll();
-        DateProvider dateProvider = new DateProvider();
-        LocalDate lastDate = dateProvider.getYesterday().toLocalDate();
-
-        for (Asset currAsset : assets) {
-            Data data = dataRepository.findTop1ByAssetOrderByDateDesc(currAsset);
-
-            DataSource.getHistoricalData(currAsset, data.getDate().toLocalDate().getYear(),
-                    data.getDate().toLocalDate().getMonthValue(), data.getDate().toLocalDate().getDayOfMonth());
-
-        }
+//        Iterable<Asset> assets = assetRepository.findAll();
+//        DateProvider dateProvider = new DateProvider();
+//        LocalDate lastDate = dateProvider.getYesterday().toLocalDate();
+//
+//        for (Asset currAsset : assets) {
+//            Data data = dataRepository.findTop1ByAssetOrderByDateDesc(currAsset);
+//
+//            dataSource.getHistoricalData(currAsset, data.getDate().toLocalDate().getYear(),
+//                    data.getDate().toLocalDate().getMonthValue(), data.getDate().toLocalDate().getDayOfMonth());
+//
+//        }
     }
 
     /*@PostConstruct

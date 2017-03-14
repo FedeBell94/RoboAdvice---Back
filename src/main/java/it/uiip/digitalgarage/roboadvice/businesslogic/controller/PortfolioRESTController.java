@@ -1,6 +1,6 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
-import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dateProvider.DateProvider;
+import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dateProvider.DateProvider;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.DailyWorthDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.GraphPortfolioHistoryDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.GraphSettingsDTO;

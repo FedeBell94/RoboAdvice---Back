@@ -2,8 +2,8 @@ package it.uiip.digitalgarage.roboadvice;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
-import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.INightlyTask;
-import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dateProvider.DateProvider;
+import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.INightlyTask;
+import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dateProvider.DateProvider;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.AssetClass;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetClassRepository;
@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import javax.annotation.PostConstruct;
 import java.io.FileReader;
@@ -29,29 +30,33 @@ import java.util.List;
 @SpringBootApplication
 public class Application {
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private AssetRepository assetRepository;
-
-    @Autowired
-    private AssetClassRepository assetClassRepository;
-
-    @Autowired
-    private INightlyTask dailyTask;
-
-
     private static final Log LOGGER = LogFactory.getLog(Application.class);
+
+    private final UserRepository userRepository;
+    private final AssetRepository assetRepository;
+    private final AssetClassRepository assetClassRepository;
+
+    private final INightlyTask nightlyTask;
+
+
+    @Autowired
+    public Application(final UserRepository userRepository, final AssetRepository assetRepository,
+                       final AssetClassRepository assetClassRepository, final INightlyTask nightlyTask) {
+        this.userRepository = userRepository;
+        this.assetRepository = assetRepository;
+        this.assetClassRepository = assetClassRepository;
+        this.nightlyTask = nightlyTask;
+    }
+
 
     // Execution of night task
     //@Scheduled(cron = "0 0 10 * * TUE-SAT")
-    //@Scheduled(cron = "*/5 * * * * *")
-    public void executeNightTask(){
+    @Scheduled(cron = "*/1 * * * * *")
+    public void executeNightTask() {
         LOGGER.debug("Night task started.");
         Long startTime = System.currentTimeMillis();
         DateProvider dateProvider = new DateProvider();
-        dailyTask.executeNightlyTask(dateProvider, userRepository.findAll());
+        nightlyTask.executeNightlyTask(dateProvider, userRepository.findAll());
         Long endTime = System.currentTimeMillis();
         LOGGER.debug("Night task ended -> execution time " + (endTime - startTime) + "ms. ");
     }
@@ -116,7 +121,7 @@ public class Application {
     }
 
     @PostConstruct
-    private void initLogger(){
+    private void initLogger() {
         Logger logger = (Logger) LoggerFactory.getLogger("it.uiip.digitalgarage.roboadvice");
         logger.setLevel(Level.DEBUG);
     }

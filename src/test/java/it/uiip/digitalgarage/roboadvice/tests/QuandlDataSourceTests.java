@@ -1,8 +1,8 @@
 package it.uiip.digitalgarage.roboadvice.tests;
 
 import it.uiip.digitalgarage.roboadvice.Application;
-import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dateProvider.DateProvider;
-import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dataUpdater.Quandl.QuandlDataSource;
+import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dateProvider.DateProvider;
+import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dataUpdater.Quandl.QuandlDataSource;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Data;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;

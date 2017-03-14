@@ -1,7 +1,7 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
-import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.INightlyTask;
-import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dateProvider.LiarDateProvider;
+import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.INightlyTask;
+import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dateProvider.LiarDateProvider;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
