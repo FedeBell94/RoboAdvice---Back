@@ -21,7 +21,7 @@ public class Data implements Serializable {
     @GeneratedValue
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "asset_id")
     private Asset asset;
 

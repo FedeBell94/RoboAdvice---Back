@@ -1,6 +1,5 @@
 package it.uiip.digitalgarage.roboadvice.persistence.repository;
 
-import it.uiip.digitalgarage.roboadvice.persistence.model.Data;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Portfolio;
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;

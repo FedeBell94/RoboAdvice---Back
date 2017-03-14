@@ -26,11 +26,11 @@ public class Portfolio implements Serializable{
     @JoinColumn(name="userId")
     private User user;
 
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne(fetch=FetchType.EAGER)
     @JoinColumn(name="assetClassId")
     private AssetClass assetClass;
 
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne(fetch=FetchType.EAGER)
     @JoinColumn(name="assetId")
     private Asset asset;
 
