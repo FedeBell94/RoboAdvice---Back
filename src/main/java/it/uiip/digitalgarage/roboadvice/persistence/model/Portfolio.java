@@ -14,7 +14,7 @@ import java.sql.Date;
 
 
 @Entity
-@Table(name = "Portfolio")
+@Table(name = "Portfolio", indexes = {@Index(name = "USER_DATE_KEY", columnList = "userId,date")})
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder @ToString
 public class Portfolio implements Serializable{
 
@@ -23,15 +23,15 @@ public class Portfolio implements Serializable{
     private Long id;
 
     @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="user_id")
+    @JoinColumn(name="userId")
     private User user;
 
     @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="asset_class_id")
+    @JoinColumn(name="assetClassId")
     private AssetClass assetClass;
 
     @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="asset_id")
+    @JoinColumn(name="assetId")
     private Asset asset;
 
     @Column(name = "unit", nullable = false, precision = 14, scale = 4)

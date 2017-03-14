@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 import java.sql.Date;
 
 @Entity
-@Table(name = "Strategy")
+@Table(name = "Strategy", indexes = {@Index(name = "USER_KEY", columnList = "userId")})
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder @ToString
 public class Strategy implements Serializable{
 
@@ -22,11 +22,11 @@ public class Strategy implements Serializable{
     private Long id;
 
     @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="user_id")
+    @JoinColumn(name="userId")
     private User user;
 
     @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="asset_class_id")
+    @JoinColumn(name="assetClassId")
     private AssetClass assetClass;
 
     @Column(name = "percentage", nullable = false, precision = 14, scale = 4)
@@ -35,7 +35,7 @@ public class Strategy implements Serializable{
     @Column(name = "active", nullable = false)
     private Boolean active;
 
-    @Column(name = "starting_date", nullable = false)
+    @Column(name = "startingDate", nullable = false)
     private Date startingDate;
 
 }

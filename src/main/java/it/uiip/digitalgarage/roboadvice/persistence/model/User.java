@@ -10,9 +10,8 @@ import lombok.*;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Date;
-
 @Entity
-@Table(name = "User")
+@Table(name = "User", indexes = {@Index(name = "USERNAME_KEY", columnList = "username", unique = true)})
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder @ToString
 public class User implements Serializable {
 
