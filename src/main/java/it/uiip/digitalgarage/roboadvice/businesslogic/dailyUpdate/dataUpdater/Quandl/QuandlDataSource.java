@@ -73,7 +73,7 @@ public class QuandlDataSource implements IDataSource {
             if (value != null) {
                 Data d = Data.builder().date(DateTimeUtils.toSqlDate(ldate)).value(BigDecimal.valueOf(value)).asset(asset).build();
                 res.add(d);
-                Data dop = dataRepository.findByAssetAndDate(asset, DateTimeUtils.toSqlDate(ldate));
+                Data dop = dataRepository.findByDateAndAsset(DateTimeUtils.toSqlDate(ldate), asset);
                 if (dop == null) {
                     dataRepository.save(d);
                 }

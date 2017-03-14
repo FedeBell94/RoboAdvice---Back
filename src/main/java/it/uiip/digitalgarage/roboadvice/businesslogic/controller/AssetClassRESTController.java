@@ -56,7 +56,7 @@ public class AssetClassRESTController {
 
         for (int i = 0; i < assets.size(); i++) {
 
-            List<Data> assetData = dataRepository.findByAssetAndDateAfter(assets.get(i), startDate);
+            List<Data> assetData = dataRepository.findByDateAfterAndAsset(startDate, assets.get(i));
 
 
             for (int j = 0; j < assetData.size(); j++) {

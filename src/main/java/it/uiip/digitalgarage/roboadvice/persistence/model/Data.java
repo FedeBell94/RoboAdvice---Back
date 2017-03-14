@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 import java.sql.Date;
 
 @Entity
-@Table(name = "Data")
+@Table(name = "Data", indexes = {@Index(name = "DATE_KEY", columnList = "date")})
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder @ToString
 public class Data implements Serializable {
 
