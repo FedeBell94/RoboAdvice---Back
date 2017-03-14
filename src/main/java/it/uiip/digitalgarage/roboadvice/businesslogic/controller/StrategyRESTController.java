@@ -78,8 +78,8 @@ public class StrategyRESTController {
                                                          Authentication authentication) {
         User user = userRepository.findByUsername(authentication.getName());
         // Set user as not new if he was new
-        if (user.isNewUser()) {
-            user.setNewUser(false);
+        if (user.getIsNewUser()) {
+            user.setIsNewUser(false);
             userRepository.save(user);
         }
 

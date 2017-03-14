@@ -36,7 +36,7 @@ public class DemoRESTController {
         LOGGER.debug("Compute portfolio demo started.");
         Long startTime = System.currentTimeMillis();
 
-        User user = userRepository.findOne((Integer) inputObject.get("user_id"));
+        User user = userRepository.findOne(Long.parseLong((String)inputObject.get("user_id")));
         List<User> userList = new ArrayList<>();
         userList.add(user);
         LiarDateProvider liarDateProvider = new LiarDateProvider((String) inputObject.get("from"));

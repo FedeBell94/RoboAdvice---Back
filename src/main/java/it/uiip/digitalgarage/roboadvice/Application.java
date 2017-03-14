@@ -91,7 +91,7 @@ public class Application {
         assetClassRepository.deleteAll();
         for (JSONObject curr : assetClassList) {
             assetClassRepository.save(AssetClass.builder()
-                    .id(Integer.parseInt((String) curr.get("id")))
+                    .id(Long.parseLong((String) curr.get("id")))
                     .name((String) curr.get("name"))
                     .build());
         }
@@ -102,8 +102,8 @@ public class Application {
         assetRepository.deleteAll();
         for (JSONObject curr : assetList) {
             Asset a = Asset.builder()
-                    .id(Integer.parseInt((String) curr.get("id")))
-                    .assetClass(assetClassRepository.findOne(Integer.parseInt((String) curr.get("assetClassId"))))
+                    .id(Long.parseLong((String) curr.get("id")))
+                    .assetClass(assetClassRepository.findOne(Long.parseLong((String) curr.get("assetClassId"))))
                     .name((String) curr.get("name"))
                     .quandlKey((String) curr.get("quandlKey"))
                     .quandlId(Integer.parseInt((String) curr.get("quandlId")))

@@ -10,7 +10,7 @@ import java.sql.Date;
 import java.util.List;
 import java.util.Map;
 
-public interface PortfolioRepository extends JpaRepository<Portfolio, Integer> {
+public interface PortfolioRepository extends JpaRepository<Portfolio, Long> {
 
     List<Portfolio> findByUserAndDate(User user, Date date);
 

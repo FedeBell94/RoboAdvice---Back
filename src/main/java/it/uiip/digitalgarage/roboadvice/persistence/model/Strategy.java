@@ -19,7 +19,7 @@ public class Strategy implements Serializable{
 
     @Id
     @GeneratedValue
-    private int id;
+    private Long id;
 
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="user_id")
@@ -33,7 +33,7 @@ public class Strategy implements Serializable{
     private BigDecimal percentage;
 
     @Column(name = "active", nullable = false)
-    private boolean active;
+    private Boolean active;
 
     @Column(name = "starting_date", nullable = false)
     private Date startingDate;

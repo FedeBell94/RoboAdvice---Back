@@ -41,7 +41,7 @@ public class QuandlDataSourceTests {
 
     private static final Log LOGGER = LogFactory.getLog(Application.class);
 
-    private int assetId = 1;
+    private Long assetId = 1L;
     private Asset asset;
     private Data data;
     private Date yesterday = new DateProvider().getYesterday();

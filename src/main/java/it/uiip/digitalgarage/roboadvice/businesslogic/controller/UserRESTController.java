@@ -108,7 +108,7 @@ public class UserRESTController {
                 .nickname(inputUser.getNickname())
                 .registration(new DateProvider().getToday())
                 .enabled(true)
-                .newUser(true)
+                .isNewUser(true)
                 .build();
         userRepository.save(user);
 

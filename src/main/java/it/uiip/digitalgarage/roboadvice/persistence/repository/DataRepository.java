@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.sql.Date;
 import java.util.List;
 
-public interface DataRepository extends JpaRepository<Data, Integer> {
+public interface DataRepository extends JpaRepository<Data, Long> {
 
     Data findByAssetAndDate(Asset asset, Date date);
 

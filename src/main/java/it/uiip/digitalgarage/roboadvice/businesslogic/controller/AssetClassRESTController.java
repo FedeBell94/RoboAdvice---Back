@@ -40,7 +40,7 @@ public class AssetClassRESTController {
     private AssetClassRepository assetClassRepository;
 
     @RequestMapping(value = "/assetClassHistory", method = RequestMethod.GET)
-    public @ResponseBody AbstractResponse requestAssetClassData(@RequestParam int assetClassId) {
+    public @ResponseBody AbstractResponse requestAssetClassData(@RequestParam Long assetClassId) {
 
         AssetClass assetClass = assetClassRepository.findOne(assetClassId);
 

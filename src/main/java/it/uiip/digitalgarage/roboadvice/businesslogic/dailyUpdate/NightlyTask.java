@@ -68,7 +68,7 @@ public class NightlyTask implements INightlyTask {
         final List<Asset> assets = assetRepository.findAll();
 
         // For each asset finds the latest price
-        final Map<Integer, BigDecimal> latestPrices = findAssetsPrice(assets, dateProvider);
+        final Map<Long, BigDecimal> latestPrices = findAssetsPrice(assets, dateProvider);
 
 
         // Finds the assets changed today
@@ -103,7 +103,7 @@ public class NightlyTask implements INightlyTask {
         }
     }
 
-    private BigDecimal computeWorth(final List<Portfolio> portfolios, final Map<Integer, BigDecimal> latestPrices) {
+    private BigDecimal computeWorth(final List<Portfolio> portfolios, final Map<Long, BigDecimal> latestPrices) {
         BigDecimal worth = new BigDecimal(0);
         for (Portfolio currPortfolio : portfolios) {
             BigDecimal singleWorth =
@@ -155,8 +155,8 @@ public class NightlyTask implements INightlyTask {
     }
 
 
-    private Map<Integer, BigDecimal> findAssetsPrice(final List<Asset> assets, final DateProvider dateProvider) {
-        Map<Integer, BigDecimal> latestPrices = new HashMap<>();
+    private Map<Long, BigDecimal> findAssetsPrice(final List<Asset> assets, final DateProvider dateProvider) {
+        Map<Long, BigDecimal> latestPrices = new HashMap<>();
         for (Asset curr : assets) {
             Data data = dataRepository.findTop1ByDateBeforeAndAssetOrderByDateDesc(dateProvider.getToday(), curr);
             latestPrices.put(data.getAsset().getId(), data.getValue());
@@ -166,7 +166,7 @@ public class NightlyTask implements INightlyTask {
 
 
     private void createPortfolio(final DateProvider dateProvider, final User user, final List<Asset> assets,
-                                 final BigDecimal totalMoney, final Map<Integer, BigDecimal> latestPrices) {
+                                 final BigDecimal totalMoney, final Map<Long, BigDecimal> latestPrices) {
 
         final Date currDate = dateProvider.getToday();
         // Finds the active strategy of the current user

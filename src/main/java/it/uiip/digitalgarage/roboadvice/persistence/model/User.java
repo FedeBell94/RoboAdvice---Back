@@ -18,7 +18,7 @@ public class User implements Serializable {
 
     @Id
     @GeneratedValue
-    private int id;
+    private Long id;
 
     @Column(name = "username", nullable = false, unique = true)
     private String username;
@@ -30,21 +30,20 @@ public class User implements Serializable {
     private String nickname;
 
     @Column(name = "enabled", nullable = false)
-    private boolean enabled;
+    private Boolean enabled;
 
     @Column(name = "registration", nullable = false)
     private Date registration;
 
-
-    @Column(name = "newUser", nullable = false)
-    private boolean newUser;
+    @Column(name = "isNewUser", nullable = false)
+    private Boolean isNewUser;
 
     public User(User user){
         this.id = user.getId();
         this.password = user.getPassword();
         this.username = user.getUsername();
-        this.enabled = user.isEnabled();
+        this.enabled = user.getEnabled();
         this.registration = user.getRegistration();
-        this.newUser = user.isNewUser();
+        this.isNewUser = user.getIsNewUser();
     }
 }

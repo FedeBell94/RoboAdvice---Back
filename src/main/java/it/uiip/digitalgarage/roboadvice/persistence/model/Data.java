@@ -19,7 +19,7 @@ public class Data implements Serializable {
 
     @Id
     @GeneratedValue
-    private int id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "asset_id")

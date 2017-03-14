@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 public class Asset implements Serializable {
 
     @Id
-    private int id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "asset_class_id")
@@ -30,7 +30,7 @@ public class Asset implements Serializable {
     private String quandlKey;
 
     @Column(name = "quandlId", nullable = false)
-    private int quandlId;
+    private Integer quandlId;
 
     @Column(name = "quandlColumn", nullable = false)
     private String quandlColumn;
