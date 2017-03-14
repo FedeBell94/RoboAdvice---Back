@@ -56,7 +56,7 @@ public class NightlyTask implements INightlyTask {
     private static final BigDecimal DEFAULT_START_WORTH = new BigDecimal(10000);
 
     @Override
-    public void executeNightlyTask(final DateProvider dateProvider, final List<User> users) {
+    public void executeNightlyTask(final DateProvider dateProvider, final Iterable<User> users) {
 
         // #1: update data (only if not in demo mode)
         if (!(dateProvider instanceof LiarDateProvider)) {
@@ -65,7 +65,7 @@ public class NightlyTask implements INightlyTask {
         }
 
         // Finds all assets
-        final List<Asset> assets = assetRepository.findAll();
+        final Iterable<Asset> assets = assetRepository.findAll();
 
         // For each asset finds the latest price
         final Map<Long, BigDecimal> latestPrices = findAssetsPrice(assets, dateProvider);
@@ -123,13 +123,13 @@ public class NightlyTask implements INightlyTask {
         for (Portfolio currPortfolio : portfolios) {
 
             Data latestAssetPrice = null;
-            for(Data currData : todayNewPrices){
-                if(currData.getAsset().getId() == currPortfolio.getAsset().getId()){
+            for (Data currData : todayNewPrices) {
+                if (currData.getAsset().getId() == currPortfolio.getAsset().getId()) {
                     latestAssetPrice = currData;
                 }
             }
 
-            if(latestAssetPrice != null) {
+            if (latestAssetPrice != null) {
                 BigDecimal assetMoney = currPortfolio.getUnit().multiply(latestAssetPrice.getValue());
 
                 insertList.add(Portfolio.builder()
@@ -140,7 +140,7 @@ public class NightlyTask implements INightlyTask {
                         .value(assetMoney)
                         .date(currDate)
                         .build());
-            } else{
+            } else {
                 insertList.add(Portfolio.builder()
                         .user(currPortfolio.getUser())
                         .assetClass(currPortfolio.getAssetClass())
@@ -155,7 +155,7 @@ public class NightlyTask implements INightlyTask {
     }
 
 
-    private Map<Long, BigDecimal> findAssetsPrice(final List<Asset> assets, final DateProvider dateProvider) {
+    private Map<Long, BigDecimal> findAssetsPrice(final Iterable<Asset> assets, final DateProvider dateProvider) {
         Map<Long, BigDecimal> latestPrices = new HashMap<>();
         for (Asset curr : assets) {
             Data data = dataRepository.findTop1ByDateBeforeAndAssetOrderByDateDesc(dateProvider.getToday(), curr);
@@ -165,7 +165,7 @@ public class NightlyTask implements INightlyTask {
     }
 
 
-    private void createPortfolio(final DateProvider dateProvider, final User user, final List<Asset> assets,
+    private void createPortfolio(final DateProvider dateProvider, final User user, final Iterable<Asset> assets,
                                  final BigDecimal totalMoney, final Map<Long, BigDecimal> latestPrices) {
 
         final Date currDate = dateProvider.getToday();
@@ -206,19 +206,19 @@ public class NightlyTask implements INightlyTask {
         portfolioRepository.save(insertList);
     }
 
-    public void dataConsistency(){
+    public void dataConsistency() {
 
-        List<Asset> assets = assetRepository.findAll();
+        Iterable<Asset> assets = assetRepository.findAll();
         DateProvider dateProvider = new DateProvider();
         LocalDate lastDate = dateProvider.getYesterday().toLocalDate();
 
-        for(int x = 0 ; x < assets.size() ; x++){
-            Data data = dataRepository.findTop1ByAssetOrderByDateDesc(assets.get(x));
+        for (Asset currAsset : assets) {
+            Data data = dataRepository.findTop1ByAssetOrderByDateDesc(currAsset);
 
-            DataSource.getHistoricalData(assets.get(x),data.getDate().toLocalDate().getYear(),data.getDate().toLocalDate().getMonthValue(),data.getDate().toLocalDate().getDayOfMonth());
+            DataSource.getHistoricalData(currAsset, data.getDate().toLocalDate().getYear(),
+                    data.getDate().toLocalDate().getMonthValue(), data.getDate().toLocalDate().getDayOfMonth());
 
         }
-
     }
 
     /*@PostConstruct

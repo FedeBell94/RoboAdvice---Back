@@ -10,8 +10,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Iterator;
 
 @Service
 @SuppressWarnings("unused")
@@ -31,7 +30,7 @@ public class DataUpdater implements IDataUpdater {
 
     @Override
     public void updateDailyData() {
-        List<Asset> assets = assetRepository.findAll();
+        Iterable<Asset> assets = assetRepository.findAll();
         for (Asset currAsset : assets) {
             Data data = dataSource.getData(currAsset, new DateProvider().getYesterday());
             if (data != null) {

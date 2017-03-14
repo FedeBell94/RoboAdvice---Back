@@ -1,9 +1,8 @@
 package it.uiip.digitalgarage.roboadvice.persistence.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import it.uiip.digitalgarage.roboadvice.persistence.model.AssetClass;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface AssetClassRepository extends JpaRepository<AssetClass, Long> {
+public interface AssetClassRepository extends PagingAndSortingRepository<AssetClass, Long> {
 
 }

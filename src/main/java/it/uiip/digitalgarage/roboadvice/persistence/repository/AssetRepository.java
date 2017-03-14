@@ -2,11 +2,11 @@ package it.uiip.digitalgarage.roboadvice.persistence.repository;
 
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.AssetClass;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.List;
 
-public interface AssetRepository extends JpaRepository<Asset, Long> {
+public interface AssetRepository extends PagingAndSortingRepository<Asset, Long> {
 
     List<Asset> findByAssetClass(AssetClass assetClass);
 
