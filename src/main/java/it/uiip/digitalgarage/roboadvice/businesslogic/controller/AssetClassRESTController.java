@@ -9,7 +9,6 @@ import it.uiip.digitalgarage.roboadvice.persistence.model.Data;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetClassRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.DataRepository;
-import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,17 +26,17 @@ import java.util.*;
 @RequestMapping(value = "securedApi")
 public class AssetClassRESTController {
 
-    @Autowired
-    private DataRepository dataRepository;
+    private final DataRepository dataRepository;
+    private final AssetRepository assetRepository;
+    private final AssetClassRepository assetClassRepository;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private AssetRepository assetRepository;
-
-    @Autowired
-    private AssetClassRepository assetClassRepository;
+    public AssetClassRESTController(final DataRepository dataRepository, final AssetRepository assetRepository,
+                                    final AssetClassRepository assetClassRepository){
+        this.dataRepository = dataRepository;
+        this.assetRepository = assetRepository;
+        this.assetClassRepository = assetClassRepository;
+    }
 
     @RequestMapping(value = "/assetClassHistory", method = RequestMethod.GET)
     public @ResponseBody AbstractResponse requestAssetClassData(@RequestParam Long assetClassId) {

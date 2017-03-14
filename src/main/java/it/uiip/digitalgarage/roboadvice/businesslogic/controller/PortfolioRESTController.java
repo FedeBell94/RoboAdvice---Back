@@ -1,12 +1,12 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
-import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dateProvider.DateProvider;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.DailyWorthDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.GraphPortfolioHistoryDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.GraphSettingsDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.PortfolioHistoryDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
+import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dateProvider.DateProvider;
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.PortfolioRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
@@ -25,13 +25,16 @@ import java.util.*;
 @RequestMapping(value = "securedApi")
 public class PortfolioRESTController {
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PortfolioRepository portfolioRepository;
-
     private static final Log LOGGER = LogFactory.getLog(PortfolioRepository.class);
+
+    private final UserRepository userRepository;
+    private final PortfolioRepository portfolioRepository;
+
+    @Autowired
+    public PortfolioRESTController(final UserRepository userRepository, final PortfolioRepository portfolioRepository){
+        this.userRepository = userRepository;
+        this.portfolioRepository = portfolioRepository;
+    }
 
     /**
      * Returns the worth history for the {@link User} in the required format.
@@ -114,6 +117,7 @@ public class PortfolioRESTController {
      *
      * @return The history of the portfolio of the caller {@link User}
      */
+    // TODO destroy this mess
     @RequestMapping(value = "/portfolio", method = RequestMethod.GET)
     public @ResponseBody AbstractResponse requestMyData(Authentication authentication) {
         User user = userRepository.findByUsername(authentication.getName());

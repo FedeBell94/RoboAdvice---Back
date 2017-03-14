@@ -1,11 +1,11 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
-import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dateProvider.DateProvider;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.UserDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.ErrorResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.ExchangeError;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
+import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dateProvider.DateProvider;
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
 import org.apache.commons.logging.Log;
@@ -28,11 +28,15 @@ import javax.servlet.http.HttpServletResponse;
 @RequestMapping(value = "securedApi")
 public class UserRESTController {
 
-    @Autowired
-    private UserRepository userRepository;
-
     private static final Log LOGGER = LogFactory.getLog(UserRESTController.class);
+
+    private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    @Autowired
+    public UserRESTController(final UserRepository userRepository){
+        this.userRepository = userRepository;
+    }
 
     /**
      * Perform the login of the user into the platform.

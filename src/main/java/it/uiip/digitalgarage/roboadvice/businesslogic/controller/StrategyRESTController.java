@@ -30,16 +30,19 @@ import java.util.List;
 @RequestMapping(value = "securedApi")
 public class StrategyRESTController {
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private StrategyRepository strategyRepository;
-
-    @Autowired
-    private AssetClassRepository assetClassRepository;
-
     private static final Log LOGGER = LogFactory.getLog(StrategyRESTController.class);
+
+    private final UserRepository userRepository;
+    private final StrategyRepository strategyRepository;
+    private final AssetClassRepository assetClassRepository;
+
+    @Autowired
+    public StrategyRESTController(final UserRepository userRepository, final StrategyRepository strategyRepository,
+                                  final AssetClassRepository assetClassRepository){
+        this.userRepository = userRepository;
+        this.strategyRepository = strategyRepository;
+        this.assetClassRepository = assetClassRepository;
+    }
 
     /**
      * Retrieve the last active strategy for the caller {@link User}.
