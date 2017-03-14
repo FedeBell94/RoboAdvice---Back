@@ -15,11 +15,16 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+import static it.uiip.digitalgarage.roboadvice.beanConfiguration.NightlyTaskBeanConfig.COMPONENT_SCAN_PATH;
+import static it.uiip.digitalgarage.roboadvice.beanConfiguration.NightlyTaskBeanConfig.JPA_REPOSITORY_PATH;
+
 @Configuration
-@ComponentScan("it.uiip.digitalgarage.roboadvice.nightlyTask")
-@EnableJpaRepositories("it.uiip.digitalgarage.roboadvice.persistence.repository")
+@ComponentScan(COMPONENT_SCAN_PATH)
+@EnableJpaRepositories(JPA_REPOSITORY_PATH)
 public class NightlyTaskBeanConfig {
 
+    static final String COMPONENT_SCAN_PATH = "it.uiip.digitalgarage.roboadvice.nightlyTask";
+    static final String JPA_REPOSITORY_PATH = "it.uiip.digitalgarage.roboadvice.persistence.repository";
 
     @Bean
     public IDataSource dataSource() {
