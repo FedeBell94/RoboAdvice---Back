@@ -35,8 +35,6 @@ public class User implements Serializable {
     @Column(name = "registration", nullable = false)
     private Date registration;
 
-    @Column(name = "autoBalancing", nullable = false)
-    private boolean autoBalancing;
 
     @Column(name = "newUser", nullable = false)
     private boolean newUser;
@@ -47,7 +45,6 @@ public class User implements Serializable {
         this.username = user.getUsername();
         this.enabled = user.isEnabled();
         this.registration = user.getRegistration();
-        this.autoBalancing = user.isAutoBalancing();
         this.newUser = user.isNewUser();
     }
 }

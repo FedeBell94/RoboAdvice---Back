@@ -108,7 +108,6 @@ public class UserRESTController {
                 .nickname(inputUser.getNickname())
                 .registration(new DateProvider().getToday())
                 .enabled(true)
-                .autoBalancing(false)
                 .newUser(true)
                 .build();
         userRepository.save(user);

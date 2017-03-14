@@ -1,9 +1,9 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate;
 
 import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dataUpdater.IDataSource;
+import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dataUpdater.IDataUpdater;
 import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dateProvider.DateProvider;
 import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dateProvider.LiarDateProvider;
-import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dataUpdater.IDataUpdater;
 import it.uiip.digitalgarage.roboadvice.persistence.model.*;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.DataRepository;
@@ -14,7 +14,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Date;
@@ -97,14 +96,8 @@ public class NightlyTask implements INightlyTask {
                     createPortfolio(dateProvider, currUser, assets, userWorth, latestPrices);
                 } else {
                     // #3: update portfolio for 'old' users which didn't change the strategy yesterday
+                    updatePortfolio(dateProvider, userPortfolio, todayNewPrices);
 
-                    // Check if the user uses and auto-balancing strategy
-                    if (currUser.isAutoBalancing()) {
-                        BigDecimal userWorth = computeWorth(userPortfolio, latestPrices);
-                        createPortfolio(dateProvider, currUser, assets, userWorth, latestPrices);
-                    } else {
-                        updatePortfolio(dateProvider, userPortfolio, todayNewPrices);
-                    }
                 }
             }
         }

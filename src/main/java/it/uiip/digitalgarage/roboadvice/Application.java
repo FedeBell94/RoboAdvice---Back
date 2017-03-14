@@ -2,8 +2,8 @@ package it.uiip.digitalgarage.roboadvice;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
-import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dateProvider.DateProvider;
 import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.INightlyTask;
+import it.uiip.digitalgarage.roboadvice.businesslogic.dailyUpdate.dateProvider.DateProvider;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.AssetClass;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetClassRepository;
@@ -46,7 +46,7 @@ public class Application {
 
     // Execution of night task
     //@Scheduled(cron = "0 0 10 * * TUE-SAT")
-    //@Scheduled(cron = "*/5 * * * * TUE-SAT")
+    //@Scheduled(cron = "*/5 * * * * *")
     public void executeNightTask(){
         LOGGER.debug("Night task started.");
         Long startTime = System.currentTimeMillis();
