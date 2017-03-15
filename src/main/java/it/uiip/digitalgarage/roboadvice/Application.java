@@ -65,6 +65,7 @@ public class Application {
 
     @PostConstruct
     public void initDatabaseDefaultValues() {
+        initLogger();
         LOGGER.debug("Database default values checking and inserting");
 
         JSONParser jsonParser = new JSONParser();
@@ -124,7 +125,6 @@ public class Application {
 
     }
 
-    @PostConstruct
     private void initLogger() {
         Logger logger = (Logger) LoggerFactory.getLogger("it.uiip.digitalgarage.roboadvice");
         logger.setLevel(Level.DEBUG);

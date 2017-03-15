@@ -41,29 +41,36 @@ public class DataUpdater implements IDataUpdater {
 
     @Override
     public void updateData() {
+        Data data = dataRepository.findTop1ByOrderByDateDesc();
+        if(data == null){
+            computeDataUpdate();
+        } else if(data.getDate().toLocalDate().compareTo(LocalDate.now()) != 0){
+            computeDataUpdate();
+        } else if(lastDataUpdate == null){
+            lastDataUpdate = LocalDate.now();
+        } else if(lastDataUpdate.compareTo(LocalDate.now()) != 0){
+            computeDataUpdate();
+        } else {
+            LOGGER.debug("In data table everything is already up-to-date");
+        }
+    }
+
+    private void computeDataUpdate(){
         Iterable<Asset> assets = assetRepository.findAll();
         List<Data> dataList = new ArrayList<>();
-
-//        Data actualLastUpdate = dataRepository.findTop1ByOrderByDateDesc();
-//        if((lastDataUpdate == null && actualLastUpdate.getDate().compareTo(dateProvider.getToday()) != 0)
-//                || (lastDataUpdate != null && lastDataUpdate.compareTo(LocalDate.now()) != 0)) {
-        if(lastDataUpdate == null || lastDataUpdate.compareTo(LocalDate.now()) != 0){
-            for (Asset currAsset : assets) {
-                Data data = dataRepository.findTop1ByAssetOrderByDateDesc(currAsset);
-                Date startDate;
-                if (data == null) {
-                    startDate = Date.valueOf(STARTING_DATA_DATE);
-                } else {
-                    startDate = new Date(data.getDate().getTime() + 24 * 60 * 60 * 1000);
-                }
-                LOGGER.debug("Updating data from " + startDate);
-                dataList.addAll(dataSource.getAllDataFrom(currAsset, startDate));
-
+        for (Asset currAsset : assets) {
+            Data data = dataRepository.findTop1ByAssetOrderByDateDesc(currAsset);
+            Date startDate;
+            if (data == null) {
+                startDate = Date.valueOf(STARTING_DATA_DATE);
+            } else {
+                startDate = new Date(data.getDate().getTime() + 24 * 60 * 60 * 1000);
             }
-            dataRepository.save(dataList);
-            lastDataUpdate = LocalDate.now();
-        } else{
-            LOGGER.debug("Everything is already up-to-date");
+            LOGGER.debug("Updating data from " + startDate);
+            dataList.addAll(dataSource.getAllDataFrom(currAsset, startDate));
+
         }
+        dataRepository.save(dataList);
+        lastDataUpdate = LocalDate.now();
     }
 }
