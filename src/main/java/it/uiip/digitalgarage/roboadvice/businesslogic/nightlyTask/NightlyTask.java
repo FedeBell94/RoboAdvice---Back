@@ -2,6 +2,7 @@ package it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask;
 
 import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dataUpdater.IDataUpdater;
 import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dateProvider.DateProvider;
+import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dateProvider.LiarDateProvider;
 import it.uiip.digitalgarage.roboadvice.persistence.model.*;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.*;
 import org.apache.commons.logging.Log;
@@ -54,7 +55,9 @@ public class NightlyTask implements INightlyTask {
     public void executeNightlyTask(final DateProvider dateProvider, final Iterable<User> users) {
 
         // #1: update data (only if not in demo mode)
-        dataUpdater.updateData();
+        if(!(dateProvider instanceof LiarDateProvider)) {
+            dataUpdater.updateData();
+        }
 
         // Finds all assets
         final Iterable<Asset> assets = assetRepository.findAll();
