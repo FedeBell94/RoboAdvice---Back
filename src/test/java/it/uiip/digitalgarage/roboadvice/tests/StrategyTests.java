@@ -69,7 +69,7 @@ public class StrategyTests {
 
         AssertAnnotations.assertMethod(Strategy.class, "getPercentage");
 
-        AssertAnnotations.assertMethod(Strategy.class, "isActive");
+        AssertAnnotations.assertMethod(Strategy.class, "getActive");
 
         AssertAnnotations.assertMethod(Strategy.class, "getStartingDate");
     }
