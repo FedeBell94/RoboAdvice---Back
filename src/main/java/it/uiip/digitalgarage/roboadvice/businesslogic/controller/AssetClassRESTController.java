@@ -32,21 +32,24 @@ public class AssetClassRESTController {
 
     @Autowired
     public AssetClassRESTController(final DataRepository dataRepository, final AssetRepository assetRepository,
-                                    final AssetClassRepository assetClassRepository){
+                                    final AssetClassRepository assetClassRepository) {
         this.dataRepository = dataRepository;
         this.assetRepository = assetRepository;
         this.assetClassRepository = assetClassRepository;
     }
 
     @RequestMapping(value = "/assetClassesName", method = RequestMethod.GET)
-    public @ResponseBody AbstractResponse requestAssetClassData() {
+    public
+    @ResponseBody
+    AbstractResponse requestAssetClassData() {
         Iterable<AssetClass> assetClasses = assetClassRepository.findAll();
         return new SuccessResponse<>(assetClasses);
     }
 
-    // TODO write this cass in a better language
     @RequestMapping(value = "/assetClassHistory", method = RequestMethod.GET)
-    public @ResponseBody AbstractResponse requestAssetClassData(@RequestParam Long assetClassId) {
+    public
+    @ResponseBody
+    AbstractResponse requestAssetClassData(@RequestParam Long assetClassId) {
 
         AssetClass assetClass = assetClassRepository.findOne(assetClassId);
 
@@ -60,20 +63,20 @@ public class AssetClassRESTController {
         Date startDate = new java.sql.Date(cal.getTimeInMillis());
 
 
-        for (int i = 0; i < assets.size(); i++) {
+        for (Asset curAsset : assets) {
 
-            List<Data> assetData = dataRepository.findByDateAfterAndAsset(startDate, assets.get(i));
+            List<Data> assetData = dataRepository.findByDateAfterAndAsset(startDate, curAsset);
 
 
-            for (int j = 0; j < assetData.size(); j++) {
+            for (Data curData : assetData) {
 
-                if (hm.get(assetData.get(j).getDate()) == null) {
-                    hm.put(assetData.get(j).getDate().toLocalDate(), assetData.get(j).getValue()
-                            .multiply(assetData.get(j).getAsset().getFixedPercentage()).divide(new BigDecimal("100")));
+                if (hm.get(curData.getDate()) == null) {
+                    hm.put(curData.getDate().toLocalDate(), curData.getValue()
+                            .multiply(curData.getAsset().getFixedPercentage()).divide(new BigDecimal("100")));
                 } else {
-                    hm.put(assetData.get(j).getDate().toLocalDate(), hm.get(assetData.get(j).getDate())
-                            .add(assetData.get(j).getValue()
-                                    .multiply(assetData.get(j).getAsset().getFixedPercentage())
+                    hm.put(curData.getDate().toLocalDate(), hm.get(curData.getDate())
+                            .add(curData.getValue()
+                                    .multiply(curData.getAsset().getFixedPercentage())
                                     .divide(new BigDecimal("100"))));
                 }
 
