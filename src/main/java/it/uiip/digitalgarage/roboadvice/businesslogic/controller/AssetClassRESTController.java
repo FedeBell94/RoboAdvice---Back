@@ -38,6 +38,12 @@ public class AssetClassRESTController {
         this.assetClassRepository = assetClassRepository;
     }
 
+    @RequestMapping(value = "/assetClassesName", method = RequestMethod.GET)
+    public @ResponseBody AbstractResponse requestAssetClassData() {
+        Iterable<AssetClass> assetClasses = assetClassRepository.findAll();
+        return new SuccessResponse<>(assetClasses);
+    }
+
     // TODO write this cass in a better language
     @RequestMapping(value = "/assetClassHistory", method = RequestMethod.GET)
     public @ResponseBody AbstractResponse requestAssetClassData(@RequestParam Long assetClassId) {
