@@ -38,6 +38,7 @@ public class AssetClassRESTController {
         this.assetClassRepository = assetClassRepository;
     }
 
+    // TODO write this cass in a better language
     @RequestMapping(value = "/assetClassHistory", method = RequestMethod.GET)
     public @ResponseBody AbstractResponse requestAssetClassData(@RequestParam Long assetClassId) {
 

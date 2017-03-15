@@ -68,7 +68,7 @@ public class NightlyTask implements INightlyTask {
         final Map<Long, BigDecimal> latestPrices = findAssetsPrice(assets, dateProvider);
 
 
-        // Finds the assets changed today
+        // Finds the assets changed today (used only because of the portfolio demo creation)
         final List<Data> todayNewPrices = dataRepository.findByDate(dateProvider.getYesterday());
 
         for (User currUser : users) {
@@ -160,6 +160,7 @@ public class NightlyTask implements INightlyTask {
     private Map<Long, BigDecimal> findAssetsPrice(final Iterable<Asset> assets, final DateProvider dateProvider) {
         Map<Long, BigDecimal> latestPrices = new HashMap<>();
         for (Asset curr : assets) {
+            // This query is only for testing (to compute the correct value on demo creation of the portfolio)
             Data data = dataRepository.findTop1ByDateBeforeAndAssetOrderByDateDesc(dateProvider.getToday(), curr);
             latestPrices.put(data.getAsset().getId(), data.getValue());
         }

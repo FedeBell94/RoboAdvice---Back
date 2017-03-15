@@ -9,15 +9,11 @@ import java.util.List;
 
 public interface DataRepository extends PagingAndSortingRepository<Data, Long> {
 
-    Data findByDateAndAsset(Date date, Asset asset);
-
+    // This query is only for testing (to compute the correct value on demo creation of the portfolio)
     Data findTop1ByDateBeforeAndAssetOrderByDateDesc(Date date, Asset asset);
-
-    Data findTop1ByAssetOrderByDateDesc(Asset asset);
-
-    //List<Data> findFirst360ByAssetOrderByDateDesc(Asset asset);
 
     List<Data> findByDateAfterAndAsset(Date date, Asset asset);
 
+    // used only because of the portfolio demo creation
     List<Data> findByDate(Date date);
 }
