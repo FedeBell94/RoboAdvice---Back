@@ -50,9 +50,13 @@ public class UserTests {
 
         AssertAnnotations.assertField(User.class, "nickname", Column.class);
 
+        AssertAnnotations.assertField(User.class, "enabled", Column.class);
+
         AssertAnnotations.assertField(User.class, "registration", Column.class);
 
-        AssertAnnotations.assertField(User.class, "autoBalancing", Column.class);
+        AssertAnnotations.assertField(User.class, "isNewUser", Column.class);
+
+        AssertAnnotations.assertField(User.class, "lastPortfolioComputation", Column.class);
 
     }
 
@@ -69,9 +73,13 @@ public class UserTests {
 
         AssertAnnotations.assertMethod(User.class, "getNickname");
 
+        AssertAnnotations.assertMethod(User.class, "getEnabled");
+
         AssertAnnotations.assertMethod(User.class, "getRegistration");
 
-        AssertAnnotations.assertMethod(User.class, "isAutoBalancing");
+        AssertAnnotations.assertMethod(User.class, "getIsNewUser");
+
+        AssertAnnotations.assertMethod(User.class, "getLastPortfolioComputation");
     }
 
     @Test
