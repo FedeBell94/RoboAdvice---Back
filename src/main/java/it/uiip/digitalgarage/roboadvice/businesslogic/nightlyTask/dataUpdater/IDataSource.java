@@ -4,11 +4,8 @@ import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Data;
 
 import java.sql.Date;
-import java.util.ArrayList;
+import java.util.List;
 
 public interface IDataSource {
-
-    Data getData(Asset asset, Date date);
-
-    ArrayList<Data> getHistoricalData(Asset asset, int startYear, int startMonth, int startDay);
+    List<Data> getAllDataFrom(Asset asset, Date from);
 }

@@ -3,6 +3,7 @@ package it.uiip.digitalgarage.roboadvice;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.INightlyTask;
+import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dataUpdater.IDataUpdater;
 import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dateProvider.DateProvider;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.AssetClass;
@@ -36,15 +37,17 @@ public class Application {
     private final AssetClassRepository assetClassRepository;
 
     private final INightlyTask nightlyTask;
-
+    private final IDataUpdater dataUpdater;
 
     @Autowired
     public Application(final UserRepository userRepository, final AssetRepository assetRepository,
-                       final AssetClassRepository assetClassRepository, final INightlyTask nightlyTask) {
+                       final AssetClassRepository assetClassRepository, final INightlyTask nightlyTask, final
+                       IDataUpdater dataUpdater) {
         this.userRepository = userRepository;
         this.assetRepository = assetRepository;
         this.assetClassRepository = assetClassRepository;
         this.nightlyTask = nightlyTask;
+        this.dataUpdater = dataUpdater;
     }
 
 
@@ -88,6 +91,8 @@ public class Application {
             e.printStackTrace();
             LOGGER.error("Failed to add default data in database.");
         }
+
+        dataUpdater.updateData();
     }
 
     private void insertDefaultAssetClasses(List<JSONObject> assetClassList) {

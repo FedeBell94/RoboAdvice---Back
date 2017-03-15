@@ -16,4 +16,8 @@ public interface DataRepository extends PagingAndSortingRepository<Data, Long> {
 
     // used only because of the portfolio demo creation
     List<Data> findByDate(Date date);
+
+    Data findTop1ByAssetOrderByDateDesc(Asset asset);
+
+    Data findTop1ByOrderByDateDesc();
 }
