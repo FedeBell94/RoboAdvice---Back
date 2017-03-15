@@ -4,10 +4,7 @@ import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dataUpdater.ID
 import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dateProvider.DateProvider;
 import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dateProvider.LiarDateProvider;
 import it.uiip.digitalgarage.roboadvice.persistence.model.*;
-import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
-import it.uiip.digitalgarage.roboadvice.persistence.repository.DataRepository;
-import it.uiip.digitalgarage.roboadvice.persistence.repository.PortfolioRepository;
-import it.uiip.digitalgarage.roboadvice.persistence.repository.StrategyRepository;
+import it.uiip.digitalgarage.roboadvice.persistence.repository.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +29,7 @@ public class NightlyTask implements INightlyTask {
     private final PortfolioRepository portfolioRepository;
     private final AssetRepository assetRepository;
     private final DataRepository dataRepository;
+    private final UserRepository userRepository;
 
     private final IDataUpdater dataUpdater;
    // private final IDataSource dataSource;
@@ -39,11 +37,12 @@ public class NightlyTask implements INightlyTask {
     @Autowired
     public NightlyTask(final StrategyRepository strategyRepository, final PortfolioRepository portfolioRepository,
                        final AssetRepository assetRepository, final DataRepository dataRepository,
-                       final IDataUpdater dataUpdater) {
+                       final UserRepository userRepository, final IDataUpdater dataUpdater) {
         this.strategyRepository = strategyRepository;
         this.portfolioRepository = portfolioRepository;
         this.assetRepository = assetRepository;
         this.dataRepository = dataRepository;
+        this.userRepository = userRepository;
         this.dataUpdater = dataUpdater;
     }
 
@@ -73,15 +72,16 @@ public class NightlyTask implements INightlyTask {
         final List<Data> todayNewPrices = dataRepository.findByDate(dateProvider.getYesterday());
 
         for (User currUser : users) {
-            // Find the portfolio of yesterday for the current user
-            List<Portfolio> userPortfolio =
-                    portfolioRepository.findByUserAndDate(currUser, dateProvider.getYesterday());
 
             // Case of brand new user
-            if (userPortfolio.isEmpty()) {
+            if (currUser.getLastPortfolioComputation() == null) {
                 // #2: create portfolio for fresh(new) users
                 createPortfolio(dateProvider, currUser, assets, DEFAULT_START_WORTH, latestPrices);
             } else {
+
+                // Find last portfolio computed for the current user
+                List<Portfolio> userPortfolio =
+                        portfolioRepository.findByUserAndDate(currUser, currUser.getLastPortfolioComputation());
 
                 // Finds the active strategy of the current user
                 List<Strategy> userStrategy = strategyRepository.findByUserAndActiveTrue(currUser);
@@ -98,6 +98,10 @@ public class NightlyTask implements INightlyTask {
 
                 }
             }
+
+            // Update of last portfolio computation date
+            currUser.setLastPortfolioComputation(dateProvider.getToday());
+            userRepository.save(currUser);
         }
     }
 

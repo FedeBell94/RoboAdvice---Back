@@ -37,6 +37,9 @@ public class User implements Serializable {
     @Column(name = "isNewUser", nullable = false)
     private Boolean isNewUser;
 
+    @Column(name = "lastPortfolioComputation")
+    private Date lastPortfolioComputation;
+
     public User(User user){
         this.id = user.getId();
         this.password = user.getPassword();
@@ -44,5 +47,6 @@ public class User implements Serializable {
         this.enabled = user.getEnabled();
         this.registration = user.getRegistration();
         this.isNewUser = user.getIsNewUser();
+        this.lastPortfolioComputation = user.getLastPortfolioComputation();
     }
 }

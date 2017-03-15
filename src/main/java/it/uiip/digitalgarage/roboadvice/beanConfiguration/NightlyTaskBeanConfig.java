@@ -6,10 +6,7 @@ import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dataUpdater.Da
 import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dataUpdater.IDataSource;
 import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dataUpdater.IDataUpdater;
 import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dataUpdater.Quandl.QuandlDataSource;
-import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
-import it.uiip.digitalgarage.roboadvice.persistence.repository.DataRepository;
-import it.uiip.digitalgarage.roboadvice.persistence.repository.PortfolioRepository;
-import it.uiip.digitalgarage.roboadvice.persistence.repository.StrategyRepository;
+import it.uiip.digitalgarage.roboadvice.persistence.repository.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -40,8 +37,9 @@ public class NightlyTaskBeanConfig {
     @Bean
     public INightlyTask nightlyTask(StrategyRepository strategyRepository, PortfolioRepository portfolioRepository,
                                     AssetRepository assetRepository, DataRepository dataRepository,
-                                    IDataUpdater dataUpdater) {
-        return new NightlyTask(strategyRepository, portfolioRepository, assetRepository, dataRepository, dataUpdater);
+                                    UserRepository userRepository, IDataUpdater dataUpdater) {
+        return new NightlyTask(strategyRepository, portfolioRepository, assetRepository, dataRepository, userRepository,
+                dataUpdater);
     }
 
 }
