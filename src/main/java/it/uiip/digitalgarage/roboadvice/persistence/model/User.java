@@ -40,14 +40,4 @@ public class User implements Serializable {
     @Column(name = "lastPortfolioComputation")
     private Date lastPortfolioComputation;
 
-
-    public User(User user){
-        this.id = user.getId();
-        this.password = user.getPassword();
-        this.username = user.getUsername();
-        this.enabled = user.getEnabled();
-        this.registration = user.getRegistration();
-        this.isNewUser = user.getIsNewUser();
-        this.lastPortfolioComputation = user.getLastPortfolioComputation();
-    }
 }

@@ -3,6 +3,7 @@ package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.AssetClassHistoryDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
+import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dateProvider.DateProvider;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.AssetClass;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Data;
@@ -85,7 +86,7 @@ public class AssetClassRESTController {
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
             result.add(AssetClassHistoryDTO.builder()
-                    .date(pair.getKey().toString())
+                    .date(new DateProvider().getToday())
                     .value((BigDecimal) pair.getValue()).build());
             it.remove();
         }
