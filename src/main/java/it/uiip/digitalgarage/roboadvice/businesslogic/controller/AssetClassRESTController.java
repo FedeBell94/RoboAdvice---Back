@@ -1,5 +1,6 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
+import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.AssetClassHistoryDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dateProvider.LiarDateProvider;
@@ -93,12 +94,12 @@ public class AssetClassRESTController {
             }
         }
 
-        Map<LocalDate, BigDecimal> returnData = new HashMap<>();
+        Map<LocalDate, BigDecimal> computedData = new HashMap<>();
         while (dateProvider.getToday().compareTo(endDate) <= 0) {
 
             // Finds the assets of today
             for (List<Data> dataList : allAssets) {
-                for(Data d : dataList) {
+                for (Data d : dataList) {
                     if (d.getDate().compareTo(dateProvider.getToday()) == 0) {
                         currentData.put(d.getAsset().getId(), d);
                     }
@@ -113,11 +114,27 @@ public class AssetClassRESTController {
                 wightedSum = wightedSum.add(actualValue);
             }
 
-            returnData.put(dateProvider.getToday().toLocalDate(), wightedSum);
+            computedData.put(dateProvider.getToday().toLocalDate(), wightedSum);
             dateProvider.goNextDay();
         }
 
+
+        // Mapping the compute data in DTO object
+        List<AssetClassHistoryDTO> returnData = new ArrayList<>(computedData.size());
+        SortedSet<LocalDate> keys = new TreeSet<>(computedData.keySet());
+        for (LocalDate key : keys) {
+            BigDecimal value = computedData.get(key);
+            returnData.add(AssetClassHistoryDTO.builder()
+                    .date(Date.valueOf(key))
+                    .value(value).build());
+        }
         return new SuccessResponse<>(returnData);
+//        for (Map.Entry<LocalDate, BigDecimal> curr : computedData.entrySet()) {
+//            returnData.add(AssetClassHistoryDTO.builder()
+//                    .date(Date.valueOf(curr.getKey()))
+//                    .value(curr.getValue()).build());
+//        }
+//        return new SuccessResponse<>(returnData);
     }
 
 }
