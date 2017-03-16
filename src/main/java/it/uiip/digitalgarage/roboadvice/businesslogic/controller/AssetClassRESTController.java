@@ -3,6 +3,7 @@ package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.AssetClassHistoryDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
+import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dateProvider.DateProvider;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.AssetClass;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Data;
@@ -39,15 +40,15 @@ public class AssetClassRESTController {
         this.assetClassRepository = assetClassRepository;
     }
 
-    @RequestMapping(value = "/assetClassesName", method = RequestMethod.GET)
-    public @ResponseBody AbstractResponse requestAssetClassData() {
+    @RequestMapping(value = "/assetClass", method = RequestMethod.GET)
+    public @ResponseBody AbstractResponse getAssetClasses() {
         Iterable<AssetClass> assetClasses = assetClassRepository.findAll();
         return new SuccessResponse<>(assetClasses);
     }
 
     // TODO refacotr this method
     @RequestMapping(value = "/assetClassHistory", method = RequestMethod.GET)
-    public @ResponseBody AbstractResponse requestAssetClassData(@RequestParam Long assetClassId) {
+    public @ResponseBody AbstractResponse getAssetClassHistory(@RequestParam Long assetClassId) {
 
         List<Asset> assets = assetRepository.findByAssetClass(AssetClass.builder().id(assetClassId).build());
 
@@ -84,7 +85,7 @@ public class AssetClassRESTController {
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
             result.add(AssetClassHistoryDTO.builder()
-                    .date(pair.getKey().toString())
+                    .date(new DateProvider().getToday())
                     .value((BigDecimal) pair.getValue()).build());
             it.remove();
         }

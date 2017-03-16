@@ -22,7 +22,6 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 
 import javax.persistence.PersistenceContext;
-import javax.validation.constraints.AssertTrue;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
@@ -60,6 +59,7 @@ public class UserRESTControllerTest {
 
     @Before
     public void before(){
+
 
         User user = User.builder().id(1L).username("testUser").password("12345").nickname("testUser").build();
 
