@@ -17,6 +17,7 @@ public interface PortfolioRepository extends PagingAndSortingRepository<Portfoli
                    "FROM Portfolio p " +
                    "WHERE p.user = ?1 " +
                    "AND p.date >= ?2 " +
-                   "GROUP BY p.date, p.assetClass.id ")
+                   "GROUP BY p.date, p.assetClass.id " +
+                   "ORDER BY p.date ASC ")
     List<PortfolioDTO> findPortfolioHistory(User user, Date from);
 }
