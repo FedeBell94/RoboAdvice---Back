@@ -40,7 +40,7 @@ public class PortfolioRESTController {
                                                         @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate from) {
         User user = userRepository.findByUsername(authentication.getName());
 
-        Date fromDate = from == null ? user.getLastPortfolioComputation(): Date.valueOf(from);
+        Date fromDate = from == null ? user.getRegistration() : Date.valueOf(from);
         List<PortfolioDTO> portfolio = portfolioRepository.findPortfolioHistory(user, fromDate);
         return new SuccessResponse<>(portfolio);
 
