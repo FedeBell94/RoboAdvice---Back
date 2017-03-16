@@ -24,14 +24,4 @@ public class AssetClass implements Serializable {
     @Column(name = "name", nullable = false)
     private String name;
 
-
-    @Override
-    public boolean equals(Object other) {
-        if (other instanceof AssetClass) {
-            if (((AssetClass) other).getId() == this.id) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

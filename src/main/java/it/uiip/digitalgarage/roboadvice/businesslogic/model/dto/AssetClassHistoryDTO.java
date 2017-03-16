@@ -4,11 +4,8 @@ import lombok.*;
 
 import java.math.BigDecimal;
 
-/**
- * Created by Simone on 10/03/2017.
- */
-@Getter @Setter @AllArgsConstructor @NoArgsConstructor @Builder @ToString
-public class AssetClassDTO {
+@Getter @Setter @AllArgsConstructor @NoArgsConstructor @Builder
+public class AssetClassHistoryDTO {
 
     private String date;
     private BigDecimal value;
