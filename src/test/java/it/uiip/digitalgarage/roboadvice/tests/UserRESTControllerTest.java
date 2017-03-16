@@ -11,8 +11,10 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.modelmapper.ModelMapper;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -36,11 +38,20 @@ import static org.mockito.Mockito.when;
         TransactionalTestExecutionListener.class})
 public class UserRESTControllerTest {
 
+
+
+    @Mock
+    Authentication authentication;
+
+    @Mock
+    PasswordEncoder passwordEncoder;
+
     @Mock
     UserRepository userRepository;
 
     @Mock
-    Authentication authentication;
+    ModelMapper modelMapper;
+
 
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
@@ -50,9 +61,13 @@ public class UserRESTControllerTest {
     @Before
     public void before(){
 
-        userRESTController = new UserRESTController(userRepository);
+        User user = User.builder().id(1L).username("testUser").password("12345").nickname("testUser").build();
+
+        userRESTController = new UserRESTController(modelMapper,userRepository,passwordEncoder);
         when(authentication.getName()).thenReturn("testUser");
-        when(userRepository.findByUsername("testUser")).thenReturn(User.builder().id(1L).username("testUser").password("12345").nickname("testUser").build());
+        when(userRepository.findByUsername("testUser")).thenReturn(user);
+        when(modelMapper.map(user,UserDTO.class))
+                .thenReturn(UserDTO.builder().username("testUser").nickname("testUser").build());
 
     }
 
