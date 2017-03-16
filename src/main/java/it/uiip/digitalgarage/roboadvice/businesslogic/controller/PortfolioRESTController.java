@@ -42,7 +42,7 @@ public class PortfolioRESTController {
 
         Date fromDate = from == null ? user.getRegistration() : Date.valueOf(from);
         List<PortfolioDTO> portfolio = portfolioRepository.findPortfolioHistory(user, fromDate);
+        LOGGER.debug("User " + user.getUsername() + " - get portfolio called.");
         return new SuccessResponse<>(portfolio);
-
     }
 }

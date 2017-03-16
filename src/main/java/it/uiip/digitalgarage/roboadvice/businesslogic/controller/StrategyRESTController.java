@@ -99,6 +99,7 @@ public class StrategyRESTController {
             }
         }
 
+
         // Insert the new strategy
         List<Strategy> insertStrategy = new ArrayList<>();
         for (StrategyDTO curr : strategyInput) {
@@ -113,7 +114,6 @@ public class StrategyRESTController {
             LOGGER.debug("User: " + user.getUsername() + " - Inserted strategy " + newStrategy);
         }
         strategyRepository.save(insertStrategy);
-
         return new SuccessResponse<>(null);
     }
 }
