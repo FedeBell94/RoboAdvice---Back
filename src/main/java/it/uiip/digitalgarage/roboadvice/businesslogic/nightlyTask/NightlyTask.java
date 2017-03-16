@@ -30,7 +30,6 @@ public class NightlyTask implements INightlyTask {
     private final AssetRepository assetRepository;
     private final DataRepository dataRepository;
     private final UserRepository userRepository;
-
     private final IDataUpdater dataUpdater;
 
     @Autowired
@@ -64,7 +63,6 @@ public class NightlyTask implements INightlyTask {
 
         // For each asset finds the latest price
         final Map<Long, BigDecimal> latestPrices = findAssetsPrice(assets, dateProvider);
-
 
         // Finds the assets changed today (used only because of the portfolio demo creation)
         final List<Data> todayNewPrices = dataRepository.findByDate(dateProvider.getYesterday());
