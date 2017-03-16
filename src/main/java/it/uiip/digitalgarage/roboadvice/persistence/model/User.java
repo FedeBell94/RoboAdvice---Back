@@ -28,17 +28,18 @@ public class User implements Serializable {
     @Column(name = "nickname")
     private String nickname;
 
-    @Column(name = "enabled", nullable = false)
-    private Boolean enabled;
-
     @Column(name = "registration", nullable = false)
     private Date registration;
 
     @Column(name = "isNewUser", nullable = false)
     private Boolean isNewUser;
 
+    @Column(name = "enabled", nullable = false)
+    private Boolean enabled;
+
     @Column(name = "lastPortfolioComputation")
     private Date lastPortfolioComputation;
+
 
     public User(User user){
         this.id = user.getId();

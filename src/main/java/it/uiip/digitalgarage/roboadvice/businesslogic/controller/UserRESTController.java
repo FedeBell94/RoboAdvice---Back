@@ -5,20 +5,22 @@ import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractRes
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.ErrorResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.ExchangeError;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
-import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dateProvider.DateProvider;
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.sql.Date;
+import java.time.LocalDate;
 
 /**
  * Class used to create all the API rest used to manage the {@link User}.
@@ -31,11 +33,15 @@ public class UserRESTController {
     private static final Log LOGGER = LogFactory.getLog(UserRESTController.class);
 
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final PasswordEncoder passwordEncoder;
+    private final ModelMapper modelMapper;
 
     @Autowired
-    public UserRESTController(final UserRepository userRepository){
+    public UserRESTController(final ModelMapper modelMapper, final UserRepository userRepository,
+                              final PasswordEncoder passwordEncoder) {
+        this.modelMapper = modelMapper;
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     /**
@@ -50,7 +56,7 @@ public class UserRESTController {
     public @ResponseBody AbstractResponse loginUser(Authentication authentication) {
         User user = userRepository.findByUsername(authentication.getName());
         LOGGER.debug("User " + user.getUsername() + " just logged in.");
-        return new SuccessResponse<>(new UserDTO(user));
+        return new SuccessResponse<>(modelMapper.map(user, UserDTO.class));
     }
 
     /**
@@ -86,7 +92,7 @@ public class UserRESTController {
     public @ResponseBody AbstractResponse tellMeWhoAmI(Authentication authentication) {
         User user = userRepository.findByUsername(authentication.getName());
         LOGGER.debug("TellWhoAmI: " + user.getUsername());
-        return new SuccessResponse<>(new UserDTO(user));
+        return new SuccessResponse<>(modelMapper.map(user, UserDTO.class));
     }
 
     /**
@@ -110,14 +116,14 @@ public class UserRESTController {
                 .username(inputUser.getUsername())
                 .password(hashPassword)
                 .nickname(inputUser.getNickname())
-                .registration(new DateProvider().getToday())
+                .registration(Date.valueOf(LocalDate.now()))
                 .enabled(true)
                 .isNewUser(true)
                 .build();
         userRepository.save(user);
 
         LOGGER.debug("User " + inputUser.getUsername() + " registered successfully");
-        return new SuccessResponse<>(new UserDTO(user));
+        return new SuccessResponse<>(modelMapper.map(user, UserDTO.class));
     }
 
 }
