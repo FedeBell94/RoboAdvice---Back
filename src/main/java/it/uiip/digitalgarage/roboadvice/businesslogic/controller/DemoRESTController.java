@@ -40,6 +40,10 @@ public class DemoRESTController {
         Long startTime = System.currentTimeMillis();
 
         User user = userRepository.findOne(Long.parseLong((String)inputObject.get("user_id")));
+        java.sql.Date date = java.sql.Date.valueOf((String) inputObject.get("from"));
+        user.setLastPortfolioComputation(null);
+        user.setRegistration(date);
+        userRepository.save(user);
         List<User> userList = new ArrayList<>();
         userList.add(user);
         LiarDateProvider liarDateProvider = new LiarDateProvider((String) inputObject.get("from"));

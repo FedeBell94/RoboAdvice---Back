@@ -40,15 +40,15 @@ public class AssetClassRESTController {
         this.assetClassRepository = assetClassRepository;
     }
 
-    @RequestMapping(value = "/assetClassesName", method = RequestMethod.GET)
-    public @ResponseBody AbstractResponse requestAssetClassData() {
+    @RequestMapping(value = "/assetClass", method = RequestMethod.GET)
+    public @ResponseBody AbstractResponse getAssetClasses() {
         Iterable<AssetClass> assetClasses = assetClassRepository.findAll();
         return new SuccessResponse<>(assetClasses);
     }
 
     // TODO refacotr this method
     @RequestMapping(value = "/assetClassHistory", method = RequestMethod.GET)
-    public @ResponseBody AbstractResponse requestAssetClassData(@RequestParam Long assetClassId) {
+    public @ResponseBody AbstractResponse getAssetClassHistory(@RequestParam Long assetClassId) {
 
         List<Asset> assets = assetRepository.findByAssetClass(AssetClass.builder().id(assetClassId).build());
 
