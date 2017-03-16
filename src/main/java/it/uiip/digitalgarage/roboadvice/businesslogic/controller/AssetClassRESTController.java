@@ -54,13 +54,13 @@ public class AssetClassRESTController {
                                                                @RequestParam(required = false)
                                                                @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate to) {
 
-        // Check for the date. If the date passed is null, the default is 30 days from today.
+        // Check for the date. If the date passed is null, the default is 120 days from today.
         Date startDate;
         Date endDate;
         Calendar calendar = Calendar.getInstance();
         if (from == null) {
             endDate = new Date(calendar.getTimeInMillis());
-            calendar.add(Calendar.DATE, -30);
+            calendar.add(Calendar.DATE, -120);
             startDate = new Date(calendar.getTimeInMillis());
         } else {
             startDate = Date.valueOf(from);
@@ -78,15 +78,17 @@ public class AssetClassRESTController {
         for (Asset currAsset : assetsAssetClass) {
             List<Data> currAssetData =
                     dataRepository.findByDateAfterAndAssetOrderByDateAsc(dateProvider.getYesterday(), currAsset);
+            if(currAssetData.isEmpty()){
+                currAssetData.add(Data.builder().asset(currAsset).date(Date.valueOf("2000-01-01")).build());
+            }
             allAssets.add(currAssetData);
         }
 
         // Retrieve the last value for the asset before today if not already present in the data
         Map<Long, Data> currentData = new HashMap<>();
         for (List<Data> dataList : allAssets) {
-            Data firstData = dataList.get(0);
-            if (firstData.getDate().compareTo(dateProvider.getToday()) == 0) {
-                currentData.put(firstData.getAsset().getId(), firstData);
+            if (!dataList.isEmpty() && dataList.get(0).getDate().compareTo(dateProvider.getToday()) == 0) {
+                currentData.put(dataList.get(0).getAsset().getId(), dataList.get(0));
             } else {
                 Data d = dataRepository.findTop1ByDateBeforeAndAssetOrderByDateDesc(dateProvider.getToday(),
                         dataList.get(0).getAsset());
@@ -129,12 +131,6 @@ public class AssetClassRESTController {
                     .value(value).build());
         }
         return new SuccessResponse<>(returnData);
-//        for (Map.Entry<LocalDate, BigDecimal> curr : computedData.entrySet()) {
-//            returnData.add(AssetClassHistoryDTO.builder()
-//                    .date(Date.valueOf(curr.getKey()))
-//                    .value(curr.getValue()).build());
-//        }
-//        return new SuccessResponse<>(returnData);
     }
 
 }
