@@ -18,8 +18,10 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 
 import java.sql.Date;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -42,6 +44,7 @@ public class QuandlDataSourceTests {
 
     private Long assetId = 1L;
     private Asset asset;
+    private List<Data> dataList;
     private Data data;
     private Date yesterday = new DateProvider().getYesterday();
 
@@ -64,28 +67,35 @@ public class QuandlDataSourceTests {
     }
 
     @Test
-    public void testGetData() {
-//
-//        asset = assetRepository.findOne(assetId);
-//        data = quandlDataSource.getDailyData(
-//                asset,
-//                yesterday
-//        );
-//        if (data == null) {
-//            LOGGER.debug("The test for Quandl asset " + asset + " can't be performed extensively for the date (" +
-//                    yesterday + ")");
-//            assertTrue(true);
-//        } else {
-//            assertEquals(
-//                    yesterday,
-//                    data.getDate()
-//            );
-//
-//            assertEquals(
-//                    "class java.math.BigDecimal",
-//                    data.getValue().getClass().toString()
-//            );
-//        }
+    public void testGetAllDataFrom() {
+
+        asset = assetRepository.findOne(assetId);
+        dataList = quandlDataSource.getAllDataFrom(
+                asset,
+                yesterday
+
+        );
+        if (dataList == null) {
+            LOGGER.debug("The test for Quandl asset " + asset + " can't be performed extensively for the date (" +
+                    yesterday + ")");
+            assertTrue(true);
+        } else {
+
+            for(Data curData:dataList){
+
+                assertEquals(
+                        yesterday.toString(),
+                        curData.getDate().toString()
+                );
+
+                assertEquals(
+                        "class java.math.BigDecimal",
+                        curData.getValue().getClass().toString()
+                );
+
+            }
+
+        }
 
     }
 

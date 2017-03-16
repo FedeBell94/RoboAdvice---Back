@@ -52,18 +52,15 @@ public class AssetClassRESTController {
 
         List<Asset> assets = assetRepository.findByAssetClass(AssetClass.builder().id(assetClassId).build());
 
-
-        HashMap<LocalDate, BigDecimal> hm = new HashMap<>();
+        Map<LocalDate, BigDecimal> hm = new HashMap<>();
 
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, -360);
         Date startDate = new java.sql.Date(cal.getTimeInMillis());
 
-
         for (Asset curAsset : assets) {
 
             List<Data> assetData = dataRepository.findByDateAfterAndAsset(startDate, curAsset);
-
 
             for (Data curData : assetData) {
 
@@ -82,7 +79,9 @@ public class AssetClassRESTController {
         }
 
         Iterator it = hm.entrySet().iterator();
-        ArrayList<AssetClassHistoryDTO> result = new ArrayList();
+
+        List<AssetClassHistoryDTO> result = new ArrayList();
+
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
             result.add(AssetClassHistoryDTO.builder()
