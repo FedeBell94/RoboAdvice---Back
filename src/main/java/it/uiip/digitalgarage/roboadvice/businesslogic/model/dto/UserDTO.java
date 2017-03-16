@@ -1,6 +1,5 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.model.dto;
 
-import it.uiip.digitalgarage.roboadvice.persistence.model.User;
 import lombok.*;
 
 import java.sql.Date;
@@ -17,11 +16,4 @@ public class UserDTO {
     private Date registration;
 
     private Boolean isNewUser;
-
-    public UserDTO(User user){
-        this.username = user.getUsername();
-        this.nickname = user.getNickname();
-        this.registration = user.getRegistration();
-        this.isNewUser = user.getIsNewUser();
-    }
 }

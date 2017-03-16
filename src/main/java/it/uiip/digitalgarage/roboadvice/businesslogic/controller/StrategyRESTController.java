@@ -12,6 +12,7 @@ import it.uiip.digitalgarage.roboadvice.persistence.repository.StrategyRepositor
 import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -36,9 +37,13 @@ public class StrategyRESTController {
     private final StrategyRepository strategyRepository;
     private final AssetClassRepository assetClassRepository;
 
+    private final ModelMapper modelMapper;
+
     @Autowired
-    public StrategyRESTController(final UserRepository userRepository, final StrategyRepository strategyRepository,
-                                  final AssetClassRepository assetClassRepository){
+    public StrategyRESTController(final ModelMapper modelMapper, final UserRepository userRepository,
+                                  final StrategyRepository strategyRepository,
+                                  final AssetClassRepository assetClassRepository) {
+        this.modelMapper = modelMapper;
         this.userRepository = userRepository;
         this.strategyRepository = strategyRepository;
         this.assetClassRepository = assetClassRepository;
@@ -60,7 +65,7 @@ public class StrategyRESTController {
         List<Strategy> strategy = strategyRepository.findByUserAndActiveTrue(user);
         List<StrategyDTO> strategyDTO = new LinkedList<>();
         for (Strategy curr : strategy) {
-            strategyDTO.add(new StrategyDTO(curr));
+            strategyDTO.add(modelMapper.map(curr, StrategyDTO.class));
         }
         LOGGER.debug("User: " + user.getUsername() + " - Get strategy API called.");
         return new SuccessResponse<>(strategyDTO);
@@ -80,17 +85,18 @@ public class StrategyRESTController {
     public @ResponseBody AbstractResponse updateStrategy(@RequestBody List<StrategyDTO> strategyInput,
                                                          Authentication authentication) {
         User user = userRepository.findByUsername(authentication.getName());
+
         // Set user as not new if he was new
         if (user.getIsNewUser()) {
             user.setIsNewUser(false);
             userRepository.save(user);
-        }
-
-        // Disable the previous active strategy if there is one
-        List<Strategy> previousActive = strategyRepository.findByUserAndActiveTrue(user);
-        for (Strategy curr : previousActive) {
-            curr.setActive(false);
-            strategyRepository.save(curr);
+        } else{
+            // Disable the previous active strategy
+            List<Strategy> previousActive = strategyRepository.findByUserAndActiveTrue(user);
+            for (Strategy curr : previousActive) {
+                curr.setActive(false);
+                strategyRepository.save(curr);
+            }
         }
 
         // Insert the new strategy

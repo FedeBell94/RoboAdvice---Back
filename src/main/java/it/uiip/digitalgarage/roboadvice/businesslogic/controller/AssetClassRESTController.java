@@ -1,6 +1,6 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
-import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.AssetClassDTO;
+import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.AssetClassHistoryDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
@@ -9,6 +9,7 @@ import it.uiip.digitalgarage.roboadvice.persistence.model.Data;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetClassRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.DataRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,10 +17,6 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.*;
-
-/**
- * Created by Simone on 10/03/2017.
- */
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -30,30 +27,29 @@ public class AssetClassRESTController {
     private final AssetRepository assetRepository;
     private final AssetClassRepository assetClassRepository;
 
+    private final ModelMapper modelMapper;
+
     @Autowired
-    public AssetClassRESTController(final DataRepository dataRepository, final AssetRepository assetRepository,
+    public AssetClassRESTController(final ModelMapper modelMapper, final DataRepository dataRepository,
+                                    final AssetRepository assetRepository,
                                     final AssetClassRepository assetClassRepository) {
+        this.modelMapper = modelMapper;
         this.dataRepository = dataRepository;
         this.assetRepository = assetRepository;
         this.assetClassRepository = assetClassRepository;
     }
 
     @RequestMapping(value = "/assetClassesName", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    AbstractResponse requestAssetClassData() {
+    public @ResponseBody AbstractResponse requestAssetClassData() {
         Iterable<AssetClass> assetClasses = assetClassRepository.findAll();
         return new SuccessResponse<>(assetClasses);
     }
 
+    // TODO refacotr this method
     @RequestMapping(value = "/assetClassHistory", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    AbstractResponse requestAssetClassData(@RequestParam Long assetClassId) {
+    public @ResponseBody AbstractResponse requestAssetClassData(@RequestParam Long assetClassId) {
 
-        AssetClass assetClass = assetClassRepository.findOne(assetClassId);
-
-        List<Asset> assets = assetRepository.findByAssetClass(assetClass);
+        List<Asset> assets = assetRepository.findByAssetClass(AssetClass.builder().id(assetClassId).build());
 
         Map<LocalDate, BigDecimal> hm = new HashMap<>();
 
@@ -82,17 +78,19 @@ public class AssetClassRESTController {
         }
 
         Iterator it = hm.entrySet().iterator();
-        List<AssetClassDTO> result = new ArrayList();
+
+        List<AssetClassHistoryDTO> result = new ArrayList();
+
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
-            result.add(AssetClassDTO.builder()
+            result.add(AssetClassHistoryDTO.builder()
                     .date(pair.getKey().toString())
                     .value((BigDecimal) pair.getValue()).build());
             it.remove();
         }
-        result.sort(new Comparator<AssetClassDTO>() {
+        result.sort(new Comparator<AssetClassHistoryDTO>() {
             @Override
-            public int compare(AssetClassDTO o1, AssetClassDTO o2) {
+            public int compare(AssetClassHistoryDTO o1, AssetClassHistoryDTO o2) {
                 return o1.getDate().compareTo(o2.getDate());
             }
         });
