@@ -12,7 +12,7 @@ public interface DataRepository extends PagingAndSortingRepository<Data, Long> {
     // This query is only for testing (to compute the correct value on demo creation of the portfolio)
     Data findTop1ByDateBeforeAndAssetOrderByDateDesc(Date date, Asset asset);
 
-    List<Data> findByDateAfterAndAsset(Date date, Asset asset);
+    List<Data> findByDateAfterAndAssetOrderByDateAsc(Date date, Asset asset);
 
     // used only because of the portfolio demo creation
     List<Data> findByDate(Date date);
