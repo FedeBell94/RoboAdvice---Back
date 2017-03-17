@@ -51,9 +51,7 @@ public class UserRESTController {
      * @return A {@link SuccessResponse} containing the {@link UserDTO} who asked for the login.
      */
     @RequestMapping(value = "/loginUser", method = RequestMethod.POST)
-    public
-    @ResponseBody
-    AbstractResponse loginUser(Authentication authentication) {
+    public @ResponseBody AbstractResponse loginUser(Authentication authentication) {
         User user = userRepository.findByUsername(authentication.getName());
         LOGGER.debug("User " + user.getUsername() + " just logged in.");
         return new SuccessResponse<>(modelMapper.map(user, UserDTO.class));
@@ -68,10 +66,8 @@ public class UserRESTController {
      * @return An empty {@link SuccessResponse}.
      */
     @RequestMapping(value = "/logoutUser", method = RequestMethod.POST)
-    public
-    @ResponseBody
-    AbstractResponse logoutUser(Authentication authentication, HttpServletRequest request,
-                                HttpServletResponse response) {
+    public @ResponseBody AbstractResponse logoutUser(Authentication authentication, HttpServletRequest request,
+                                                     HttpServletResponse response) {
         new SecurityContextLogoutHandler().logout(request, response, authentication);
         SecurityContextHolder.getContext().setAuthentication(null);
         LOGGER.debug("User " + authentication.getName() + " just logged out.");
@@ -85,9 +81,7 @@ public class UserRESTController {
      * @return Returns the {@link User} which has called this method.
      */
     @RequestMapping(value = "/tellMeWhoAmI", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    AbstractResponse tellMeWhoAmI(Authentication authentication) {
+    public @ResponseBody AbstractResponse tellMeWhoAmI(Authentication authentication) {
         User user = userRepository.findByUsername(authentication.getName());
         LOGGER.debug("TellWhoAmI: " + user.getUsername());
         return new SuccessResponse<>(modelMapper.map(user, UserDTO.class));
@@ -101,9 +95,7 @@ public class UserRESTController {
      * if something goes wrong during the registration.
      */
     @RequestMapping(value = "/registerUser", method = RequestMethod.POST)
-    public
-    @ResponseBody
-    AbstractResponse registerUser(@RequestBody UserDTO inputUser) {
+    public @ResponseBody AbstractResponse registerUser(@RequestBody UserDTO inputUser) {
 
         if (userRepository.findByUsername(inputUser.getUsername()) != null) {
             LOGGER.debug("Email already used for this user");

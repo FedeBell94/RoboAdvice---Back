@@ -9,6 +9,8 @@ import java.util.List;
 /**
  * Created by Simone on 09/03/2017.
  */
+
+
 public class AssertAnnotations {
 
     private static void assertAnnotations(
