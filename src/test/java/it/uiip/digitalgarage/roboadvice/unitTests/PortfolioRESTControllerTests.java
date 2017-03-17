@@ -1,4 +1,4 @@
-package it.uiip.digitalgarage.roboadvice.tests;
+package it.uiip.digitalgarage.roboadvice.unitTests;
 
 import it.uiip.digitalgarage.roboadvice.businesslogic.controller.PortfolioRESTController;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.PortfolioDTO;
@@ -24,7 +24,6 @@ import org.springframework.test.context.transaction.TransactionalTestExecutionLi
 import javax.persistence.PersistenceContext;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;

@@ -1,8 +1,7 @@
-package it.uiip.digitalgarage.roboadvice.tests;
+package it.uiip.digitalgarage.roboadvice.unitTests;
 
 import it.uiip.digitalgarage.roboadvice.businesslogic.controller.AssetClassRESTController;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.AssetClassHistoryDTO;
-import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.NightlyTask;
 import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dateProvider.DateProvider;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.AssetClass;
@@ -25,7 +24,6 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 
 import javax.persistence.PersistenceContext;
-import javax.validation.constraints.AssertTrue;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

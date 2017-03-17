@@ -1,9 +1,8 @@
-package it.uiip.digitalgarage.roboadvice.tests;
+package it.uiip.digitalgarage.roboadvice.unitTests;
 
 import it.uiip.digitalgarage.roboadvice.businesslogic.controller.UserRESTController;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.UserDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
-import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
 import org.junit.Before;
