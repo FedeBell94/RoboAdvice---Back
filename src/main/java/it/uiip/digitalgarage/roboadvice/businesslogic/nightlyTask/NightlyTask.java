@@ -38,9 +38,7 @@ public class NightlyTask implements INightlyTask {
         this.dataUpdater = dataUpdater;
     }
 
-    /**
-     * The default start worth of a user. It is set to 10000.
-     */
+    // The default start worth of a user. It is set to 10000.
     private static final BigDecimal DEFAULT_START_WORTH = new BigDecimal(10000);
 
 
@@ -48,42 +46,50 @@ public class NightlyTask implements INightlyTask {
     public void executeNightlyTask(final Iterable<User> users) {
 
         // #1: update assets data
-        // TODO fatal if can not download data
         dataUpdater.updateAssetData();
 
         // Finds all assets
         final Iterable<Asset> assets = assetRepository.findAll();
 
-
+        // Compute the daily portfolio for each user
         for (User currUser : users) {
 
+            // If the user is new creates the portfolio
             if (currUser.getLastPortfolioComputation() == null) {
 
-                // For each asset finds the latest price
+                // For each asset finds the latest price for the registration's day
                 final Map<Long, BigDecimal> latestPrices = findAssetsPriceDay(assets, currUser.getRegistration());
 
-                // TODO check if the user has not a strategy
-                List<Strategy> userStrategy =
-                        strategyRepository.findTop4ByUserAndStartingDateLessThanEqualOrderByStartingDateDesc(currUser, currUser.getRegistration());
-                Date tomorrow = new Date(currUser.getRegistration().getTime() + 24*60*60*1000);
-                createPortfolio(currUser, tomorrow, assets, DEFAULT_START_WORTH, latestPrices,
-                        userStrategy);
+                // TODO remove top 4 hardcoding, checking the last portfolio date
+                List<Strategy> userStrategy = strategyRepository
+                        .findTop4ByUserAndStartingDateLessThanEqualOrderByStartingDateDesc(currUser,
+                                currUser.getRegistration());
+                if(userStrategy.isEmpty()){
+                    // If the strategy is not set i do not compute the portfolio for this user
+                    continue;
+                }
+                Date tomorrow = new Date(currUser.getRegistration().getTime() + 24 * 60 * 60 * 1000);
+                createPortfolio(currUser, tomorrow, assets, DEFAULT_START_WORTH, latestPrices, userStrategy);
                 currUser.setLastPortfolioComputation(tomorrow);
             }
 
             LiarDateProvider dateProvider = new LiarDateProvider(currUser.getLastPortfolioComputation().toString());
             dateProvider.goNextDay();
+            // Computes all the portfolios for the user in case the nightly task failed in the previous days
             while (dateProvider.getToday().compareTo(Date.valueOf(LocalDate.now())) <= 0) {
 
                 // Find last portfolio computed for the current user
                 List<Portfolio> userPortfolio =
                         portfolioRepository.findByUserAndDate(currUser, dateProvider.getYesterday());
 
-                // Finds the active strategy of the current user
-                // TODO check if the user has not a strategy
-                List<Strategy> userStrategy =
-                        strategyRepository.findTop4ByUserAndStartingDateLessThanEqualOrderByStartingDateDesc(currUser, dateProvider.getToday());
-
+                // Finds the active strategy of the current user for the current date
+                List<Strategy> userStrategy = strategyRepository
+                        .findTop4ByUserAndStartingDateLessThanEqualOrderByStartingDateDesc(currUser,
+                                dateProvider.getToday());
+                if(userStrategy.isEmpty()){
+                    // If the strategy is not set i do not compute the portfolio for this user
+                    continue;
+                }
 
                 // For each asset finds the latest price
                 final Map<Long, BigDecimal> latestPrices = findAssetsPriceDay(assets, dateProvider.getToday());
@@ -96,8 +102,7 @@ public class NightlyTask implements INightlyTask {
                     createPortfolio(currUser, dateProvider.getToday(), assets, userWorth, latestPrices, userStrategy);
                 } else {
                     // #3: update portfolio for 'old' users which didn't change the strategy yesterday
-
-                    final List<Data> todayNewPrices = dataRepository.findByDate(dateProvider.getToday());
+                    List<Data> todayNewPrices = dataRepository.findByDate(dateProvider.getToday());
                     updatePortfolio(dateProvider.getToday(), userPortfolio, todayNewPrices);
                 }
 
@@ -118,13 +123,6 @@ public class NightlyTask implements INightlyTask {
             for (Asset currAsset : assets) {
                 if (currAsset.getAssetClass().getId().equals(currStrategy.getAssetClass().getId())) {
 
-                    /*
-                     * assetMoney = totalMoney*(assetClassStrategyPerc)*(assetDistributionPerc)
-                     *
-                     * assetMoney = totalMoney*(assetClassStrategy / 100)*(assetDistribution / 100)
-                     *
-                     * assetMoney = totalMoney*(assetClassStrategy * assetDistribution)/10000
-                     */
                     BigDecimal assetMoney = worth.multiply(currStrategy.getPercentage())
                             .multiply(currAsset.getFixedPercentage()).divide(new BigDecimal(10000), 4);
 

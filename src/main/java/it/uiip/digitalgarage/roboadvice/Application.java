@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 
 import javax.annotation.PostConstruct;
 import java.io.FileReader;
@@ -53,11 +52,10 @@ public class Application {
 
     // Execution of night task
     //@Scheduled(cron = "0 0 10 * * TUE-SAT")
-    @Scheduled(cron = "*/1 * * * * *")
+    //@Scheduled(cron = "*/1 * * * * *")
     public void executeNightTask() {
         LOGGER.debug("Night task started.");
         Long startTime = System.currentTimeMillis();
-//        DateProvider dateProvider = new DateProvider();
         nightlyTask.executeNightlyTask(userRepository.findAll());
         Long endTime = System.currentTimeMillis();
         LOGGER.debug("Night task ended -> execution time " + (endTime - startTime) + "ms. ");
@@ -93,10 +91,10 @@ public class Application {
 
         } catch (Exception e) {
             e.printStackTrace();
-            LOGGER.error("Failed to add default data in database.");
-        }
+        LOGGER.error("Failed to add default data in database.");
+    }
 
-        dataUpdater.updateAssetData();
+    dataUpdater.updateAssetData();
     }
 
     private void insertDefaultAssetClasses(List<JSONObject> assetClassList) {

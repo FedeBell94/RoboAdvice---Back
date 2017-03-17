@@ -36,6 +36,7 @@ public class DataUpdater implements IDataUpdater {
 
     @Override
     public void updateAssetData() {
+        // TODO throw exception if it is not possible to download daily data
         Data data = dataRepository.findTop1ByOrderByDateDesc();
         if(data == null || data.getDate().toLocalDate().compareTo(LocalDate.now()) != 0){
             computeDataUpdate();
