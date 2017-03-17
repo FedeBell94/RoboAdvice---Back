@@ -4,7 +4,6 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.INightlyTask;
 import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dataUpdater.IDataUpdater;
-import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dateProvider.DateProvider;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.AssetClass;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetClassRepository;
@@ -57,8 +56,8 @@ public class Application {
     public void executeNightTask() {
         LOGGER.debug("Night task started.");
         Long startTime = System.currentTimeMillis();
-        DateProvider dateProvider = new DateProvider();
-        nightlyTask.executeNightlyTask(dateProvider, userRepository.findAll());
+//        DateProvider dateProvider = new DateProvider();
+        nightlyTask.executeNightlyTask(userRepository.findAll());
         Long endTime = System.currentTimeMillis();
         LOGGER.debug("Night task ended -> execution time " + (endTime - startTime) + "ms. ");
     }

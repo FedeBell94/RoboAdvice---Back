@@ -101,6 +101,7 @@ public class StrategyRESTController {
 
 
         // Insert the new strategy
+        // TODO delete strategy in the same day if inserted more than once!!!
         List<Strategy> insertStrategy = new ArrayList<>();
         for (StrategyDTO curr : strategyInput) {
             AssetClass assetClass = assetClassRepository.findOne(curr.getAssetClassId());
