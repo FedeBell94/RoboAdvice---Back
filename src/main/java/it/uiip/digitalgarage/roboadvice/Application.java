@@ -96,7 +96,7 @@ public class Application {
             LOGGER.error("Failed to add default data in database.");
         }
 
-        dataUpdater.updateData();
+        dataUpdater.updateAssetData();
     }
 
     private void insertDefaultAssetClasses(List<JSONObject> assetClassList) {

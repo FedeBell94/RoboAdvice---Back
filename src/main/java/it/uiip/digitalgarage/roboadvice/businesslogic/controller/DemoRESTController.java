@@ -54,7 +54,6 @@ public class DemoRESTController {
 
         Long endTime = System.currentTimeMillis();
         LOGGER.debug("Compute portfolio demo ended -> execution time " + (endTime - startTime) + "ms. ");
-
         return new SuccessResponse<>(null);
     }
 }

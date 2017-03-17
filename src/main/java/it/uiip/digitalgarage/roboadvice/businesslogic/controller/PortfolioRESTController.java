@@ -34,6 +34,7 @@ public class PortfolioRESTController {
     }
 
 
+    // From excluded
     @RequestMapping(value = "/portfolio", method = RequestMethod.GET)
     public @ResponseBody AbstractResponse requestMyData(Authentication authentication,
                                                         @RequestParam(required = false)
@@ -42,7 +43,7 @@ public class PortfolioRESTController {
 
         Date fromDate = from == null ? user.getRegistration() : Date.valueOf(from);
         List<PortfolioDTO> portfolio = portfolioRepository.findPortfolioHistory(user, fromDate);
+        LOGGER.debug("User " + user.getUsername() + " - get portfolio called.");
         return new SuccessResponse<>(portfolio);
-
     }
 }

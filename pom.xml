@@ -94,7 +94,7 @@
         <dependency>
             <groupId>org.modelmapper</groupId>
             <artifactId>modelmapper</artifactId>
-            <version>0.7.5</version>
+            <version>RELEASE</version>
         </dependency>
 
     </dependencies>

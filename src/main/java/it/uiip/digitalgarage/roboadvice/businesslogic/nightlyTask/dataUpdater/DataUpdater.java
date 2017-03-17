@@ -1,6 +1,5 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dataUpdater;
 
-import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dateProvider.DateProvider;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Data;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
@@ -27,10 +26,6 @@ public class DataUpdater implements IDataUpdater {
 
     private final IDataSource dataSource;
 
-    private LocalDate lastDataUpdate;
-
-    private DateProvider dateProvider = new DateProvider();
-
     @Autowired
     public DataUpdater(final DataRepository dataRepository, final AssetRepository assetRepository,
                        final IDataSource dataSource) {
@@ -40,18 +35,12 @@ public class DataUpdater implements IDataUpdater {
     }
 
     @Override
-    public void updateData() {
+    public void updateAssetData() {
         Data data = dataRepository.findTop1ByOrderByDateDesc();
-        if(data == null){
-            computeDataUpdate();
-        } else if(data.getDate().toLocalDate().compareTo(LocalDate.now()) != 0){
-            computeDataUpdate();
-        } else if(lastDataUpdate == null){
-            lastDataUpdate = LocalDate.now();
-        } else if(lastDataUpdate.compareTo(LocalDate.now()) != 0){
+        if(data == null || data.getDate().toLocalDate().compareTo(LocalDate.now()) != 0){
             computeDataUpdate();
         } else {
-            LOGGER.debug("In data table everything is already up-to-date");
+            LOGGER.info("In data table everything is already up-to-date");
         }
     }
 
@@ -71,6 +60,5 @@ public class DataUpdater implements IDataUpdater {
 
         }
         dataRepository.save(dataList);
-        lastDataUpdate = LocalDate.now();
     }
 }

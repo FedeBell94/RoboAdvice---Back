@@ -44,6 +44,7 @@ public class AssetClassRESTController {
     @RequestMapping(value = "/assetClass", method = RequestMethod.GET)
     public @ResponseBody AbstractResponse getAssetClasses() {
         Iterable<AssetClass> assetClasses = assetClassRepository.findAll();
+        LOGGER.debug("Get all asset class API called.");
         return new SuccessResponse<>(assetClasses);
     }
 
@@ -54,13 +55,13 @@ public class AssetClassRESTController {
                                                                @RequestParam(required = false)
                                                                @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate to) {
 
-        // Check for the date. If the date passed is null, the default is 120 days from today.
+        // Check for the date. If the date passed is null, the default is 500 days from today.
         Date startDate;
         Date endDate;
         Calendar calendar = Calendar.getInstance();
         if (from == null) {
             endDate = new Date(calendar.getTimeInMillis());
-            calendar.add(Calendar.DATE, -120);
+            calendar.add(Calendar.DATE, -500);
             startDate = new Date(calendar.getTimeInMillis());
         } else {
             startDate = Date.valueOf(from);
@@ -132,6 +133,8 @@ public class AssetClassRESTController {
                     .date(Date.valueOf(key))
                     .value(value).build());
         }
+
+        LOGGER.debug("Get asset class history called for asset id " + assetClassId);
         return new SuccessResponse<>(returnData);
     }
 

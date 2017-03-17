@@ -2,5 +2,5 @@ package it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dataUpdater;
 
 public interface IDataUpdater {
 
-    void updateData();
+    void updateAssetData();
 }
