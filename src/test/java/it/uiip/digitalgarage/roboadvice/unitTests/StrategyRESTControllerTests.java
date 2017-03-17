@@ -2,7 +2,6 @@ package it.uiip.digitalgarage.roboadvice.unitTests;
 
 import it.uiip.digitalgarage.roboadvice.businesslogic.controller.StrategyRESTController;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.StrategyDTO;
-import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dateProvider.DateProvider;
 import it.uiip.digitalgarage.roboadvice.persistence.model.AssetClass;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Strategy;
@@ -27,7 +26,6 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 
 import javax.persistence.PersistenceContext;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -117,7 +115,7 @@ public class StrategyRESTControllerTests {
     @Test
     public void testUpdateStrategy() {
 
-        Boolean check = strategyRESTController.updateStrategy(strategyDTOList, authentication).getResponse() == 1;
+        Boolean check = strategyRESTController.updateStrategy(authentication, strategyDTOList).getResponse() == 1;
 
         assertTrue(check);
     }

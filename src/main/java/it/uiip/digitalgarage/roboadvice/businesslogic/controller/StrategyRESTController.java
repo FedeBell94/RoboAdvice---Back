@@ -18,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
@@ -88,16 +89,24 @@ public class StrategyRESTController {
             user.setIsNewUser(false);
             userRepository.save(user);
         } else {
-            // Disable the previous active strategy
+            // Disable the previous active strategy or delete it if it is in the same day of the new one
             List<Strategy> previousActive = strategyRepository.findByUserAndActiveTrue(user);
-            for (Strategy curr : previousActive) {
-                curr.setActive(false);
-                strategyRepository.save(curr);
+            if (!previousActive.isEmpty() &&
+                    previousActive.get(0).getStartingDate().compareTo(Date.valueOf(LocalDate.now())) == 0) {
+                // Delete the strategy
+                for (Strategy curr : previousActive) {
+                    strategyRepository.delete(curr);
+                }
+            } else {
+                // Disable the strategy
+                for (Strategy curr : previousActive) {
+                    curr.setActive(false);
+                    strategyRepository.save(curr);
+                }
             }
         }
 
         // Insert the new strategy
-        // TODO delete strategy in the same day if inserted more than once!!!
         List<Strategy> insertStrategy = new ArrayList<>();
         for (StrategyDTO curr : strategyInput) {
             AssetClass assetClass = assetClassRepository.findOne(curr.getAssetClassId());
