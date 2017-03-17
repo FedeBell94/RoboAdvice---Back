@@ -47,22 +47,22 @@ public class UserRESTControllerTest {
 
 
     @Mock
-    Authentication authentication;
+    private Authentication authentication;
 
     @Mock
-    PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     @Mock
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Mock
-    ModelMapper modelMapper;
+    private ModelMapper modelMapper;
 
     @Mock
-    HttpServletRequest request;
+    private HttpServletRequest request;
 
     @Mock
-    HttpServletResponse response;
+    private HttpServletResponse response;
 
 
     @Rule

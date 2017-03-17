@@ -73,7 +73,8 @@ public class UserRESTController {
      */
     @RequestMapping(value = "/logoutUser", method = RequestMethod.POST)
     public @ResponseBody AbstractResponse logoutUser(Authentication authentication, HttpServletRequest request,
-                                HttpServletResponse response) {
+                                                     HttpServletResponse response) {
+
         new SecurityContextLogoutHandler().logout(request, response, authentication);
         SecurityContextHolder.getContext().setAuthentication(null);
         LOGGER.debug("User " + authentication.getName() + " just logged out.");

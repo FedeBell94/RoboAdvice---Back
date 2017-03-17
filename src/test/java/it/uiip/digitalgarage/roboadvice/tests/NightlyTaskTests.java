@@ -44,7 +44,7 @@ import static org.mockito.Mockito.when;
 @ContextConfiguration(classes = {PersistenceContext.class})
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class,
         TransactionalTestExecutionListener.class})
-public class NightlyTaskTest {
+public class NightlyTaskTests {
 
 
     private static final Log LOGGER = LogFactory.getLog(Application.class);

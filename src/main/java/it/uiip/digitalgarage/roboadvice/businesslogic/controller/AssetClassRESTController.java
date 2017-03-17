@@ -75,6 +75,7 @@ public class AssetClassRESTController {
 
         // Retrieve the assets for this asset class
         List<Asset> assetsAssetClass = assetRepository.findByAssetClass(AssetClass.builder().id(assetClassId).build());
+
         List<List<Data>> allAssets = new ArrayList<>();
         for (Asset currAsset : assetsAssetClass) {
             List<Data> currAssetData =
@@ -83,6 +84,7 @@ public class AssetClassRESTController {
                 currAssetData.add(Data.builder().asset(currAsset).date(Date.valueOf("2000-01-01")).build());
             }
             allAssets.add(currAssetData);
+
         }
 
         // Retrieve the last value for the asset before today if not already present in the data
