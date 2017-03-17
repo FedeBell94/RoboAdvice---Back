@@ -34,6 +34,7 @@ public class PortfolioRESTController {
     }
 
 
+    // From excluded
     @RequestMapping(value = "/portfolio", method = RequestMethod.GET)
     public @ResponseBody AbstractResponse requestMyData(Authentication authentication,
                                                         @RequestParam(required = false)

@@ -47,13 +47,13 @@ public class UserRESTController {
     /**
      * Perform the login of the user into the platform.
      *
-     * @param authentication Represents the token for an authentication request or for an authenticated {@link User}.
+     * @param authentication
+     *         Represents the token for an authentication request or for an authenticated {@link User}.
+     *
      * @return A {@link SuccessResponse} containing the {@link UserDTO} who asked for the login.
      */
     @RequestMapping(value = "/loginUser", method = RequestMethod.POST)
-    public
-    @ResponseBody
-    AbstractResponse loginUser(Authentication authentication) {
+    public @ResponseBody AbstractResponse loginUser(Authentication authentication) {
         User user = userRepository.findByUsername(authentication.getName());
         LOGGER.debug("User " + user.getUsername() + " just logged in.");
         return new SuccessResponse<>(modelMapper.map(user, UserDTO.class));
@@ -62,15 +62,17 @@ public class UserRESTController {
     /**
      * Performs the logout of the caller user fom the platform.
      *
-     * @param authentication Represents the token for an authentication request or for an authenticated {@link User}.
-     * @param request        The {@link HttpServletRequest} of the servlet.
-     * @param response       The {@link HttpServletResponse} of the servlet.
+     * @param authentication
+     *         Represents the token for an authentication request or for an authenticated {@link User}.
+     * @param request
+     *         The {@link HttpServletRequest} of the servlet.
+     * @param response
+     *         The {@link HttpServletResponse} of the servlet.
+     *
      * @return An empty {@link SuccessResponse}.
      */
     @RequestMapping(value = "/logoutUser", method = RequestMethod.POST)
-    public
-    @ResponseBody
-    AbstractResponse logoutUser(Authentication authentication, HttpServletRequest request,
+    public @ResponseBody AbstractResponse logoutUser(Authentication authentication, HttpServletRequest request,
                                 HttpServletResponse response) {
         new SecurityContextLogoutHandler().logout(request, response, authentication);
         SecurityContextHolder.getContext().setAuthentication(null);
@@ -81,13 +83,13 @@ public class UserRESTController {
     /**
      * Returns to the caller his identity (as {@link User}).
      *
-     * @param authentication Represents the token for an authentication request or for an authenticated {@link User}.
+     * @param authentication
+     *         Represents the token for an authentication request or for an authenticated {@link User}.
+     *
      * @return Returns the {@link User} which has called this method.
      */
     @RequestMapping(value = "/tellMeWhoAmI", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    AbstractResponse tellMeWhoAmI(Authentication authentication) {
+    public @ResponseBody AbstractResponse tellMeWhoAmI(Authentication authentication) {
         User user = userRepository.findByUsername(authentication.getName());
         LOGGER.debug("TellWhoAmI: " + user.getUsername());
         return new SuccessResponse<>(modelMapper.map(user, UserDTO.class));
@@ -96,14 +98,14 @@ public class UserRESTController {
     /**
      * Register the {@link User} in the platform. This API is not secured.
      *
-     * @param inputUser The {@link UserDTO} user to register.
+     * @param inputUser
+     *         The {@link UserDTO} user to register.
+     *
      * @return A {@link SuccessResponse} containing the user created, an {@link ErrorResponse} containing the error code
      * if something goes wrong during the registration.
      */
     @RequestMapping(value = "/registerUser", method = RequestMethod.POST)
-    public
-    @ResponseBody
-    AbstractResponse registerUser(@RequestBody UserDTO inputUser) {
+    public @ResponseBody AbstractResponse registerUser(@RequestBody UserDTO inputUser) {
 
         if (userRepository.findByUsername(inputUser.getUsername()) != null) {
             LOGGER.debug("Email already used for this user");
