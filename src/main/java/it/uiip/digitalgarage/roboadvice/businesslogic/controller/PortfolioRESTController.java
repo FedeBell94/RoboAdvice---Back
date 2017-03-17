@@ -33,8 +33,19 @@ public class PortfolioRESTController {
         this.portfolioRepository = portfolioRepository;
     }
 
-
-    // From excluded
+    /**
+     * This method returns the portfolio history for the user which called the method. The parameter from is optional.
+     * If it is not specified this method returns all the portfolio history of the user from the first day of
+     * registration to the last one computed. Otherwise this method returns all the portfolio history from the 'from'
+     * date to the last one computed.
+     * The required format for the date is yyyy-MM-dd.
+     *
+     * @param authentication Represents the authentication token of an authenticated request.
+     * @param from           Optional - The date from when the portfolio history is needed. The required format id
+     *                       yyyy-MM-dd.
+     *
+     * @return An {@link AbstractResponse} containing the list of {@link PortfolioDTO} requested.
+     */
     @RequestMapping(value = "/portfolio", method = RequestMethod.GET)
     public @ResponseBody AbstractResponse requestMyData(Authentication authentication,
                                                         @RequestParam(required = false)

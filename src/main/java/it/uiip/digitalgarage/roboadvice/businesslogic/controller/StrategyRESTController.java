@@ -52,7 +52,8 @@ public class StrategyRESTController {
     /**
      * Retrieve the last active strategy for the caller {@link User}.
      *
-     * @param authentication Represents the token for an authentication request or for an authenticated {@link User}.
+     * @param authentication Represents the authentication token of an authenticated request.
+     *
      * @return The last active {@link StrategyDTO} for the user, null in case the user has not a strategy set.
      */
     @RequestMapping(value = "/strategy", method = RequestMethod.GET)
@@ -73,12 +74,13 @@ public class StrategyRESTController {
      * Insert the strategy passed if the {@link User} is new, or update the strategy if the {@link User} is not new.
      *
      * @param strategyInput  The new strategy to insert into the database.
-     * @param authentication Represents the token for an authentication request or for an authenticated {@link User}.
+     * @param authentication Represents the authentication token of an authenticated request.
+     *
      * @return An empty {@link SuccessResponse}.
      */
     @RequestMapping(value = "/strategy", method = RequestMethod.POST)
-    public @ResponseBody AbstractResponse updateStrategy(@RequestBody List<StrategyDTO> strategyInput,
-                                                         Authentication authentication) {
+    public @ResponseBody AbstractResponse updateStrategy(Authentication authentication,
+                                                         @RequestBody List<StrategyDTO> strategyInput) {
         User user = userRepository.findByUsername(authentication.getName());
 
         // Set user as not new if he was new

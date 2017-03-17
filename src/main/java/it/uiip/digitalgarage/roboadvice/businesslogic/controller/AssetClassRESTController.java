@@ -65,12 +65,10 @@ public class AssetClassRESTController {
      * not specified. From and To date are both excluded.
      * The format of date required is yyyy-MM-dd.
      *
-     * @param assetClassId
-     *         The {@link AssetClass} id which history is required.
-     * @param from
-     *         Optional - The date in format yyyy-MM-dd from when the history of the asset class is required.
-     * @param to
-     *         Optional - The date in format yyyy-MM-dd to when the history of the asset class is required.
+     * @param assetClassId The {@link AssetClass} id which history is required.
+     * @param from         Optional - The date in format yyyy-MM-dd from when the history of the asset class is
+     *                     required.
+     * @param to           Optional - The date in format yyyy-MM-dd to when the history of the asset class is required.
      *
      * @return An {@link AbstractResponse} containing a list of {@link AssetClassHistoryDTO} objects required.
      */

@@ -47,8 +47,7 @@ public class UserRESTController {
     /**
      * Perform the login of the user into the platform.
      *
-     * @param authentication
-     *         Represents the token for an authentication request or for an authenticated {@link User}.
+     * @param authentication Represents the authentication token of an authenticated request.
      *
      * @return A {@link SuccessResponse} containing the {@link UserDTO} who asked for the login.
      */
@@ -62,12 +61,9 @@ public class UserRESTController {
     /**
      * Performs the logout of the caller user fom the platform.
      *
-     * @param authentication
-     *         Represents the token for an authentication request or for an authenticated {@link User}.
-     * @param request
-     *         The {@link HttpServletRequest} of the servlet.
-     * @param response
-     *         The {@link HttpServletResponse} of the servlet.
+     * @param authentication Represents the authentication token of an authenticated request.
+     * @param request        The {@link HttpServletRequest} of the servlet.
+     * @param response       The {@link HttpServletResponse} of the servlet.
      *
      * @return An empty {@link SuccessResponse}.
      */
@@ -84,8 +80,7 @@ public class UserRESTController {
     /**
      * Returns to the caller his identity (as {@link User}).
      *
-     * @param authentication
-     *         Represents the token for an authentication request or for an authenticated {@link User}.
+     * @param authentication Represents the authentication token of an authenticated request.
      *
      * @return Returns the {@link User} which has called this method.
      */
@@ -99,8 +94,7 @@ public class UserRESTController {
     /**
      * Register the {@link User} in the platform. This API is not secured.
      *
-     * @param inputUser
-     *         The {@link UserDTO} user to register.
+     * @param inputUser The {@link UserDTO} user to register.
      *
      * @return A {@link SuccessResponse} containing the user created, an {@link ErrorResponse} containing the error code
      * if something goes wrong during the registration.
