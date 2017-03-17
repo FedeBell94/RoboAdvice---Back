@@ -22,6 +22,10 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.*;
 
+
+/**
+ * Class used to create all the API rest used to manage the {@link AssetClass}.
+ */
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping(value = "securedApi")
@@ -41,6 +45,11 @@ public class AssetClassRESTController {
         this.assetClassRepository = assetClassRepository;
     }
 
+    /**
+     * This method returns all the {@link AssetClass}.
+     *
+     * @return All the {@link AssetClass} present in the database.
+     */
     @RequestMapping(value = "/assetClass", method = RequestMethod.GET)
     public @ResponseBody AbstractResponse getAssetClasses() {
         Iterable<AssetClass> assetClasses = assetClassRepository.findAll();
@@ -48,6 +57,23 @@ public class AssetClassRESTController {
         return new SuccessResponse<>(assetClasses);
     }
 
+    /**
+     * This method returns the history of the {@link AssetClass} passed as parameter. This parameter is required. This
+     * method also provides two optionals parameters: from and to. Both are not necessaries. If from is not specified
+     * this method returns a default number of days of history of the portfolio. Otherwise if from is specified it
+     * returns all the history of the asset from the date 'from' to the date 'to' if present or to the current day if
+     * not specified. From and To date are both excluded.
+     * The format of date required is yyyy-MM-dd.
+     *
+     * @param assetClassId
+     *         The {@link AssetClass} id which history is required.
+     * @param from
+     *         Optional - The date in format yyyy-MM-dd from when the history of the asset class is required.
+     * @param to
+     *         Optional - The date in format yyyy-MM-dd to when the history of the asset class is required.
+     *
+     * @return An {@link AbstractResponse} containing a list of {@link AssetClassHistoryDTO} objects required.
+     */
     @RequestMapping(value = "/assetClassHistory", method = RequestMethod.GET)
     public @ResponseBody AbstractResponse getAssetClassHistory(@RequestParam Long assetClassId,
                                                                @RequestParam(required = false)
@@ -64,7 +90,7 @@ public class AssetClassRESTController {
             calendar.add(Calendar.DATE, -500);
             startDate = new Date(calendar.getTimeInMillis());
         } else {
-            startDate = Date.valueOf(from);
+            startDate = new Date(Date.valueOf(from).getTime() + 24 * 60 * 60 * 1000);
             if (to == null) {
                 endDate = new Date(calendar.getTimeInMillis());
             } else {
@@ -80,8 +106,8 @@ public class AssetClassRESTController {
         for (Asset currAsset : assetsAssetClass) {
             List<Data> currAssetData =
                     dataRepository.findByDateAfterAndAssetOrderByDateAsc(dateProvider.getYesterday(), currAsset);
-            if(currAssetData.isEmpty()){
-                currAssetData.add(Data.builder().asset(currAsset).date(Date.valueOf("2000-01-01")).build());
+            if (currAssetData.isEmpty()) {
+                currAssetData.add(Data.builder().asset(currAsset).date(Date.valueOf("1900-01-01")).build());
             }
             allAssets.add(currAssetData);
 
