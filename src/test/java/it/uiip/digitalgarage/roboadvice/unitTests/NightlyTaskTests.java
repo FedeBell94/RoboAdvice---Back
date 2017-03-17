@@ -124,7 +124,7 @@ public class NightlyTaskTests {
 
         NightlyTask nightlyTask = new NightlyTask(strategyRepositoryMock, portfolioRepositoryMock, assetRepositoryMock, dataRepositoryMock, userRepositoryMock, dataUpdaterMock);
 
-        nightlyTask.executeNightlyTask(dateProviderMock, users);
+        //nightlyTask.executeNightlyTask(dateProviderMock, users);
 
         assertTrue(true);
 
