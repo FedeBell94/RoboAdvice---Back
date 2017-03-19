@@ -7,5 +7,17 @@ import java.sql.Date;
 import java.util.List;
 
 public interface IDataSource {
-    List<Data> getAllDataFrom(Asset asset, Date from);
+
+    List<Data> getAllDataFrom(Asset asset, Date from) throws ConnectionException, IndexOutOfBoundsException;
+
+    class ConnectionException extends Exception {
+
+        public ConnectionException() {
+            super();
+        }
+
+        public ConnectionException(String s) {
+            super(s);
+        }
+    }
 }

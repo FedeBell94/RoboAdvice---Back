@@ -1,6 +1,7 @@
 package test.unitTests;
 
 import it.uiip.digitalgarage.roboadvice.Application;
+import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dataUpdater.IDataSource;
 import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dataUpdater.Quandl.QuandlDataSource;
 import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dateProvider.DateProvider;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
@@ -70,18 +71,22 @@ public class QuandlDataSourceTests {
     public void testGetAllDataFrom() {
 
         asset = assetRepository.findOne(assetId);
-        dataList = quandlDataSource.getAllDataFrom(
-                asset,
-                yesterday
 
-        );
+        try {
+            dataList = quandlDataSource.getAllDataFrom(
+                    asset,
+                    yesterday
+            );
+        } catch (IDataSource.ConnectionException e) {
+            assertTrue(false);
+        }
         if (dataList == null) {
             LOGGER.debug("The test for Quandl asset " + asset + " can't be performed extensively for the date (" +
                     yesterday + ")");
             assertTrue(true);
         } else {
 
-            for(Data curData:dataList){
+            for (Data curData : dataList) {
 
                 assertEquals(
                         yesterday.toString(),

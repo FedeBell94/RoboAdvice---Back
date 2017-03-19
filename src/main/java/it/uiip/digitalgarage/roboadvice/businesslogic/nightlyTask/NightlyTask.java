@@ -4,6 +4,8 @@ import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dataUpdater.ID
 import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dateProvider.LiarDateProvider;
 import it.uiip.digitalgarage.roboadvice.persistence.model.*;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,8 @@ import java.util.Map;
 
 @Service
 public class NightlyTask implements INightlyTask {
+
+    private static final Log LOGGER = LogFactory.getLog(NightlyTask.class);
 
     private final StrategyRepository strategyRepository;
     private final PortfolioRepository portfolioRepository;
@@ -46,7 +50,12 @@ public class NightlyTask implements INightlyTask {
     public void executeNightlyTask(final Iterable<User> users) {
 
         // #1: update assets data
-        dataUpdater.updateAssetData();
+        try {
+            dataUpdater.updateAssetData();
+        } catch(IDataUpdater.DataUpdateException e){
+            LOGGER.error("Failed to execute nightly task due to an error in updating asset data.");
+            return;
+        }
 
         // Finds all assets
         final Iterable<Asset> assets = assetRepository.findAll();

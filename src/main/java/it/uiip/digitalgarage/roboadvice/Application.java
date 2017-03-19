@@ -91,10 +91,14 @@ public class Application {
 
         } catch (Exception e) {
             e.printStackTrace();
-        LOGGER.error("Failed to add default data in database.");
-    }
+            LOGGER.error("Failed to add default data in database.");
+        }
 
-    dataUpdater.updateAssetData();
+        try {
+            dataUpdater.updateAssetData();
+        } catch (IDataUpdater.DataUpdateException e) {
+            LOGGER.error("Failed to download data of the assets");
+        }
     }
 
     private void insertDefaultAssetClasses(List<JSONObject> assetClassList) {
