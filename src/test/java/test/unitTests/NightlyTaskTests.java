@@ -3,9 +3,9 @@ package test.unitTests;
 import it.uiip.digitalgarage.roboadvice.Application;
 import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.NightlyTask;
 import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dataUpdater.IDataUpdater;
-import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dateProvider.DateProvider;
 import it.uiip.digitalgarage.roboadvice.persistence.model.*;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.*;
+import it.uiip.digitalgarage.roboadvice.utils.CustomDate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
@@ -43,7 +43,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 @ContextConfiguration(classes = {PersistenceContext.class})
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class,
-        TransactionalTestExecutionListener.class})
+                                TransactionalTestExecutionListener.class})
 public class NightlyTaskTests {
 
 
@@ -68,7 +68,7 @@ public class NightlyTaskTests {
     private IDataUpdater dataUpdaterMock;
 
     @Mock
-    private DateProvider dateProviderMock;
+    private CustomDate customDateMock;
 
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
@@ -78,29 +78,36 @@ public class NightlyTaskTests {
     @Before
     public void before() {
 
-        User testUser = User.builder().id(1L).username("testUser").password("12345").nickname("testUser").lastPortfolioComputation(Date.valueOf(LocalDate.now())).build();
+        User testUser = User.builder().id(1L).username("testUser").password("12345").nickname("testUser")
+                .lastPortfolioComputation(Date.valueOf(LocalDate.now())).build();
 
         List<Asset> assetList = new ArrayList<>();
         AssetClass assetClass = AssetClass.builder().id(0L).name("JUNITassetClass").build();
-        Asset asset = Asset.builder().assetClass(assetClass).name("unitTest").id(0L).fixedPercentage(new BigDecimal("100")).quandlColumn("before").quandlId(1).quandlKey("WIKI/unitTest").build();
+        Asset asset =
+                Asset.builder().assetClass(assetClass).name("unitTest").id(0L).fixedPercentage(new BigDecimal("100"))
+                        .quandlColumn("before").quandlId(1).quandlKey("WIKI/unitTest").build();
         assetList.add(asset);
 
         List<Data> dataList = new ArrayList<>();
-        Data data = Data.builder().asset(asset).date(Date.valueOf(LocalDate.now())).value(new BigDecimal("300")).id(0L).build();
+        Data data = Data.builder().asset(asset).date(Date.valueOf(LocalDate.now())).value(new BigDecimal("300")).id(0L)
+                .build();
         dataList.add(data);
 
         users = new ArrayList<>();
         users.add(testUser);
 
         List<Portfolio> portfolioList = new ArrayList<>();
-        Portfolio portfolio = Portfolio.builder().asset(asset).value(new BigDecimal("900")).unit(new BigDecimal("3")).id(0L).user(testUser).date(Date.valueOf(LocalDate.now())).assetClass(assetClass).build();
+        Portfolio portfolio =
+                Portfolio.builder().asset(asset).value(new BigDecimal("900")).unit(new BigDecimal("3")).id(0L)
+                        .user(testUser).date(Date.valueOf(LocalDate.now())).assetClass(assetClass).build();
 
         List<Strategy> strategyList = new ArrayList<>();
-        Strategy strategy = Strategy.builder().assetClass(assetClass).user(testUser).active(true).id(1L).percentage(new BigDecimal("100")).startingDate(Date.valueOf(LocalDate.now())).build();
+        Strategy strategy = Strategy.builder().assetClass(assetClass).user(testUser).active(true).id(1L)
+                .percentage(new BigDecimal("100")).startingDate(Date.valueOf(LocalDate.now())).build();
         strategyList.add(strategy);
 
         when(assetRepositoryMock.findAll()).thenReturn(assetList);
-        when(dateProviderMock.getYesterday()).thenReturn(getYesterday());
+        when(customDateMock.getYesterdaySql()).thenReturn(getYesterday());
         when(dataRepositoryMock.findByDate(any())).thenReturn(dataList);
         when(portfolioRepositoryMock.findByUserAndDate(any(), any())).thenReturn(portfolioList);
         when(strategyRepositoryMock.findByUserAndActiveTrue(any())).thenReturn(strategyList);
@@ -111,7 +118,8 @@ public class NightlyTaskTests {
     @Test
     public void testCreationNightlyTask() {
 
-        NightlyTask nightlyTask = new NightlyTask(strategyRepositoryMock, portfolioRepositoryMock, assetRepositoryMock, dataRepositoryMock, userRepositoryMock, dataUpdaterMock);
+        NightlyTask nightlyTask = new NightlyTask(strategyRepositoryMock, portfolioRepositoryMock, assetRepositoryMock,
+                dataRepositoryMock, userRepositoryMock, dataUpdaterMock);
 
         assertEquals(
                 "class it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.NightlyTask",
@@ -122,7 +130,8 @@ public class NightlyTaskTests {
     @Test
     public void testNightlyTask() {
 
-        NightlyTask nightlyTask = new NightlyTask(strategyRepositoryMock, portfolioRepositoryMock, assetRepositoryMock, dataRepositoryMock, userRepositoryMock, dataUpdaterMock);
+        NightlyTask nightlyTask = new NightlyTask(strategyRepositoryMock, portfolioRepositoryMock, assetRepositoryMock,
+                dataRepositoryMock, userRepositoryMock, dataUpdaterMock);
 
         //nightlyTask.executeNightlyTask(dateProviderMock, users);
 

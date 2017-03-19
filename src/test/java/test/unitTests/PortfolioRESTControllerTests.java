@@ -2,10 +2,10 @@ package test.unitTests;
 
 import it.uiip.digitalgarage.roboadvice.businesslogic.controller.PortfolioRESTController;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.PortfolioDTO;
-import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dateProvider.DateProvider;
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.PortfolioRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
+import it.uiip.digitalgarage.roboadvice.utils.CustomDate;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,7 +38,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 @ContextConfiguration(classes = {PersistenceContext.class})
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class,
-        TransactionalTestExecutionListener.class})
+                                TransactionalTestExecutionListener.class})
 public class PortfolioRESTControllerTests {
 
     @Mock
@@ -55,22 +55,24 @@ public class PortfolioRESTControllerTests {
 
     private PortfolioRESTController portfolioRESTController;
 
-    private DateProvider dateProvider;
+    private CustomDate customDate;
 
     @Before
     public void before() {
 
         portfolioRESTController = new PortfolioRESTController(userRepository, portfolioRepository);
 
-        dateProvider = new DateProvider();
+        customDate = CustomDate.getToday();
 
         List<PortfolioDTO> portfolioDTOList = new ArrayList<>();
 
-        User user = User.builder().username("TestUser").nickname("TestUser").password("HASCED12345").enabled(true).id(1L).isNewUser(false).build();
+        User user =
+                User.builder().username("TestUser").nickname("TestUser").password("HASCED12345").enabled(true).id(1L)
+                        .isNewUser(false).build();
 
         PortfolioDTO portfolioDTO = new PortfolioDTO();
         portfolioDTO.put("VALUE", new BigDecimal("1200"));
-        portfolioDTO.put("DATE", dateProvider.getYesterday());
+        portfolioDTO.put("DATE", customDate.getYesterdaySql());
         portfolioDTO.put("Asset_Class", 1);
 
         portfolioDTOList.add(portfolioDTO);
@@ -84,10 +86,12 @@ public class PortfolioRESTControllerTests {
     @Test
     public void testRequestMyData() {
 
-        List<PortfolioDTO> result = (List<PortfolioDTO>) portfolioRESTController.requestMyData(authentication, dateProvider.getYesterday().toLocalDate()).getData();
+        List<PortfolioDTO> result = (List<PortfolioDTO>) portfolioRESTController
+                .requestMyData(authentication, customDate.getYesterdaySql().toLocalDate()).getData();
 
         Boolean check1 = result.get(0).get("VALUE").equals(new BigDecimal("1200"));
-        Boolean check2 = result.get(0).get("DATE").toString().equals(dateProvider.getYesterday().toLocalDate().toString());
+        Boolean check2 =
+                result.get(0).get("DATE").toString().equals(customDate.getYesterdaySql().toLocalDate().toString());
         Boolean check3 = (int) result.get(0).get("Asset_Class") == 1;
 
         assertTrue(check1);

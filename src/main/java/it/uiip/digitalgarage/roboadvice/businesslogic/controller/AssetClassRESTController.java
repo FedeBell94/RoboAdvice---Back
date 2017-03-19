@@ -3,13 +3,13 @@ package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.AssetClassHistoryDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
-import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dateProvider.LiarDateProvider;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.AssetClass;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Data;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetClassRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.DataRepository;
+import it.uiip.digitalgarage.roboadvice.utils.CustomDate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,7 +95,7 @@ public class AssetClassRESTController {
                 endDate = Date.valueOf(to);
             }
         }
-        LiarDateProvider dateProvider = new LiarDateProvider(startDate.toString());
+        CustomDate customDate = new CustomDate(startDate);
 
         // Retrieve the assets for this asset class
         List<Asset> assetsAssetClass = assetRepository.findByAssetClass(AssetClass.builder().id(assetClassId).build());
@@ -103,7 +103,7 @@ public class AssetClassRESTController {
         List<List<Data>> allAssets = new ArrayList<>();
         for (Asset currAsset : assetsAssetClass) {
             List<Data> currAssetData =
-                    dataRepository.findByDateAfterAndAssetOrderByDateAsc(dateProvider.getYesterday(), currAsset);
+                    dataRepository.findByDateAfterAndAssetOrderByDateAsc(customDate.getYesterdaySql(), currAsset);
             if (currAssetData.isEmpty()) {
                 currAssetData.add(Data.builder().asset(currAsset).date(Date.valueOf("1900-01-01")).build());
             }
@@ -114,22 +114,22 @@ public class AssetClassRESTController {
         // Retrieve the last value for the asset before today if not already present in the data
         Map<Long, Data> currentData = new HashMap<>();
         for (List<Data> dataList : allAssets) {
-            if (!dataList.isEmpty() && dataList.get(0).getDate().compareTo(dateProvider.getToday()) == 0) {
+            if (!dataList.isEmpty() && dataList.get(0).getDate().compareTo(customDate.getDateSql()) == 0) {
                 currentData.put(dataList.get(0).getAsset().getId(), dataList.get(0));
             } else {
-                Data d = dataRepository.findTop1ByDateBeforeAndAssetOrderByDateDesc(dateProvider.getToday(),
+                Data d = dataRepository.findTop1ByDateBeforeAndAssetOrderByDateDesc(customDate.getDateSql(),
                         dataList.get(0).getAsset());
                 currentData.put(d.getAsset().getId(), d);
             }
         }
 
         Map<LocalDate, BigDecimal> computedData = new HashMap<>();
-        while (dateProvider.getToday().compareTo(endDate) <= 0) {
+        while (customDate.compareTo(endDate) <= 0) {
 
             // Finds the assets of today
             for (List<Data> dataList : allAssets) {
                 for (Data d : dataList) {
-                    if (d.getDate().compareTo(dateProvider.getToday()) == 0) {
+                    if (customDate.compareTo(d.getDate()) == 0) {
                         currentData.put(d.getAsset().getId(), d);
                     }
                 }
@@ -143,8 +143,8 @@ public class AssetClassRESTController {
                 wightedSum = wightedSum.add(actualValue);
             }
 
-            computedData.put(dateProvider.getToday().toLocalDate(), wightedSum);
-            dateProvider.goNextDay();
+            computedData.put(customDate.getDateLocalDate(), wightedSum);
+            customDate.moveOneDayForward();
         }
 
 

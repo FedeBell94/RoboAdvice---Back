@@ -2,13 +2,13 @@ package test.unitTests;
 
 import it.uiip.digitalgarage.roboadvice.businesslogic.controller.StrategyRESTController;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.StrategyDTO;
-import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dateProvider.DateProvider;
 import it.uiip.digitalgarage.roboadvice.persistence.model.AssetClass;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Strategy;
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetClassRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.StrategyRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
+import it.uiip.digitalgarage.roboadvice.utils.CustomDate;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -41,7 +41,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 @ContextConfiguration(classes = {PersistenceContext.class})
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class,
-        TransactionalTestExecutionListener.class})
+                                TransactionalTestExecutionListener.class})
 public class StrategyRESTControllerTests {
 
     @Mock
@@ -64,24 +64,29 @@ public class StrategyRESTControllerTests {
 
     private StrategyRESTController strategyRESTController;
 
-    private DateProvider dateProvider;
+    private CustomDate customDate;
 
     private List<StrategyDTO> strategyDTOList;
 
     @Before
     public void before() {
 
-        dateProvider = new DateProvider();
+        customDate = CustomDate.getToday();
 
-        strategyRESTController = new StrategyRESTController(modelMapper, userRepository, strategyRepository, assetClassRepository);
+        strategyRESTController =
+                new StrategyRESTController(modelMapper, userRepository, strategyRepository, assetClassRepository);
 
         List<Strategy> strategyList = new ArrayList<>();
 
-        User user = User.builder().username("TestUser").nickname("TestUser").password("HASCED12345").enabled(true).id(1L).isNewUser(false).lastPortfolioComputation(dateProvider.getToday()).build();
+        User user =
+                User.builder().username("TestUser").nickname("TestUser").password("HASCED12345").enabled(true).id(1L)
+                        .isNewUser(false).lastPortfolioComputation(customDate.getDateSql()).build();
 
         AssetClass assetClass = AssetClass.builder().name("TestClass").id(1L).build();
 
-        Strategy strategy = Strategy.builder().startingDate(dateProvider.getYesterday()).percentage(new BigDecimal("100")).active(true).user(user).id(1L).assetClass(assetClass).build();
+        Strategy strategy =
+                Strategy.builder().startingDate(customDate.getYesterdaySql()).percentage(new BigDecimal("100"))
+                        .active(true).user(user).id(1L).assetClass(assetClass).build();
 
         strategyList.add(strategy);
 
@@ -102,7 +107,8 @@ public class StrategyRESTControllerTests {
     @Test
     public void testGetActiveStrategy() {
 
-        List<StrategyDTO> result = (List<StrategyDTO>) strategyRESTController.getActiveStrategy(authentication).getData();
+        List<StrategyDTO> result =
+                (List<StrategyDTO>) strategyRESTController.getActiveStrategy(authentication).getData();
 
         Boolean check1 = result.get(0).getAssetClassId() == 1L;
         Boolean check2 = result.get(0).getPercentage().equals(new BigDecimal("100"));

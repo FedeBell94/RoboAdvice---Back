@@ -1,9 +1,9 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask;
 
 import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dataUpdater.IDataUpdater;
-import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dateProvider.LiarDateProvider;
 import it.uiip.digitalgarage.roboadvice.persistence.model.*;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.*;
+import it.uiip.digitalgarage.roboadvice.utils.CustomDate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,44 +88,44 @@ public class NightlyTask implements INightlyTask {
                 currUser.setLastPortfolioComputation(tomorrow);
             }
 
-            LiarDateProvider dateProvider = new LiarDateProvider(currUser.getLastPortfolioComputation().toString());
-            dateProvider.goNextDay();
+            CustomDate customDate = new CustomDate(currUser.getLastPortfolioComputation());
+            customDate.moveOneDayForward();
             // Computes all the portfolios for the user in case the nightly task failed in the previous days
-            while (dateProvider.getToday().compareTo(Date.valueOf(LocalDate.now())) <= 0) {
+            while (customDate.compareTo(LocalDate.now()) <= 0) {
 
                 // Find last portfolio computed for the current user
                 List<Portfolio> userPortfolio =
-                        portfolioRepository.findByUserAndDate(currUser, dateProvider.getYesterday());
+                        portfolioRepository.findByUserAndDate(currUser, customDate.getYesterdaySql());
 
                 // Finds the active strategy of the current user for the current date
                 List<Strategy> userStrategy = strategyRepository
                         .findTop4ByUserAndStartingDateLessThanEqualOrderByStartingDateDesc(currUser,
-                                dateProvider.getToday());
+                                customDate.getDateSql());
                 if (userStrategy.isEmpty()) {
                     // If the strategy is not set i do not compute the portfolio for this user
                     continue;
                 }
 
                 // For each asset finds the latest price
-                final Map<Long, BigDecimal> latestPrices = findAssetsPriceDay(assets, dateProvider.getToday());
+                final Map<Long, BigDecimal> latestPrices = findAssetsPriceDay(assets, customDate.getDateSql());
 
                 // Check if the user strategy was changed yesterday
-                if (userStrategy.get(0).getStartingDate().compareTo(dateProvider.getYesterday()) == 0) {
+                if (userStrategy.get(0).getStartingDate().compareTo(customDate.getYesterdaySql()) == 0) {
 
                     // #4: compute portfolio for 'old' users which has changed the strategy (same as #2)
                     BigDecimal userWorth = computeWorth(userPortfolio, latestPrices);
-                    createPortfolio(currUser, dateProvider.getToday(), assets, userWorth, latestPrices, userStrategy);
+                    createPortfolio(currUser, customDate.getDateSql(), assets, userWorth, latestPrices, userStrategy);
                 } else {
                     // #3: update portfolio for 'old' users which didn't change the strategy yesterday
-                    List<Data> todayNewPrices = dataRepository.findByDate(dateProvider.getToday());
-                    updatePortfolio(dateProvider.getToday(), userPortfolio, todayNewPrices);
+                    List<Data> todayNewPrices = dataRepository.findByDate(customDate.getDateSql());
+                    updatePortfolio(customDate.getDateSql(), userPortfolio, todayNewPrices);
                 }
 
-                dateProvider.goNextDay();
+                customDate.moveOneDayForward();
             }
 
             // Update of last portfolio computation date
-            currUser.setLastPortfolioComputation(dateProvider.getYesterday());
+            currUser.setLastPortfolioComputation(customDate.getYesterdaySql());
             userRepository.save(currUser);
         }
     }
