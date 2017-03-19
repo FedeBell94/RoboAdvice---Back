@@ -18,6 +18,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Implementation of the interface {@link INightlyTask}. This class try to compute all the portfolio of the users when
+ * the method executeNightlyTask is called. This method can fail - can not necessarily compute all the portfolio - when
+ * something unexpected happens i.e. when the update of the values of the assets fail, the portfolios can not be
+ * executed.
+ */
 @Service
 public class NightlyTask implements INightlyTask {
 
@@ -42,7 +48,7 @@ public class NightlyTask implements INightlyTask {
         this.dataUpdater = dataUpdater;
     }
 
-    // The default start worth of a user. It is set to 10000.
+    // The default start worth of a user.
     private static final BigDecimal DEFAULT_START_WORTH = new BigDecimal(10000);
 
 
@@ -52,7 +58,7 @@ public class NightlyTask implements INightlyTask {
         // #1: update assets data
         try {
             dataUpdater.updateAssetData();
-        } catch(IDataUpdater.DataUpdateException e){
+        } catch (IDataUpdater.DataUpdateException e) {
             LOGGER.error("Failed to execute nightly task due to an error in updating asset data.");
             return;
         }
@@ -73,7 +79,7 @@ public class NightlyTask implements INightlyTask {
                 List<Strategy> userStrategy = strategyRepository
                         .findTop4ByUserAndStartingDateLessThanEqualOrderByStartingDateDesc(currUser,
                                 currUser.getRegistration());
-                if(userStrategy.isEmpty()){
+                if (userStrategy.isEmpty()) {
                     // If the strategy is not set i do not compute the portfolio for this user
                     continue;
                 }
@@ -95,7 +101,7 @@ public class NightlyTask implements INightlyTask {
                 List<Strategy> userStrategy = strategyRepository
                         .findTop4ByUserAndStartingDateLessThanEqualOrderByStartingDateDesc(currUser,
                                 dateProvider.getToday());
-                if(userStrategy.isEmpty()){
+                if (userStrategy.isEmpty()) {
                     // If the strategy is not set i do not compute the portfolio for this user
                     continue;
                 }
@@ -124,6 +130,9 @@ public class NightlyTask implements INightlyTask {
         }
     }
 
+    /**
+     * This method create the portfolio for the user passed, with the amount of money specified(worth).
+     */
     private void createPortfolio(final User user, final Date date, final Iterable<Asset> assets, final BigDecimal worth,
                                  final Map<Long, BigDecimal> latestPrices, List<Strategy> userStrategy) {
 
@@ -152,6 +161,11 @@ public class NightlyTask implements INightlyTask {
         portfolioRepository.save(insertList);
     }
 
+    /**
+     * This method finds the prices for all the assets in a specific date.
+     *
+     * @return A map containing the id of the asset as Key, and the value of that asset as Value.
+     */
     private Map<Long, BigDecimal> findAssetsPriceDay(final Iterable<Asset> assets, final Date date) {
         Map<Long, BigDecimal> latestPrices = new HashMap<>();
         for (Asset curr : assets) {
@@ -161,6 +175,9 @@ public class NightlyTask implements INightlyTask {
         return latestPrices;
     }
 
+    /**
+     * Compute the worth of the portfolio passed with the given asset prices.
+     */
     private BigDecimal computeWorth(final List<Portfolio> portfolios, final Map<Long, BigDecimal> latestPrices) {
         BigDecimal worth = new BigDecimal(0);
         for (Portfolio currPortfolio : portfolios) {
@@ -171,6 +188,9 @@ public class NightlyTask implements INightlyTask {
         return worth;
     }
 
+    /**
+     * Update the portfolio in the given date.
+     */
     private void updatePortfolio(final Date date, final List<Portfolio> portfolios,
                                  final List<Data> todayNewPrices) {
 

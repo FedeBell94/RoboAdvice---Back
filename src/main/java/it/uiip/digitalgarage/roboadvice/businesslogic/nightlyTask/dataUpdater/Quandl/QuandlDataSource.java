@@ -12,13 +12,15 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
 import org.threeten.bp.DateTimeUtils;
 
-import javax.ws.rs.ProcessingException;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Implementation of the {@link IDataSource} interface which retrieves the data from Quandl (www.quandl.com)
+ */
 @Service
 public class QuandlDataSource implements IDataSource {
 
@@ -53,7 +55,7 @@ public class QuandlDataSource implements IDataSource {
             }
 
             return dataList;
-        } catch (Exception e){
+        } catch (Exception e) {
             LOGGER.error("Quandl data update failed: " + e.getMessage());
             throw new ConnectionException("Quandl can NOT download data from server.");
         }
