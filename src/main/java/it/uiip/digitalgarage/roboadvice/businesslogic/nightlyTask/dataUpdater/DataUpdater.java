@@ -4,6 +4,7 @@ import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Data;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.DataRepository;
+import it.uiip.digitalgarage.roboadvice.utils.CustomDate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,8 @@ public class DataUpdater implements IDataUpdater {
 
     private final IDataSource dataSource;
 
+    private CustomDate lastDataUpdate;
+
     @Autowired
     public DataUpdater(final DataRepository dataRepository, final AssetRepository assetRepository,
                        final IDataSource dataSource) {
@@ -37,9 +40,11 @@ public class DataUpdater implements IDataUpdater {
     @Override
     public void updateAssetData() throws DataUpdateException {
         Data data = dataRepository.findTop1ByOrderByDateDesc();
-        if (data == null || data.getDate().toLocalDate().compareTo(LocalDate.now()) != 0) {
+        if (((data == null) || (data.getDate().toLocalDate().compareTo(LocalDate.now()) != 0)) &&
+                (lastDataUpdate == null || lastDataUpdate.compareTo(CustomDate.getToday()) < 0)) {
             try {
                 computeDataUpdate();
+                lastDataUpdate = CustomDate.getToday();
             } catch (IDataSource.ConnectionException e) {
                 LOGGER.error("Failed to update asset data:" + e.getMessage());
                 throw new DataUpdateException("Failed to update asset data: " + e.getMessage());

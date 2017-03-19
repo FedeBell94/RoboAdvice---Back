@@ -102,6 +102,10 @@ public class CustomDate {
         return compareTo(fromSql(date));
     }
 
+    public int compareTo(CustomDate customDate){
+        return compareTo(customDate.getDateLocalDate());
+    }
+
 
 
     /*
