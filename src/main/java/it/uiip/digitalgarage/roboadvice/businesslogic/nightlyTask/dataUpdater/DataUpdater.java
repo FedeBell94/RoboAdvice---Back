@@ -10,7 +10,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,14 +58,14 @@ public class DataUpdater implements IDataUpdater {
         List<Data> dataList = new ArrayList<>();
         for (Asset currAsset : assets) {
             Data data = dataRepository.findTop1ByAssetOrderByDateDesc(currAsset);
-            Date startDate;
+            CustomDate startDate;
             if (data == null) {
-                startDate = Date.valueOf(STARTING_DATA_DATE);
+                startDate = new CustomDate(STARTING_DATA_DATE);
             } else {
-                startDate = new Date(data.getDate().getTime() + 24 * 60 * 60 * 1000);
+                startDate = new CustomDate(data.getDate()).moveOneDayForward();
             }
             LOGGER.debug("Updating data from " + startDate);
-            dataList.addAll(dataSource.getAllDataFrom(currAsset, startDate));
+            dataList.addAll(dataSource.getAllDataFrom(currAsset, startDate, CustomDate.getToday()));
         }
         dataRepository.save(dataList);
     }

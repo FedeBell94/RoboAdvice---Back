@@ -2,8 +2,8 @@ package it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dataUpdater;
 
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Data;
+import it.uiip.digitalgarage.roboadvice.utils.CustomDate;
 
-import java.sql.Date;
 import java.util.List;
 
 /**
@@ -16,12 +16,13 @@ public interface IDataSource {
      *
      * @param asset The assets to find the prices.
      * @param from  The date from which is needed to find the data.
+     * @param to    The date to which is needed to find the data.
      *
      * @return A list of the required {@link Data}.
      *
      * @throws ConnectionException Exception thrown in case the connection to the datasource of the data fails.
      */
-    List<Data> getAllDataFrom(Asset asset, Date from) throws ConnectionException;
+    List<Data> getAllDataFrom(Asset asset, CustomDate from, CustomDate to) throws ConnectionException;
 
     /**
      * Exception thrown in case the connection to the datasource of the data fails.

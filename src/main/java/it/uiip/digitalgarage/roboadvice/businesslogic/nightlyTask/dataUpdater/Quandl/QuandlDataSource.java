@@ -7,14 +7,15 @@ import com.jimmoores.quandl.TabularResult;
 import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dataUpdater.IDataSource;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Data;
+import it.uiip.digitalgarage.roboadvice.utils.CustomDate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
 import org.threeten.bp.DateTimeUtils;
+import org.threeten.bp.ZoneId;
 
 import java.math.BigDecimal;
-import java.sql.Date;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,16 +34,15 @@ public class QuandlDataSource implements IDataSource {
     }
 
     @Override
-    public List<Data> getAllDataFrom(Asset asset, Date from) throws ConnectionException {
-        LocalDate fromDate = from.toLocalDate();
-        org.threeten.bp.LocalDate to = org.threeten.bp.LocalDate.now();
+    public List<Data> getAllDataFrom(Asset asset, CustomDate from, CustomDate to) throws ConnectionException {
+
         try {
             TabularResult tabularResult = session.getDataSet(
                     DataSetRequest.Builder.of(asset.getQuandlKey())
                             .withColumn(asset.getQuandlId())
                             .withStartDate(org.threeten.bp.LocalDate
-                                    .of(fromDate.getYear(), fromDate.getMonthValue(), fromDate.getDayOfMonth()))
-                            .withEndDate(to).build());
+                                    .of(from.getYear(), from.getMonth(), from.getDay()))
+                            .withEndDate(to.getDateBpLocalDate()).build());
             List<Data> dataList = new ArrayList<>(tabularResult.size());
             for (Row currRow : tabularResult) {
                 Double value = currRow.getDouble(1);
