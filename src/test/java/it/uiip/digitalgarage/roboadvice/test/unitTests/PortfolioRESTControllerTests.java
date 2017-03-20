@@ -1,4 +1,4 @@
-package test.unitTests;
+package it.uiip.digitalgarage.roboadvice.test.unitTests;
 
 import it.uiip.digitalgarage.roboadvice.businesslogic.controller.PortfolioRESTController;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.PortfolioDTO;

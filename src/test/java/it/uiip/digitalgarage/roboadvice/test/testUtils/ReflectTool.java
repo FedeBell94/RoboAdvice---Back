@@ -1,4 +1,4 @@
-package test.testUtils;
+package it.uiip.digitalgarage.roboadvice.test.testUtils;
 
 import java.lang.annotation.Annotation;
 
