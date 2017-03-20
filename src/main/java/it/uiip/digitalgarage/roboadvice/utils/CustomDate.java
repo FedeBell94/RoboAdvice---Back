@@ -149,6 +149,12 @@ public class CustomDate {
         return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }
 
+
+    @Override
+    public String toString(){
+        return this.localDate.toString();
+    }
+
     /*
      *    STATIC METHOD UTIL
      */
