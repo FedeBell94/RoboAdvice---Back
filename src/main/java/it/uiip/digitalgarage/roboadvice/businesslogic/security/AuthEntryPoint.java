@@ -1,5 +1,6 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.ErrorResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.ExchangeError;
 import org.springframework.security.core.AuthenticationException;
@@ -16,12 +17,11 @@ public class AuthEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
-        //response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-        // Return 200 with normal AbstractResponse (needed in the frontend)
-        response.setContentType("application/json");
+        response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_OK);
-        response.getOutputStream().println(new ErrorResponse(ExchangeError.SECURITY_ERROR).toJSONFormat());
-
+        response.getWriter()
+                .write(new ObjectMapper().writeValueAsString(new ErrorResponse(ExchangeError.SECURITY_ERROR)));
     }
+
 }

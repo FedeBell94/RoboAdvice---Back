@@ -23,8 +23,9 @@ class GlobalControllerExceptionHandler {
     }
 
     @ExceptionHandler(ConversionFailedException.class)
-    public AbstractResponse handleTypeMismatchE(ConversionFailedException e) {
+    public AbstractResponse handleConversionFailedException(ConversionFailedException e) {
         LOGGER.error(e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
+
 }

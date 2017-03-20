@@ -116,7 +116,6 @@ public class UserRESTControllerTest {
 
         try {
             AbstractResponse response = userRESTController.registerUser(userDTO);
-            System.out.println(response.toJSONFormat());
             Boolean check = response.getResponse() == 1;
             assertTrue(check);
         } catch(BadRequestException e){

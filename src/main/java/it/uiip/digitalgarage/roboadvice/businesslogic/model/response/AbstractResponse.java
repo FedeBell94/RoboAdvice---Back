@@ -19,9 +19,4 @@ public abstract class AbstractResponse<T> {
         this.data = data;
     }
 
-    public String toJSONFormat() {
-        return "{ \"response\": " + this.response + ", \"errorCode\": " + this.errorCode +
-                ", \"errorString\": \"" + this.errorString + "\", \"data\": null }";
-    }
-
 }
