@@ -1,6 +1,7 @@
 package it.uiip.digitalgarage.roboadvice.test.unitTests;
 
 import it.uiip.digitalgarage.roboadvice.businesslogic.controller.UserRESTController;
+import it.uiip.digitalgarage.roboadvice.businesslogic.exception.BadRequestException;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.UserDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
@@ -113,10 +114,14 @@ public class UserRESTControllerTest {
     @Test
     public void registerUserTest(){
 
-        AbstractResponse response = userRESTController.registerUser(userDTO);
-        System.out.println(response.toJSONFormat());
-        Boolean check = response.getResponse() == 1;
-        assertTrue(check);
+        try {
+            AbstractResponse response = userRESTController.registerUser(userDTO);
+            System.out.println(response.toJSONFormat());
+            Boolean check = response.getResponse() == 1;
+            assertTrue(check);
+        } catch(BadRequestException e){
+            assertTrue(false);
+        }
     }
 
 }

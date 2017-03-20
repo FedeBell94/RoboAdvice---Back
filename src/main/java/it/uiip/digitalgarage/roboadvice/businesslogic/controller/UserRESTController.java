@@ -1,5 +1,6 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
+import it.uiip.digitalgarage.roboadvice.businesslogic.exception.BadRequestException;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.UserDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.ErrorResponse;
@@ -70,7 +71,6 @@ public class UserRESTController {
     @RequestMapping(value = "/logoutUser", method = RequestMethod.POST)
     public @ResponseBody AbstractResponse logoutUser(Authentication authentication, HttpServletRequest request,
                                                      HttpServletResponse response) {
-
         new SecurityContextLogoutHandler().logout(request, response, authentication);
         SecurityContextHolder.getContext().setAuthentication(null);
         LOGGER.debug("User " + authentication.getName() + " just logged out.");
@@ -100,11 +100,15 @@ public class UserRESTController {
      * if something goes wrong during the registration.
      */
     @RequestMapping(value = "/registerUser", method = RequestMethod.POST)
-    public @ResponseBody AbstractResponse registerUser(@RequestBody UserDTO inputUser) {
+    public @ResponseBody AbstractResponse registerUser(@RequestBody UserDTO inputUser) throws BadRequestException {
 
+        if(inputUser.getUsername() == null || inputUser.getPassword() == null || inputUser.getNickname() == null){
+            throw new BadRequestException("Bad request - field needed: username, password, nickname");
+        }
+
+        // Check if the email is already used
         if (userRepository.findByUsername(inputUser.getUsername()) != null) {
             LOGGER.debug("Email already used for this user");
-
             return new ErrorResponse(ExchangeError.EMAIL_ALREADY_USED);
         }
 

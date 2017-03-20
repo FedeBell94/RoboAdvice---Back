@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 
 import javax.annotation.PostConstruct;
 import java.io.FileReader;
@@ -53,7 +52,7 @@ public class Application {
 
     // Execution of night task
     //@Scheduled(cron = "0 0 10 * * TUE-SAT")
-    @Scheduled(cron = "*/1 * * * * *")
+    //@Scheduled(cron = "*/1 * * * * *")
     public void executeNightTask() {
         LOGGER.debug("Night task started.");
         Long startTime = System.currentTimeMillis();
