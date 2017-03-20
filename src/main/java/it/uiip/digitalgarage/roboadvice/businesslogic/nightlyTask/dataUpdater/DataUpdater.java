@@ -10,7 +10,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +38,7 @@ public class DataUpdater implements IDataUpdater {
     @Override
     public void updateAssetData() throws DataUpdateException {
         Data data = dataRepository.findTop1ByOrderByDateDesc();
-        if (((data == null) || (data.getDate().toLocalDate().compareTo(LocalDate.now()) != 0)) &&
+        if (((data == null) || (CustomDate.getToday().compareTo(data.getDate()) != 0)) &&
                 (lastDataUpdate == null || lastDataUpdate.compareTo(CustomDate.getToday()) < 0)) {
             try {
                 computeDataUpdate();
