@@ -32,7 +32,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class,
-                                TransactionalTestExecutionListener.class})
+        TransactionalTestExecutionListener.class})
 public class QuandlDataSourceTests {
 
     @Autowired
@@ -50,7 +50,7 @@ public class QuandlDataSourceTests {
     private CustomDate yesterday;
 
     @Before
-    public void before(){
+    public void before() {
 
         assetId = 1L;
         yesterday = CustomDate.getToday();
