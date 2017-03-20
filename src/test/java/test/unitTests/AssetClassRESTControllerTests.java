@@ -107,7 +107,8 @@ public class AssetClassRESTControllerTests {
         List<AssetClassHistoryDTO> result = (List<AssetClassHistoryDTO>) assetClassRESTController
                 .getAssetClassHistory(1L, customDate.getYesterdaySql().toLocalDate(), LocalDate.now()).getData();
 
-        Boolean check = result.get(0).getDate().toString().equals(customDate.getYesterdaySql().toLocalDate().toString());
+        Boolean check = customDate.compareTo(result.get(0).getDate()) == 0;
+        //Boolean check = result.get(0).getDate().toString().equals(customDate.getYesterdaySql().toLocalDate().toString());
 
         assertTrue(check);
 

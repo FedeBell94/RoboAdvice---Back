@@ -9,6 +9,7 @@ import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
 import it.uiip.digitalgarage.roboadvice.utils.CustomDate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,11 +44,18 @@ public class QuandlDataSourceTests {
 
     private static final Log LOGGER = LogFactory.getLog(Application.class);
 
-    private Long assetId = 1L;
+    private Long assetId;
     private Asset asset;
     private List<Data> dataList;
     private Data data;
-    private Date yesterday = CustomDate.getToday().getYesterdaySql();
+    private Date yesterday;
+
+    @Before
+    public void before(){
+
+        assetId = 1L;
+        yesterday = CustomDate.getToday().getYesterdaySql();
+    }
 
     @Test
     public void testQuandlDataSource() {
