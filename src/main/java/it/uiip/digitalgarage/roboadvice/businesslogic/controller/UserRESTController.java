@@ -70,7 +70,7 @@ public class UserRESTController {
      */
     @RequestMapping(value = "/logoutUser", method = RequestMethod.POST)
     public AbstractResponse logoutUser(Authentication authentication, HttpServletRequest request,
-                                                     HttpServletResponse response) {
+                                       HttpServletResponse response) {
         new SecurityContextLogoutHandler().logout(request, response, authentication);
         SecurityContextHolder.getContext().setAuthentication(null);
         LOGGER.debug("User " + authentication.getName() + " just logged out.");
@@ -98,11 +98,13 @@ public class UserRESTController {
      *
      * @return A {@link SuccessResponse} containing the user created, an {@link ErrorResponse} containing the error code
      * if something goes wrong during the registration.
+     *
+     * @throws BadRequestException When the request is malformed - username, password or nickname ar not passed.
      */
     @RequestMapping(value = "/registerUser", method = RequestMethod.POST)
     public AbstractResponse registerUser(@RequestBody UserDTO inputUser) throws BadRequestException {
 
-        if(inputUser.getUsername() == null || inputUser.getPassword() == null || inputUser.getNickname() == null){
+        if (inputUser.getUsername() == null || inputUser.getPassword() == null || inputUser.getNickname() == null) {
             throw new BadRequestException("Bad request - field needed: username, password, nickname");
         }
 

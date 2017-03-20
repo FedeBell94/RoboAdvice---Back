@@ -1,6 +1,7 @@
 package it.uiip.digitalgarage.roboadvice.test.unitTests;
 
 import it.uiip.digitalgarage.roboadvice.businesslogic.controller.StrategyRESTController;
+import it.uiip.digitalgarage.roboadvice.businesslogic.exception.BadRequestException;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.StrategyDTO;
 import it.uiip.digitalgarage.roboadvice.persistence.model.AssetClass;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Strategy;
@@ -121,7 +122,12 @@ public class StrategyRESTControllerTests {
     @Test
     public void testUpdateStrategy() {
 
-        Boolean check = strategyRESTController.updateStrategy(authentication, strategyDTOList).getResponse() == 1;
+        Boolean check = null;
+        try {
+             check = strategyRESTController.updateStrategy(authentication, strategyDTOList).getResponse() == 1;
+        } catch (BadRequestException e){
+            assertTrue(false);
+        }
 
         assertTrue(check);
     }

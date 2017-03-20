@@ -1,6 +1,7 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
 
+import it.uiip.digitalgarage.roboadvice.businesslogic.exception.BadRequestException;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.StrategyDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -78,10 +80,21 @@ public class StrategyRESTController {
      * @param authentication Represents the authentication token of an authenticated request.
      *
      * @return An empty {@link SuccessResponse}.
+     *
+     * @throws BadRequestException In case the total percentage of the strategy is different from 100%
      */
     @RequestMapping(value = "/strategy", method = RequestMethod.POST)
     public AbstractResponse updateStrategy(Authentication authentication,
-                                                         @RequestBody List<StrategyDTO> strategyInput) {
+                                           @RequestBody List<StrategyDTO> strategyInput) throws BadRequestException {
+        // Checking if the total percentage of the strategy is 100%
+        BigDecimal percentage = BigDecimal.ZERO;
+        for(StrategyDTO currStrategy : strategyInput){
+            percentage = percentage.add(currStrategy.getPercentage());
+        }
+        if (percentage.compareTo(BigDecimal.valueOf(100)) != 0) {
+            throw new BadRequestException("Bad request - The percentage of the strategy passed is wrong.");
+        }
+
         User user = userRepository.findByUsername(authentication.getName());
 
         // Set user as not new if he was new
