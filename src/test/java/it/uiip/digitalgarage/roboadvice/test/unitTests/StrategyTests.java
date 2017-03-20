@@ -1,8 +1,8 @@
-package test.unitTests;
+package it.uiip.digitalgarage.roboadvice.test.unitTests;
 
 import it.uiip.digitalgarage.roboadvice.persistence.model.Strategy;
-import test.testUtils.AssertAnnotations;
-import test.testUtils.ReflectTool;
+import it.uiip.digitalgarage.roboadvice.test.testUtils.AssertAnnotations;
+import it.uiip.digitalgarage.roboadvice.test.testUtils.ReflectTool;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
