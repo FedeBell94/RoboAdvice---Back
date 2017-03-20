@@ -45,6 +45,10 @@ public class CustomDate {
         return toDateSql(this.localDate);
     }
 
+    public org.threeten.bp.LocalDate getDateBpLocalDate(){
+        return org.threeten.bp.LocalDate.of(localDate.getYear(), localDate.getMonthValue(), localDate.getDayOfMonth());
+    }
+
 
     public LocalDate getYesterdayLocalDate(){
         return getDayFromLocalDate(-1);
@@ -73,6 +77,8 @@ public class CustomDate {
     public java.sql.Date getDayFromSql(int days){
         return toDateSql(getDayFromLocalDate(days));
     }
+
+
 
     public int getYear(){
         return this.localDate.getYear();

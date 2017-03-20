@@ -19,7 +19,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 
-import java.sql.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -48,13 +47,13 @@ public class QuandlDataSourceTests {
     private Asset asset;
     private List<Data> dataList;
     private Data data;
-    private Date yesterday;
+    private CustomDate yesterday;
 
     @Before
     public void before(){
 
         assetId = 1L;
-        yesterday = CustomDate.getToday().getYesterdaySql();
+        yesterday = CustomDate.getToday();
     }
 
     @Test
@@ -83,7 +82,8 @@ public class QuandlDataSourceTests {
         try {
             dataList = quandlDataSource.getAllDataFrom(
                     asset,
-                    yesterday
+                    yesterday,
+                    CustomDate.getToday()
             );
         } catch (IDataSource.ConnectionException e) {
             assertTrue(false);
