@@ -51,7 +51,7 @@ public class AssetClassRESTController {
      * @return All the {@link AssetClass} present in the database.
      */
     @RequestMapping(value = "/assetClass", method = RequestMethod.GET)
-    public @ResponseBody AbstractResponse getAssetClasses() {
+    public AbstractResponse getAssetClasses() {
         Iterable<AssetClass> assetClasses = assetClassRepository.findAll();
         LOGGER.debug("Get all asset class API called.");
         return new SuccessResponse<>(assetClasses);
@@ -73,7 +73,7 @@ public class AssetClassRESTController {
      * @return An {@link AbstractResponse} containing a list of {@link AssetClassHistoryDTO} objects required.
      */
     @RequestMapping(value = "/assetClassHistory", method = RequestMethod.GET)
-    public @ResponseBody AbstractResponse getAssetClassHistory(@RequestParam Long assetClassId,
+    public AbstractResponse getAssetClassHistory(@RequestParam Long assetClassId,
                                                                @RequestParam(required = false)
                                                                @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate from,
                                                                @RequestParam(required = false)

@@ -47,14 +47,14 @@ public class PortfolioRESTController {
      * @return An {@link AbstractResponse} containing the list of {@link PortfolioDTO} requested.
      */
     @RequestMapping(value = "/portfolio", method = RequestMethod.GET)
-    public @ResponseBody AbstractResponse requestMyData(Authentication authentication,
+    public AbstractResponse requestMyData(Authentication authentication,
                                                         @RequestParam(required = false)
                                                         @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate from) {
         User user = userRepository.findByUsername(authentication.getName());
 
         Date fromDate = from == null ? user.getRegistration() : Date.valueOf(from);
         List<PortfolioDTO> portfolio = portfolioRepository.findPortfolioHistory(user, fromDate);
-        LOGGER.debug("User " + user.getUsername() + " - get portfolio called.");
+        LOGGER.debug("User: " + user.getUsername() + " - get portfolio called.");
         return new SuccessResponse<>(portfolio);
     }
 }

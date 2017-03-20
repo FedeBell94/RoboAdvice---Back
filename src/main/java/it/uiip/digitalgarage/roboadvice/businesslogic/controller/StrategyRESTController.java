@@ -58,7 +58,7 @@ public class StrategyRESTController {
      * @return The last active {@link StrategyDTO} for the user, null in case the user has not a strategy set.
      */
     @RequestMapping(value = "/strategy", method = RequestMethod.GET)
-    public @ResponseBody AbstractResponse getActiveStrategy(Authentication authentication) {
+    public AbstractResponse getActiveStrategy(Authentication authentication) {
         User user = userRepository.findByUsername(authentication.getName());
 
         // Retrieve the strategy
@@ -80,7 +80,7 @@ public class StrategyRESTController {
      * @return An empty {@link SuccessResponse}.
      */
     @RequestMapping(value = "/strategy", method = RequestMethod.POST)
-    public @ResponseBody AbstractResponse updateStrategy(Authentication authentication,
+    public AbstractResponse updateStrategy(Authentication authentication,
                                                          @RequestBody List<StrategyDTO> strategyInput) {
         User user = userRepository.findByUsername(authentication.getName());
 
