@@ -74,6 +74,18 @@ public class CustomDate {
         return toDateSql(getDayFromLocalDate(days));
     }
 
+    public int getYear(){
+        return this.localDate.getYear();
+    }
+
+    public int getMonth(){
+        return  this.localDate.getMonthValue();
+    }
+
+    public int getDay(){
+        return this.localDate.getDayOfMonth();
+    }
+
 
 
 
