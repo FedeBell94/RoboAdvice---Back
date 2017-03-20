@@ -1,6 +1,7 @@
 package it.uiip.digitalgarage.roboadvice.test.unitTests;
 
 import it.uiip.digitalgarage.roboadvice.businesslogic.controller.AssetClassRESTController;
+import it.uiip.digitalgarage.roboadvice.businesslogic.exception.BadRequestException;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.AssetClassHistoryDTO;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.AssetClass;
@@ -104,8 +105,13 @@ public class AssetClassRESTControllerTests {
     @Test
     public void testGetAssetClassHistory() {
 
-        List<AssetClassHistoryDTO> result = (List<AssetClassHistoryDTO>) assetClassRESTController
-                .getAssetClassHistory(1L, customDate.getYesterdaySql().toLocalDate(), LocalDate.now()).getData();
+        List<AssetClassHistoryDTO> result = null;
+        try {
+            result = (List<AssetClassHistoryDTO>) assetClassRESTController
+                    .getAssetClassHistory(1L, customDate.getYesterdaySql().toLocalDate(), LocalDate.now()).getData();
+        } catch(BadRequestException e){
+            assertTrue(false);
+        }
 
         Boolean check = customDate.compareTo(result.get(0).getDate()) == 0;
         //Boolean check = result.get(0).getDate().toString().equals(customDate.getYesterdaySql().toLocalDate().toString());

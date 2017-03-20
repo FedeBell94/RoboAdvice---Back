@@ -1,5 +1,6 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
+import it.uiip.digitalgarage.roboadvice.businesslogic.exception.BadRequestException;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.AssetClassHistoryDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
@@ -71,13 +72,24 @@ public class AssetClassRESTController {
      * @param to           Optional - The date in format yyyy-MM-dd to when the history of the asset class is required.
      *
      * @return An {@link AbstractResponse} containing a list of {@link AssetClassHistoryDTO} objects required.
+     *
+     * @throws BadRequestException Exception thrown in cas date 'from' is after date 'to'.
      */
     @RequestMapping(value = "/assetClassHistory", method = RequestMethod.GET)
     public AbstractResponse getAssetClassHistory(@RequestParam Long assetClassId,
-                                                               @RequestParam(required = false)
-                                                               @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate from,
-                                                               @RequestParam(required = false)
-                                                               @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate to) {
+                                                 @RequestParam(required = false)
+                                                 @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate from,
+                                                 @RequestParam(required = false)
+                                                 @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate to)
+            throws BadRequestException {
+        if(from != null){
+            if(CustomDate.getToday().compareTo(from) <= 0) {
+                throw new BadRequestException("Bad request - Date from must be before today.");
+            }
+            if(to != null && from.compareTo(to) >= 0) {
+                throw new BadRequestException("Bad request - Date 'from' must be before date 'to'.");
+            }
+        }
 
         // Check for the date. If the date passed is null, the default is 500 days from today.
         Date startDate;
