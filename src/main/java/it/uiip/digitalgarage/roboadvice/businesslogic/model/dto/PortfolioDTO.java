@@ -1,7 +1,17 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.model.dto;
 
-import java.util.HashMap;
+import lombok.*;
 
-// TODO refactor this class
-public class PortfolioDTO extends HashMap<String,Object> {
+import java.math.BigDecimal;
+import java.util.Date;
+
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+public class PortfolioDTO {
+
+    private BigDecimal value;
+
+    private Date date;
+
+    private Long assetClassId;
+
 }

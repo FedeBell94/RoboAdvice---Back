@@ -13,7 +13,8 @@ public interface PortfolioRepository extends PagingAndSortingRepository<Portfoli
 
     List<Portfolio> findByUserAndDate(User user, Date date);
 
-    @Query("SELECT SUM(p.value) AS value, p.date AS date, p.assetClass.id AS assetClassId " +
+    @Query("SELECT new it.uiip.digitalgarage.roboadvice.businesslogic.model.dto." +
+                   "PortfolioDTO(SUM(p.value), p.date, p.assetClass.id) " +
                    "FROM Portfolio p " +
                    "WHERE p.user = ?1 " +
                    "AND p.date > ?2 " +

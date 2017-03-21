@@ -71,9 +71,9 @@ public class PortfolioRESTControllerTests {
                         .isNewUser(false).build();
 
         PortfolioDTO portfolioDTO = new PortfolioDTO();
-        portfolioDTO.put("VALUE", new BigDecimal("1200"));
-        portfolioDTO.put("DATE", customDate.getYesterdaySql());
-        portfolioDTO.put("Asset_Class", 1);
+        portfolioDTO.setAssetClassId(1L);
+        portfolioDTO.setDate(customDate.getYesterdayUtils());
+        portfolioDTO.setValue(new BigDecimal("1200"));
 
         portfolioDTOList.add(portfolioDTO);
 
@@ -89,10 +89,9 @@ public class PortfolioRESTControllerTests {
         List<PortfolioDTO> result = (List<PortfolioDTO>) portfolioRESTController
                 .requestMyData(authentication, customDate.getYesterdaySql().toLocalDate()).getData();
 
-        Boolean check1 = result.get(0).get("VALUE").equals(new BigDecimal("1200"));
-        Boolean check2 =
-                result.get(0).get("DATE").toString().equals(customDate.getYesterdaySql().toLocalDate().toString());
-        Boolean check3 = (int) result.get(0).get("Asset_Class") == 1;
+        Boolean check1 = result.get(0).getValue().equals(new BigDecimal("1200"));
+        Boolean check2 = customDate.getYesterdayUtils().toString().equals(result.get(0).getDate().toString());
+        Boolean check3 = result.get(0).getAssetClassId() == 1;
 
         assertTrue(check1);
         assertTrue(check2);
