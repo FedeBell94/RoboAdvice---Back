@@ -38,10 +38,10 @@
   "id": "5",
   "assetClassId": "2",
   "name": "USD -> BIT",
-  "quandlKey": "BAVERAGE/USD",
-  "quandlId": "1",
+  "quandlKey": "BTCE/USDBTC",
+  "quandlId": "3",
   "fixedPercentage": "25",
-  "quandlColumn": "24H Average"
+  "quandlColumn": "Average"
 },
 {
   "id": "6",

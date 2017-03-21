@@ -18,7 +18,7 @@ public class DataUpdater implements IDataUpdater {
 
     private static final Log LOGGER = LogFactory.getLog(DataUpdater.class);
 
-    private static final String STARTING_DATA_DATE = "2012-01-01";
+    private static final String STARTING_DATA_DATE = "2014-04-30";
 
     private final DataRepository dataRepository;
     private final AssetRepository assetRepository;
