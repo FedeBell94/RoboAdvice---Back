@@ -24,7 +24,7 @@ public class DemoRESTController {
     }
 
     @RequestMapping(value = "/demo", method = RequestMethod.POST)
-    public AbstractResponse requestDemo(@RequestBody List<StrategyDTO> strategyInput, @RequestBody LocalDate date) {
+    public AbstractResponse requestDemo(@RequestBody List<StrategyDTO> strategyInput, @RequestBody LocalDate date, @RequestBody int worth) {
 
 
 
