@@ -48,13 +48,25 @@ public class PortfolioRESTController {
      */
     @RequestMapping(value = "/portfolio", method = RequestMethod.GET)
     public AbstractResponse requestMyData(Authentication authentication,
-                                                        @RequestParam(required = false)
-                                                        @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate from) {
+                                          @RequestParam(required = false)
+                                          @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate from) {
         User user = userRepository.findByUsername(authentication.getName());
 
         Date fromDate = from == null ? user.getRegistration() : Date.valueOf(from);
         List<PortfolioDTO> portfolio = portfolioRepository.findPortfolioHistory(user, fromDate);
         LOGGER.debug("User: " + user.getUsername() + " - get portfolio called.");
         return new SuccessResponse<>(portfolio);
+    }
+
+    @RequestMapping(value = "/backtesting", method = RequestMethod.GET)
+    public AbstractResponse backTesting(Authentication authentication,
+                                          @RequestParam(required = false)
+                                          @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate from) {
+        User user = userRepository.findByUsername(authentication.getName());
+
+//        List<PortfolioDTO> portfolio = COMPUTE HISTORICAL DATA
+
+        LOGGER.debug("User: " + user.getUsername() + " - get portfolio called.");
+        return new SuccessResponse<>(true);
     }
 }
