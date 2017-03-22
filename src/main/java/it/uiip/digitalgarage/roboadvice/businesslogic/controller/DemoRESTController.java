@@ -1,9 +1,11 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
+import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.DemoDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.StrategyDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -24,13 +26,10 @@ public class DemoRESTController {
     }
 
     @RequestMapping(value = "/demo", method = RequestMethod.POST)
-    public AbstractResponse requestDemo(@RequestBody List<StrategyDTO> strategyInput, @RequestBody LocalDate date, @RequestBody int worth) {
-
-
+    public AbstractResponse requestDemo(@RequestBody DemoDTO demoDTO) {
 
         return new SuccessResponse<>(true);
     }
-
 
 
 }
