@@ -1,10 +1,10 @@
-package it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dataUpdater.Quandl;
+package it.uiip.digitalgarage.roboadvice.core.dataUpdater.quandl;
 
 import com.jimmoores.quandl.DataSetRequest;
 import com.jimmoores.quandl.QuandlSession;
 import com.jimmoores.quandl.Row;
 import com.jimmoores.quandl.TabularResult;
-import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dataUpdater.IDataSource;
+import it.uiip.digitalgarage.roboadvice.core.dataUpdater.IDataSource;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Data;
 import it.uiip.digitalgarage.roboadvice.utils.CustomDate;
@@ -12,10 +12,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
 import org.threeten.bp.DateTimeUtils;
-import org.threeten.bp.ZoneId;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 

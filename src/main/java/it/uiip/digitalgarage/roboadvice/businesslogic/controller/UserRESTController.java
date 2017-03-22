@@ -8,6 +8,7 @@ import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.ExchangeErr
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
+import it.uiip.digitalgarage.roboadvice.utils.CustomDate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.modelmapper.ModelMapper;
@@ -20,8 +21,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.sql.Date;
-import java.time.LocalDate;
 
 /**
  * Class used to create all the API rest used to manage the {@link User}.
@@ -119,7 +118,8 @@ public class UserRESTController {
                 .username(inputUser.getUsername())
                 .password(hashPassword)
                 .nickname(inputUser.getNickname())
-                .registration(Date.valueOf(LocalDate.now()))
+                .registration(CustomDate.getToday().getDateSql())
+                .lastPortfolioComputation(CustomDate.getToday().getDateSql())
                 .enabled(true)
                 .isNewUser(true)
                 .build();

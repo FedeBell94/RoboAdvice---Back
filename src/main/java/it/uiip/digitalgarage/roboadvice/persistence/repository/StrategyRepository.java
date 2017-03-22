@@ -11,6 +11,6 @@ public interface StrategyRepository extends PagingAndSortingRepository<Strategy,
 
     List<Strategy> findByUserAndActiveTrue(User user);
 
-    List<Strategy> findTop4ByUserAndStartingDateLessThanEqualOrderByStartingDateDesc(User user, Date date);
+    List<Strategy> findByUserAndStartingDate(User user, Date date);
 
 }

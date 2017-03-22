@@ -1,4 +1,4 @@
-package it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dataUpdater;
+package it.uiip.digitalgarage.roboadvice.core.dataUpdater;
 
 /**
  * Download and update the prices for the assets.
