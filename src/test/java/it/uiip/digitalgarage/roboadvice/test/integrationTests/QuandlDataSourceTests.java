@@ -1,4 +1,4 @@
-package it.uiip.digitalgarage.roboadvice.test.unitTests;
+package it.uiip.digitalgarage.roboadvice.test.integrationTests;
 
 import it.uiip.digitalgarage.roboadvice.Application;
 import it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dataUpdater.IDataSource;
