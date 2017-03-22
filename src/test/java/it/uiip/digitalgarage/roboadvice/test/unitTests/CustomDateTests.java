@@ -88,11 +88,7 @@ public class CustomDateTests {
 
         calendar.add(Calendar.DATE, -1);
 
-        calendar.set(Calendar.HOUR, -12);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-
-        Boolean check5 = customDate.getYesterdayUtils().toString().equals(calendar.getTime().toString());
+        Boolean check5 = customDate.getYesterdayUtils().getDate() == calendar.getTime().getDate();
 
         assertTrue(check5);
 
