@@ -23,7 +23,7 @@ public class DemoRESTController {
 
     }
 
-    @RequestMapping(value = "/forecast", method = RequestMethod.POST)
+    @RequestMapping(value = "/demo", method = RequestMethod.POST)
     public AbstractResponse requestDemo(@RequestBody List<StrategyDTO> strategyInput, @RequestBody LocalDate date) {
 
 
