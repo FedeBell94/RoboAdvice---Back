@@ -60,7 +60,7 @@ public class QuandlDataSourceTests {
     public void testQuandlDataSource() {
 
         assertEquals(
-                "class it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.dataUpdater.Quandl.QuandlDataSource",
+                "class it.uiip.digitalgarage.roboadvice.core.dataUpdater.quandl.QuandlDataSource",
                 this.quandlDataSource.getClass().toString());
 
     }

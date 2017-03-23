@@ -82,9 +82,9 @@ public class NightlyTaskTests {
                 .lastPortfolioComputation(Date.valueOf(LocalDate.now())).build();
 
         List<Asset> assetList = new ArrayList<>();
-        AssetClass assetClass = AssetClass.builder().id(0L).name("JUNITassetClass").build();
+        AssetClass assetClass = AssetClass.builder().id(1L).name("JUNITassetClass").build();
         Asset asset =
-                Asset.builder().assetClass(assetClass).name("unitTest").id(0L).fixedPercentage(new BigDecimal("100"))
+                Asset.builder().assetClass(assetClass).name("unitTest").id(1L).fixedPercentage(new BigDecimal("100"))
                         .quandlColumn("before").quandlId(1).quandlKey("WIKI/unitTest").build();
         assetList.add(asset);
 
@@ -106,12 +106,14 @@ public class NightlyTaskTests {
                 .percentage(new BigDecimal("100")).startingDate(Date.valueOf(LocalDate.now())).build();
         strategyList.add(strategy);
 
+        when(userRepositoryMock.findAll()).thenReturn(users);
         when(assetRepositoryMock.findAll()).thenReturn(assetList);
         when(customDateMock.getYesterdaySql()).thenReturn(getYesterday());
         when(dataRepositoryMock.findByDate(any())).thenReturn(dataList);
         when(portfolioRepositoryMock.findByUserAndDate(any(), any())).thenReturn(portfolioList);
         when(strategyRepositoryMock.findByUserAndActiveTrue(any())).thenReturn(strategyList);
-        when(dataRepositoryMock.findTop1ByDateBeforeAndAssetOrderByDateDesc(any(), any())).thenReturn(data);
+        //when(dataRepositoryMock.findTop1ByDateBeforeAndAssetOrderByDateDesc(any(), any())).thenReturn(data);
+        when(dataRepositoryMock.findTop1ByDateLessThanEqualAndAssetOrderByDateDesc(any(),any())).thenReturn(data);
 
     }
 
@@ -122,7 +124,7 @@ public class NightlyTaskTests {
                 dataRepositoryMock, userRepositoryMock, dataUpdaterMock);
 
         assertEquals(
-                "class it.uiip.digitalgarage.roboadvice.businesslogic.nightlyTask.NightlyTask",
+                "class it.uiip.digitalgarage.roboadvice.core.NightlyTask",
                 nightlyTask.getClass().toString());
 
     }
