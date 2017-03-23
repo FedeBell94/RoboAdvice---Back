@@ -16,5 +16,7 @@ public class DemoDTO {
 
     private Integer worth;
 
-    private Date date;
+    private Date from;
+
+    private Date to;
 }
