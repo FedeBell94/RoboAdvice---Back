@@ -37,7 +37,7 @@ public class CoreTask {
         } else {
             List<Portfolio> computedPortfolio = updatePortfolio(lastPortfolio, assetPrice);
             if (needToReBalance(computedPortfolio, activeStrategy)) {
-                // TODO rebalance algorithm
+                return reBalancePortfolio(computedPortfolio, activeStrategy);
             }
             return computedPortfolio;
         }
@@ -101,6 +101,8 @@ public class CoreTask {
         return worth;
     }
 
+    // TODO remove this suppress warning
+    @SuppressWarnings("Duplicates")
     private static boolean needToReBalance(List<Portfolio> portfolio, List<Strategy> strategy) {
         Map<Long, BigDecimal> assetClassWorth = new HashMap<>();
         BigDecimal total = BigDecimal.ZERO;
@@ -118,7 +120,8 @@ public class CoreTask {
         for (Map.Entry currAssetClass : assetClassWorth.entrySet()) {
             BigDecimal assetClassPercentage = ((BigDecimal) currAssetClass.getValue())
                     .divide(total, BigDecimal.ROUND_HALF_UP)
-                    .multiply(BigDecimal.valueOf(100));
+                    .multiply(BigDecimal.valueOf(100))
+                    .setScale(4, BigDecimal.ROUND_HALF_UP);
             Strategy currStrategy = null;
             for (Strategy s : strategy) {
                 if (s.getAssetClass().getId() == currAssetClass.getKey()) {
@@ -139,7 +142,64 @@ public class CoreTask {
         }
         return false;
     }
+    
+    @SuppressWarnings("Duplicates")
+    private static List<Portfolio> reBalancePortfolio(List<Portfolio> portfolio, List<Strategy> strategy) {
+        Map<Long, BigDecimal> assetClassWorth = new HashMap<>();
+        BigDecimal total = BigDecimal.ZERO;
+        for (Portfolio currPortfolio : portfolio) {
+            Long currAssetClassId = currPortfolio.getAssetClass().getId();
+            BigDecimal worth = assetClassWorth.get(currAssetClassId);
+            if (worth == null) {
+                assetClassWorth.put(currAssetClassId, currPortfolio.getValue());
+            } else {
+                assetClassWorth.put(currAssetClassId, worth.add(currPortfolio.getValue()));
+            }
+            total = total.add(currPortfolio.getValue());
+        }
 
+        // Calculate the percentage to remove/add for each asset class
+        Map<Long, BigDecimal> assetClassPercentage = new HashMap<>();
+        for (Map.Entry currAssetClass : assetClassWorth.entrySet()) {
+            BigDecimal assetClassTotal = (BigDecimal) currAssetClass.getValue();
+            BigDecimal globalPercentage = assetClassTotal
+                    .divide(total, BigDecimal.ROUND_HALF_UP)
+                    .multiply(BigDecimal.valueOf(100));
+            Long currAssetClassId = (Long) currAssetClass.getKey();
+            Strategy currStrategy = null;
+            for (Strategy s : strategy) {
+                if (s.getAssetClass().getId().compareTo(currAssetClassId) == 0) {
+                    currStrategy = s;
+                    break;
+                }
+            }
+            BigDecimal strategyPercentage = currStrategy.getPercentage();
+
+            BigDecimal percentageDifference = globalPercentage.subtract(strategyPercentage)
+                    .divide(BigDecimal.valueOf(100), BigDecimal.ROUND_HALF_UP);
+
+            BigDecimal localPercentage = total
+                    .multiply(percentageDifference)
+                    .divide(assetClassTotal, BigDecimal.ROUND_HALF_UP)
+                    .setScale(8, BigDecimal.ROUND_HALF_UP);
+
+            assetClassPercentage.put(currAssetClassId, localPercentage);
+        }
+
+        for (Portfolio currPortfolio : portfolio) {
+            BigDecimal localPercentage = assetClassPercentage.get(currPortfolio.getAssetClass().getId());
+            BigDecimal rebalancedUnits = currPortfolio.getUnit()
+                    .add(currPortfolio.getUnit().multiply(localPercentage.negate()))
+                    .setScale(4, BigDecimal.ROUND_HALF_UP);
+            BigDecimal rebalancedValue = currPortfolio.getValue()
+                    .add(currPortfolio.getValue().multiply(localPercentage.negate()))
+                    .setScale(4, BigDecimal.ROUND_HALF_UP);
+
+            currPortfolio.setUnit(rebalancedUnits);
+            currPortfolio.setValue(rebalancedValue);
+        }
+        return portfolio;
+    }
 
     private CoreTask() {
     }
