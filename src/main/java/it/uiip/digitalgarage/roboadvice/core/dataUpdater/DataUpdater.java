@@ -5,6 +5,7 @@ import it.uiip.digitalgarage.roboadvice.persistence.model.Data;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.DataRepository;
 import it.uiip.digitalgarage.roboadvice.utils.CustomDate;
+import it.uiip.digitalgarage.roboadvice.utils.RoboAdviceConstant;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +18,6 @@ import java.util.List;
 public class DataUpdater implements IDataUpdater {
 
     private static final Log LOGGER = LogFactory.getLog(DataUpdater.class);
-
-    private static final String STARTING_DATA_DATE = "2014-04-30";
 
     private final DataRepository dataRepository;
     private final AssetRepository assetRepository;
@@ -59,7 +58,7 @@ public class DataUpdater implements IDataUpdater {
             Data data = dataRepository.findTop1ByAssetOrderByDateDesc(currAsset);
             CustomDate startDate;
             if (data == null) {
-                startDate = new CustomDate(STARTING_DATA_DATE);
+                startDate = RoboAdviceConstant.STARTING_DATA;
             } else {
                 startDate = new CustomDate(data.getDate()).moveOneDayForward();
             }

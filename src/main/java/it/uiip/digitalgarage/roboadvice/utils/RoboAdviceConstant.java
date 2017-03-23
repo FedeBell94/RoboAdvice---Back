@@ -6,6 +6,8 @@ public class RoboAdviceConstant {
 
     public static final BigDecimal DEFAULT_START_WORTH = BigDecimal.valueOf(10000);
 
+    public static final CustomDate STARTING_DATA = new CustomDate("2014-04-30");
+
     private RoboAdviceConstant(){}
 
 }
