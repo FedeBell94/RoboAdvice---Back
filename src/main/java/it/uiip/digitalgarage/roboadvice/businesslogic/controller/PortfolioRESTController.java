@@ -1,9 +1,11 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
+import it.uiip.digitalgarage.roboadvice.businesslogic.exception.BadRequestException;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.BackTestingDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.PortfolioDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.StrategyDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
+import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.ErrorResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
 import it.uiip.digitalgarage.roboadvice.core.CoreTask;
 import it.uiip.digitalgarage.roboadvice.persistence.model.*;
@@ -80,6 +82,11 @@ public class PortfolioRESTController {
 
     @RequestMapping(value = "/backTesting", method = RequestMethod.POST)
     public AbstractResponse backTesting(@RequestBody BackTestingDTO backtestingDTO) {
+
+        if(backtestingDTO.getStrategy() == null){
+            return new ErrorResponse("Missing parameter: STRATEGY.");
+        }
+
         Date fromDate = backtestingDTO.getFrom() == null ? CustomDate.getToday().getDayFromSql(-500) :
                 backtestingDTO.getFrom();
 

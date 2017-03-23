@@ -4,6 +4,7 @@ import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.DemoDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.PortfolioDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.StrategyDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
+import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.ErrorResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
 import it.uiip.digitalgarage.roboadvice.core.CoreTask;
 import it.uiip.digitalgarage.roboadvice.persistence.model.*;
@@ -41,6 +42,13 @@ public class DemoRESTController {
 
     @RequestMapping(value = "/demo", method = RequestMethod.POST)
     public AbstractResponse requestDemo(@RequestBody DemoDTO demoDTO) {
+
+        if(demoDTO.getFrom() == null || demoDTO.getStrategy() == null || demoDTO.getWorth() == null){
+            return new ErrorResponse("Missing parameter/s.");
+        }
+        if(demoDTO.getTo() == null){
+            demoDTO.setTo(new CustomDate(demoDTO.getFrom()).getDayFromSql(1));
+        }
 
         CustomDate fromDate = new CustomDate(new CustomDate(demoDTO.getFrom()).getYesterdayLocalDate());
 
@@ -91,7 +99,6 @@ public class DemoRESTController {
         Iterator it = aggregator.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
-//            System.out.println(pair.getKey() + " = " + pair.getValue());
             String[] parts = pair.getKey().toString().split(",");
             returnAggregatedListDTO.add(PortfolioDTO.builder()
                     .assetClassId(Long.parseLong(parts[1]))
