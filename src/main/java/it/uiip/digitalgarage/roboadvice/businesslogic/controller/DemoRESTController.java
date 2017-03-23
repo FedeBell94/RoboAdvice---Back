@@ -4,6 +4,7 @@ import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.DemoDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.PortfolioDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.StrategyDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
+import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.ErrorResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
 import it.uiip.digitalgarage.roboadvice.core.CoreTask;
 import it.uiip.digitalgarage.roboadvice.persistence.model.*;
@@ -42,6 +43,13 @@ public class DemoRESTController {
     @RequestMapping(value = "/demo", method = RequestMethod.POST)
     public AbstractResponse requestDemo(@RequestBody DemoDTO demoDTO) {
 
+        if (demoDTO.getFrom() == null || demoDTO.getStrategy() == null || demoDTO.getWorth() == null) {
+            return new ErrorResponse("Missing parameter/s.");
+        }
+        if (demoDTO.getTo() == null) {
+            demoDTO.setTo(new CustomDate(demoDTO.getFrom()).getDayFromSql(1));
+        }
+
         CustomDate fromDate = new CustomDate(new CustomDate(demoDTO.getFrom()).getYesterdayLocalDate());
 
         User user = User.builder()
@@ -79,28 +87,26 @@ public class DemoRESTController {
             returnListDTO.add(modelMapper.map(p, PortfolioDTO.class));
         }
 
-        Map<String,BigDecimal> aggregator = new HashMap<>();
-        for(PortfolioDTO p : returnListDTO){
-            if(aggregator.get(p.getDate().toString()+","+p.getAssetClassId()) == null){
-                aggregator.put(p.getDate().toString()+","+p.getAssetClassId(),p.getValue());
-            }else{
-                aggregator.put(p.getDate().toString()+","+p.getAssetClassId(),aggregator.get(p.getDate().toString()+","+p.getAssetClassId()).add(p.getValue()));
+        Map<String, BigDecimal> aggregator = new HashMap<>();
+        for (PortfolioDTO p : returnListDTO) {
+            if (aggregator.get(p.getDate().toString() + "," + p.getAssetClassId()) == null) {
+                aggregator.put(p.getDate().toString() + "," + p.getAssetClassId(), p.getValue());
+            } else {
+                aggregator.put(p.getDate().toString() + "," + p.getAssetClassId(), aggregator.get(p.getDate().toString() + "," + p.getAssetClassId()).add(p.getValue()));
             }
         }
         List<PortfolioDTO> returnAggregatedListDTO = new ArrayList<>();
         Iterator it = aggregator.entrySet().iterator();
         while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
-//            System.out.println(pair.getKey() + " = " + pair.getValue());
+            Map.Entry pair = (Map.Entry) it.next();
             String[] parts = pair.getKey().toString().split(",");
             returnAggregatedListDTO.add(PortfolioDTO.builder()
                     .assetClassId(Long.parseLong(parts[1]))
                     .date(new CustomDate(parts[0]).getDateSql())
-                    .value((BigDecimal)pair.getValue()).build());
+                    .value((BigDecimal) pair.getValue()).build());
             it.remove();
         }
-
-
+        Collections.sort(returnAggregatedListDTO);
 
         LOGGER.debug("Back-test called from date " + demoDTO.getFrom());
         return new SuccessResponse<>(returnAggregatedListDTO);
