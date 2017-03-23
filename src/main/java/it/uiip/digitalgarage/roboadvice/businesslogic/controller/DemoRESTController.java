@@ -18,16 +18,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping(value = "securedApi")
 public class DemoRESTController {
-
 
     private static final Log LOGGER = LogFactory.getLog(DemoRESTController.class);
 
@@ -83,8 +79,31 @@ public class DemoRESTController {
             returnListDTO.add(modelMapper.map(p, PortfolioDTO.class));
         }
 
+        Map<String,BigDecimal> aggregator = new HashMap<>();
+        for(PortfolioDTO p : returnListDTO){
+            if(aggregator.get(p.getDate().toString()+","+p.getAssetClassId()) == null){
+                aggregator.put(p.getDate().toString()+","+p.getAssetClassId(),p.getValue());
+            }else{
+                aggregator.put(p.getDate().toString()+","+p.getAssetClassId(),aggregator.get(p.getDate().toString()+","+p.getAssetClassId()).add(p.getValue()));
+            }
+        }
+        List<PortfolioDTO> returnAggregatedListDTO = new ArrayList<>();
+        Iterator it = aggregator.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+//            System.out.println(pair.getKey() + " = " + pair.getValue());
+            String[] parts = pair.getKey().toString().split(",");
+            returnAggregatedListDTO.add(PortfolioDTO.builder()
+                    .assetClassId(Long.parseLong(parts[1]))
+                    .date(new CustomDate(parts[0]).getDateSql())
+                    .value((BigDecimal)pair.getValue()).build());
+            it.remove();
+        }
+
+
+
         LOGGER.debug("Back-test called from date " + demoDTO.getFrom());
-        return new SuccessResponse<>(returnListDTO);
+        return new SuccessResponse<>(returnAggregatedListDTO);
     }
 
     private Map<Long, BigDecimal> getLatestAssetPrices(final Iterable<Asset> assets, final Date date) {
@@ -97,6 +116,5 @@ public class DemoRESTController {
         }
         return latestPrices;
     }
-
 
 }
