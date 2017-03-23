@@ -1,7 +1,5 @@
 package it.uiip.digitalgarage.roboadvice;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
 import it.uiip.digitalgarage.roboadvice.core.INightlyTask;
 import it.uiip.digitalgarage.roboadvice.core.dataUpdater.IDataUpdater;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
@@ -13,7 +11,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -63,10 +60,6 @@ public class Application {
 
     @PostConstruct
     public void initDatabaseDefaultValues() {
-        // Logger initialization
-        Logger logger = (Logger) LoggerFactory.getLogger("it.uiip.digitalgarage.roboadvice");
-        logger.setLevel(Level.DEBUG);
-
         LOGGER.debug("Database default values checking and inserting");
 
         JSONParser jsonParser = new JSONParser();
