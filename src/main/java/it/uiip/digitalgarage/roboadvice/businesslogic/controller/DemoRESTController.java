@@ -87,26 +87,24 @@ public class DemoRESTController {
             returnListDTO.add(modelMapper.map(p, PortfolioDTO.class));
         }
 
-        Map<String, BigDecimal> aggregator = new HashMap<>();
-        for (PortfolioDTO p : returnListDTO) {
-            if (aggregator.get(p.getDate().toString() + "," + p.getAssetClassId()) == null) {
-                aggregator.put(p.getDate().toString() + "," + p.getAssetClassId(), p.getValue());
+        long curAssetClassID = 0;
+        java.util.Date curDate = null;
+        List<PortfolioDTO> returnAggregatedListDTO = new ArrayList<>();
+
+        for (int i = 0; i < returnListDTO.size(); i++) {
+            if (returnListDTO.get(i).getDate() == curDate) {
+                if (returnListDTO.get(i).getAssetClassId() == curAssetClassID) {
+                    returnAggregatedListDTO.get(returnAggregatedListDTO.size() - 1).setValue(returnAggregatedListDTO.get(returnAggregatedListDTO.size() - 1).getValue().add(returnListDTO.get(i).getValue()));
+                } else {
+                    curAssetClassID = returnListDTO.get(i).getAssetClassId();
+                    returnAggregatedListDTO.add(PortfolioDTO.builder().assetClassId(curAssetClassID).date(curDate).value(returnListDTO.get(i).getValue()).build());
+                }
             } else {
-                aggregator.put(p.getDate().toString() + "," + p.getAssetClassId(), aggregator.get(p.getDate().toString() + "," + p.getAssetClassId()).add(p.getValue()));
+                curDate = returnListDTO.get(i).getDate();
+                curAssetClassID = returnListDTO.get(i).getAssetClassId();
+                returnAggregatedListDTO.add(PortfolioDTO.builder().assetClassId(curAssetClassID).date(curDate).value(returnListDTO.get(i).getValue()).build());
             }
         }
-        List<PortfolioDTO> returnAggregatedListDTO = new ArrayList<>();
-        Iterator it = aggregator.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
-            String[] parts = pair.getKey().toString().split(",");
-            returnAggregatedListDTO.add(PortfolioDTO.builder()
-                    .assetClassId(Long.parseLong(parts[1]))
-                    .date(new CustomDate(parts[0]).getDateSql())
-                    .value((BigDecimal) pair.getValue()).build());
-            it.remove();
-        }
-        Collections.sort(returnAggregatedListDTO);
 
         LOGGER.debug("Back-test called from date " + demoDTO.getFrom());
         return new SuccessResponse<>(returnAggregatedListDTO);
