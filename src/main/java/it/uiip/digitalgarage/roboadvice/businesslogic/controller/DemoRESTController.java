@@ -93,21 +93,16 @@ public class DemoRESTController {
 
         for (int i = 0; i < returnListDTO.size(); i++) {
             if (returnListDTO.get(i).getDate() == curDate) {
-                System.out.println("stesso giorno");
                 if (returnListDTO.get(i).getAssetClassId() == curAssetClassID) {
-                    System.out.println("e stessa classe: " + curAssetClassID);
                     returnAggregatedListDTO.get(returnAggregatedListDTO.size() - 1).setValue(returnAggregatedListDTO.get(returnAggregatedListDTO.size() - 1).getValue().add(returnListDTO.get(i).getValue()));
                 } else {
-                    System.out.println("classe diversa: " + curAssetClassID);
                     curAssetClassID = returnListDTO.get(i).getAssetClassId();
                     returnAggregatedListDTO.add(PortfolioDTO.builder().assetClassId(curAssetClassID).date(curDate).value(returnListDTO.get(i).getValue()).build());
                 }
             } else {
-                System.out.println("giorno diverso");
                 curDate = returnListDTO.get(i).getDate();
                 curAssetClassID = returnListDTO.get(i).getAssetClassId();
                 returnAggregatedListDTO.add(PortfolioDTO.builder().assetClassId(curAssetClassID).date(curDate).value(returnListDTO.get(i).getValue()).build());
-
             }
         }
 
