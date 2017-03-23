@@ -19,9 +19,11 @@ public class CoreTask {
     public static List<Portfolio> executeTask(final User user, final List<Portfolio> lastPortfolio,
                                               final List<Strategy> activeStrategy,
                                               final Map<Long, BigDecimal> assetPrice,
-                                              final Iterable<Asset> assets) {
+                                              final Iterable<Asset> assets,
+                                              final BigDecimal worthToAllocate) {
         if (lastPortfolio.isEmpty()) {
-            return createPortfolio(user, assets, RoboAdviceConstant.DEFAULT_START_WORTH, assetPrice, activeStrategy);
+            BigDecimal worth = worthToAllocate == null ? RoboAdviceConstant.DEFAULT_START_WORTH : worthToAllocate;
+            return createPortfolio(user, assets, worth, assetPrice, activeStrategy);
         } else if (user.getLastStrategyComputed() != null &&
                 user.getLastStrategyComputed().compareTo(activeStrategy.get(0).getStartingDate()) != 0) {
             BigDecimal dayWorth = computeWorth(lastPortfolio, assetPrice);

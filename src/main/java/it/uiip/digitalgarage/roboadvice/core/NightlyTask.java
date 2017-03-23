@@ -54,7 +54,7 @@ public class NightlyTask implements INightlyTask {
         List<Portfolio> savePortfolioList = new LinkedList<>();
         for (User currUser : users) {
             // Check if the user is already up to date
-            if(CustomDate.getToday().compareTo(currUser.getLastPortfolioComputation()) == 0){
+            if (CustomDate.getToday().compareTo(currUser.getLastPortfolioComputation()) == 0) {
                 continue;
             }
 
@@ -68,7 +68,8 @@ public class NightlyTask implements INightlyTask {
             List<Strategy> activeStrategy = strategyRepository.findByUserAndActiveTrue(currUser);
 
             savePortfolioList
-                    .addAll(CoreTask.executeTask(currUser, lastPortfolio, activeStrategy, latestAssetPrice, assets));
+                    .addAll(CoreTask
+                            .executeTask(currUser, lastPortfolio, activeStrategy, latestAssetPrice, assets, null));
 
             currUser.setLastPortfolioComputation(CustomDate.getToday().getDateSql());
             currUser.setLastStrategyComputed(activeStrategy.get(0).getStartingDate());
@@ -91,7 +92,7 @@ public class NightlyTask implements INightlyTask {
             Map<Long, BigDecimal> assetPrice = getLatestAssetPrices(assets, date);
 
             // TODO do NOT change the caller lastPortfolio!!!!!!!
-            List<Portfolio> tmp = CoreTask.executeTask(user, lastPortfolio, activeStrategy, assetPrice, assets);
+            List<Portfolio> tmp = CoreTask.executeTask(user, lastPortfolio, activeStrategy, assetPrice, assets, null);
             lastPortfolio.clear();
             lastPortfolio.addAll(tmp);
             returnList.addAll(lastPortfolio);

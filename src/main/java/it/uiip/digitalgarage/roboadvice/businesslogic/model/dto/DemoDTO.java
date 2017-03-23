@@ -3,18 +3,16 @@ package it.uiip.digitalgarage.roboadvice.businesslogic.model.dto;
 import lombok.*;
 
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.List;
 
-/**
- * Created by Simone on 22/03/2017.
- */
 @Getter @Setter @AllArgsConstructor @NoArgsConstructor @Builder @ToString
 public class DemoDTO {
 
-    private List<StrategyDTO> strategyInput;
+    private List<StrategyDTO> strategy;
 
-    private Integer worth;
+    private BigDecimal worth;
 
     private Date from;
 

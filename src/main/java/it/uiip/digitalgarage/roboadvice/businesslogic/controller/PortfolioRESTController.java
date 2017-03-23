@@ -33,7 +33,7 @@ import java.util.Map;
 @RequestMapping(value = "securedApi")
 public class PortfolioRESTController {
 
-    private static final Log LOGGER = LogFactory.getLog(PortfolioRepository.class);
+    private static final Log LOGGER = LogFactory.getLog(PortfolioRESTController.class);
 
     private final UserRepository userRepository;
     private final PortfolioRepository portfolioRepository;
@@ -107,12 +107,12 @@ public class PortfolioRESTController {
         List<Portfolio> portfolioList = new ArrayList<>();
         while (customDate.moveOneDayForward().compareTo(today) <= 0) {
             Map<Long, BigDecimal> latestAssetPrice = getLatestAssetPrices(assets, customDate.getDateSql());
-            lastPortfolio = CoreTask.executeTask(user, lastPortfolio, activeStrategy, latestAssetPrice, assets);
+            lastPortfolio = CoreTask.executeTask(user, lastPortfolio, activeStrategy, latestAssetPrice, assets, null);
             portfolioList.addAll(lastPortfolio);
         }
 
         List<PortfolioDTO> returnListDTO = new ArrayList<>(portfolioList.size());
-        for(Portfolio p : portfolioList){
+        for (Portfolio p : portfolioList) {
             returnListDTO.add(modelMapper.map(p, PortfolioDTO.class));
         }
 
