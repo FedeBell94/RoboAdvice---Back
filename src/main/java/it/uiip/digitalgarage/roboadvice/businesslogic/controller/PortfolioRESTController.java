@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -65,7 +67,6 @@ public class PortfolioRESTController {
      * @param authentication Represents the authentication token of an authenticated request.
      * @param from           Optional - The date from when the portfolio history is needed. The required format id
      *                       yyyy-MM-dd.
-     *
      * @return An {@link AbstractResponse} containing the list of {@link PortfolioDTO} requested.
      */
     @RequestMapping(value = "/portfolio", method = RequestMethod.GET)
@@ -83,7 +84,7 @@ public class PortfolioRESTController {
     @RequestMapping(value = "/backTesting", method = RequestMethod.POST)
     public AbstractResponse backTesting(@RequestBody BackTestingDTO backtestingDTO) {
 
-        if(backtestingDTO.getStrategy() == null){
+        if (backtestingDTO.getStrategy() == null) {
             return new ErrorResponse("Missing parameter: STRATEGY.");
         }
 
@@ -123,8 +124,27 @@ public class PortfolioRESTController {
             returnListDTO.add(modelMapper.map(p, PortfolioDTO.class));
         }
 
+        long curAssetClassID = 0;
+        java.util.Date curDate = new Date(Long.MIN_VALUE);
+        List<PortfolioDTO> returnAggregatedListDTO = new ArrayList<>();
+
+        for (int i = 0; i < returnListDTO.size(); i++) {
+            if (returnListDTO.get(i).getDate().compareTo(curDate) == 0) {
+                if (returnListDTO.get(i).getAssetClassId() == curAssetClassID) {
+                    returnAggregatedListDTO.get(returnAggregatedListDTO.size() - 1).setValue(returnAggregatedListDTO.get(returnAggregatedListDTO.size() - 1).getValue().add(returnListDTO.get(i).getValue()));
+                } else {
+                    curAssetClassID = returnListDTO.get(i).getAssetClassId();
+                    returnAggregatedListDTO.add(PortfolioDTO.builder().assetClassId(curAssetClassID).date(curDate).value(returnListDTO.get(i).getValue()).build());
+                }
+            } else {
+                curDate = returnListDTO.get(i).getDate();
+                curAssetClassID = returnListDTO.get(i).getAssetClassId();
+                returnAggregatedListDTO.add(PortfolioDTO.builder().assetClassId(curAssetClassID).date(curDate).value(returnListDTO.get(i).getValue()).build());
+            }
+        }
+
         LOGGER.debug("Back-test called from date " + backtestingDTO.getFrom());
-        return new SuccessResponse<>(returnListDTO);
+        return new SuccessResponse<>(returnAggregatedListDTO);
     }
 
 
