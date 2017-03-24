@@ -2,7 +2,7 @@ package it.uiip.digitalgarage.roboadvice.test.unitTests;
 
 import it.uiip.digitalgarage.roboadvice.businesslogic.controller.AssetClassRESTController;
 import it.uiip.digitalgarage.roboadvice.businesslogic.exception.BadRequestException;
-import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.AssetClassHistoryDTO;
+import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.AssetClassDTO;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.AssetClass;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Data;
@@ -105,9 +105,9 @@ public class AssetClassRESTControllerTests {
     @Test
     public void testGetAssetClassHistory() {
 
-        List<AssetClassHistoryDTO> result = null;
+        List<AssetClassDTO> result = null;
         try {
-            result = (List<AssetClassHistoryDTO>) assetClassRESTController
+            result = (List<AssetClassDTO>) assetClassRESTController
                     .getAssetClassHistory(1L, customDate.getYesterdaySql().toLocalDate(), LocalDate.now()).getData();
         } catch(BadRequestException e){
             assertTrue(false);

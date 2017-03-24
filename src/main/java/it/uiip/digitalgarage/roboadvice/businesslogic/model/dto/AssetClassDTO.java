@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.sql.Date;
 
 @Getter @Setter @AllArgsConstructor @NoArgsConstructor @Builder
-public class AssetClassHistoryDTO {
+public class AssetClassDTO {
 
     private Date date;
 

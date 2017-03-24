@@ -10,6 +10,8 @@ public class RoboAdviceConstant {
 
     public static final BigDecimal RE_BALANCING_BOUNDARIES = BigDecimal.valueOf(1);
 
+    public static final Integer FORECAST_DAYS = 180;
+
     private RoboAdviceConstant(){}
 
 }

@@ -178,6 +178,7 @@ public class CoreTask {
             BigDecimal percentageDifference = globalPercentage.subtract(strategyPercentage)
                     .divide(BigDecimal.valueOf(100), BigDecimal.ROUND_HALF_UP);
 
+            // TODO check if assetClassTotal is zero!!!!
             BigDecimal localPercentage = total
                     .multiply(percentageDifference)
                     .divide(assetClassTotal, BigDecimal.ROUND_HALF_UP)

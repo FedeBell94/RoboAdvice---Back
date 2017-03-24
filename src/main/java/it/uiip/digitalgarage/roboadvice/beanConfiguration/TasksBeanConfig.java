@@ -1,5 +1,6 @@
 package it.uiip.digitalgarage.roboadvice.beanConfiguration;
 
+import it.uiip.digitalgarage.roboadvice.core.forecastTask.DataForecastTask;
 import it.uiip.digitalgarage.roboadvice.core.nightlyTask.INightlyTask;
 import it.uiip.digitalgarage.roboadvice.core.nightlyTask.NightlyTask;
 import it.uiip.digitalgarage.roboadvice.core.dataUpdater.DataUpdater;
@@ -32,6 +33,12 @@ public class TasksBeanConfig {
                                     UserRepository userRepository, IDataUpdater dataUpdater) {
         return new NightlyTask(strategyRepository, portfolioRepository, assetRepository, dataRepository, userRepository,
                 dataUpdater);
+    }
+
+    @Bean
+    public DataForecastTask dataForecastTask(DataRepository dataRepository, AssetRepository assetRepository,
+                                             AssetClassRepository assetClassRepository) {
+        return new DataForecastTask(dataRepository, assetRepository, assetClassRepository);
     }
 
 }

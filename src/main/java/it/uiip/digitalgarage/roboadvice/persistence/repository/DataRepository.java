@@ -9,6 +9,8 @@ import java.util.List;
 
 public interface DataRepository extends PagingAndSortingRepository<Data, Long> {
 
+    List<Data> findByAssetOrderByDateDesc(Asset asset);
+
     Data findTop1ByDateBeforeAndAssetOrderByDateDesc(Date date, Asset asset);
 
     Data findTop1ByDateLessThanEqualAndAssetOrderByDateDesc(Date date, Asset asset);
