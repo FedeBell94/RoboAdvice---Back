@@ -1,7 +1,7 @@
 package it.uiip.digitalgarage.roboadvice.test.unitTests;
 
 import it.uiip.digitalgarage.roboadvice.Application;
-import it.uiip.digitalgarage.roboadvice.core.NightlyTask;
+import it.uiip.digitalgarage.roboadvice.core.nightlyTask.NightlyTask;
 import it.uiip.digitalgarage.roboadvice.core.dataUpdater.IDataUpdater;
 import it.uiip.digitalgarage.roboadvice.persistence.model.*;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.*;
