@@ -7,7 +7,6 @@ import it.uiip.digitalgarage.roboadvice.persistence.model.*;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.DataRepository;
 import it.uiip.digitalgarage.roboadvice.utils.CustomDate;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,13 +21,14 @@ public class BackTestingTask {
 
     private final AssetRepository assetRepository;
     private final DataRepository dataRepository;
-    private final ModelMapper modelMapper;
+    private final PortfolioConversionUtil portfolioConversion;
 
     @Autowired
-    public BackTestingTask(AssetRepository assetRepository, DataRepository dataRepository, ModelMapper modelMapper){
+    public BackTestingTask(AssetRepository assetRepository, DataRepository dataRepository,
+                           PortfolioConversionUtil portfolioConversion) {
         this.assetRepository = assetRepository;
         this.dataRepository = dataRepository;
-        this.modelMapper = modelMapper;
+        this.portfolioConversion = portfolioConversion;
     }
 
     public List<PortfolioDTO> computeBackTesting(Date fromDate, List<StrategyDTO> strategy) {
@@ -54,44 +54,14 @@ public class BackTestingTask {
 
         CustomDate today = CustomDate.getToday();
         List<Portfolio> lastPortfolio = new ArrayList<>();
-        List<Portfolio> portfolioList = new ArrayList<>();
+        List<PortfolioDTO> returnPortfolio = new ArrayList<>();
         AssetPriceUtils assetPriceUtils = new AssetPriceUtils(customDate.getDayFromSql(1), assets, dataRepository);
         while (customDate.moveOneDayForward().compareTo(today) <= 0) {
             Map<Long, BigDecimal> latestAssetPrice = assetPriceUtils.getLatestPrices();
             assetPriceUtils.moveOneDayForward();
             lastPortfolio = CoreTask.executeTask(user, lastPortfolio, activeStrategy, latestAssetPrice, assets, null);
-            portfolioList.addAll(lastPortfolio);
+            returnPortfolio.addAll(portfolioConversion.convertPortfolio(lastPortfolio));
         }
-
-        List<PortfolioDTO> returnListDTO = new ArrayList<>(portfolioList.size());
-        for (Portfolio p : portfolioList) {
-            returnListDTO.add(modelMapper.map(p, PortfolioDTO.class));
-        }
-
-        // TODO remove this!!!!
-        long curAssetClassID = 0;
-        java.util.Date curDate = new Date(Long.MIN_VALUE);
-        List<PortfolioDTO> returnAggregatedListDTO = new ArrayList<>();
-
-        for (int i = 0; i < returnListDTO.size(); i++) {
-            if (returnListDTO.get(i).getDate().compareTo(curDate) == 0) {
-                if (returnListDTO.get(i).getAssetClassId() == curAssetClassID) {
-                    returnAggregatedListDTO.get(returnAggregatedListDTO.size() - 1).setValue(
-                            returnAggregatedListDTO.get(returnAggregatedListDTO.size() - 1).getValue()
-                                    .add(returnListDTO.get(i).getValue()));
-                } else {
-                    curAssetClassID = returnListDTO.get(i).getAssetClassId();
-                    returnAggregatedListDTO.add(PortfolioDTO.builder().assetClassId(curAssetClassID).date(curDate)
-                            .value(returnListDTO.get(i).getValue()).build());
-                }
-            } else {
-                curDate = returnListDTO.get(i).getDate();
-                curAssetClassID = returnListDTO.get(i).getAssetClassId();
-                returnAggregatedListDTO.add(PortfolioDTO.builder().assetClassId(curAssetClassID).date(curDate)
-                        .value(returnListDTO.get(i).getValue()).build());
-            }
-        }
-
-        return returnAggregatedListDTO;
+        return returnPortfolio;
     }
 }
