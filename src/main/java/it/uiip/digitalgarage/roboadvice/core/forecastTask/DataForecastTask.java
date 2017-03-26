@@ -13,6 +13,7 @@ import it.uiip.digitalgarage.roboadvice.utils.CustomDate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -22,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Service
 public class DataForecastTask {
 
     private static final Log LOGGER = LogFactory.getLog(ForecastRESTController.class);

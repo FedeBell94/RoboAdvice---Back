@@ -1,12 +1,11 @@
 package it.uiip.digitalgarage.roboadvice.beanConfiguration;
 
-import it.uiip.digitalgarage.roboadvice.core.forecastTask.DataForecastTask;
-import it.uiip.digitalgarage.roboadvice.core.nightlyTask.INightlyTask;
-import it.uiip.digitalgarage.roboadvice.core.nightlyTask.NightlyTask;
 import it.uiip.digitalgarage.roboadvice.core.dataUpdater.DataUpdater;
 import it.uiip.digitalgarage.roboadvice.core.dataUpdater.IDataSource;
 import it.uiip.digitalgarage.roboadvice.core.dataUpdater.IDataUpdater;
 import it.uiip.digitalgarage.roboadvice.core.dataUpdater.quandl.QuandlDataSource;
+import it.uiip.digitalgarage.roboadvice.core.nightlyTask.INightlyTask;
+import it.uiip.digitalgarage.roboadvice.core.nightlyTask.NightlyTask;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,12 +32,6 @@ public class TasksBeanConfig {
                                     UserRepository userRepository, IDataUpdater dataUpdater) {
         return new NightlyTask(strategyRepository, portfolioRepository, assetRepository, dataRepository, userRepository,
                 dataUpdater);
-    }
-
-    @Bean
-    public DataForecastTask dataForecastTask(DataRepository dataRepository, AssetRepository assetRepository,
-                                             AssetClassRepository assetClassRepository) {
-        return new DataForecastTask(dataRepository, assetRepository, assetClassRepository);
     }
 
 }
