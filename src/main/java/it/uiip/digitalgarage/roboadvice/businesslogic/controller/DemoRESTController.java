@@ -6,12 +6,9 @@ import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractRes
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.ErrorResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
 import it.uiip.digitalgarage.roboadvice.core.demoTask.DemoTask;
-import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
-import it.uiip.digitalgarage.roboadvice.persistence.repository.DataRepository;
 import it.uiip.digitalgarage.roboadvice.utils.CustomDate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,16 +21,11 @@ public class DemoRESTController {
 
     private static final Log LOGGER = LogFactory.getLog(DemoRESTController.class);
 
-    private final AssetRepository assetRepository;
-    private final DataRepository dataRepository;
-    private final ModelMapper modelMapper;
+    private final DemoTask demoTask;
 
     @Autowired
-    public DemoRESTController(final AssetRepository assetRepository, final DataRepository dataRepository,
-                              final ModelMapper modelMapper) {
-        this.assetRepository = assetRepository;
-        this.dataRepository = dataRepository;
-        this.modelMapper = modelMapper;
+    public DemoRESTController(DemoTask demoTask) {
+        this.demoTask = demoTask;
     }
 
     @RequestMapping(value = "/demo", method = RequestMethod.POST)
@@ -51,10 +43,8 @@ public class DemoRESTController {
         CustomDate toDate = new CustomDate(demoDTO.getTo());
 
         List<PortfolioDTO> returnList =
-                DemoTask.computeDemo(fromDate, toDate, demoDTO.getStrategy(), demoDTO.getWorth(), assetRepository,
-                        dataRepository, modelMapper);
-
-
+                demoTask.computeDemo(fromDate, toDate, demoDTO.getStrategy(), demoDTO.getWorth());
+        
         LOGGER.debug("Back-test called from date " + demoDTO.getFrom());
         return new SuccessResponse<>(returnList);
     }

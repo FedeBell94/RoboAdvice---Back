@@ -8,6 +8,7 @@ import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.DataRepository;
 import it.uiip.digitalgarage.roboadvice.utils.CustomDate;
 import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -16,12 +17,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Service
 public class DemoTask {
 
-    // TODO if needed, call here the dao, to remove all the dao(repository) from the controllers
-    public static List<PortfolioDTO> computeDemo(CustomDate from, CustomDate to, List<StrategyDTO> strategy,
-                                          BigDecimal worth, AssetRepository assetRepository,
-                                          DataRepository dataRepository, ModelMapper modelMapper) {
+    private final AssetRepository assetRepository;
+    private final DataRepository dataRepository;
+    private final ModelMapper modelMapper;
+
+    public DemoTask(AssetRepository assetRepository, DataRepository dataRepository, ModelMapper modelMapper){
+        this.assetRepository = assetRepository;
+        this.dataRepository = dataRepository;
+        this.modelMapper = modelMapper;
+    }
+
+    public List<PortfolioDTO> computeDemo(CustomDate from, CustomDate to, List<StrategyDTO> strategy,
+                                          BigDecimal worth) {
         User user = User.builder()
                 .registration(from.getYesterdaySql())
                 .lastPortfolioComputation(from.getDateSql())
@@ -84,7 +94,7 @@ public class DemoTask {
     }
 
     private static Map<Long, BigDecimal> getLatestAssetPrices(final Iterable<Asset> assets, final Date date, final
-                                                       DataRepository dataRepository) {
+    DataRepository dataRepository) {
         // TODO make a class utility that returns this
         // TODO make it faster
         Map<Long, BigDecimal> latestPrices = new HashMap<>();
@@ -93,8 +103,5 @@ public class DemoTask {
             latestPrices.put(data.getAsset().getId(), data.getValue());
         }
         return latestPrices;
-    }
-
-    private DemoTask() {
     }
 }
