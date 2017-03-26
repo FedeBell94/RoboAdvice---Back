@@ -8,7 +8,7 @@ public class RoboAdviceConstant {
 
     public static final CustomDate STARTING_DATA = new CustomDate("2014-04-30");
 
-    public static final BigDecimal RE_BALANCING_BOUNDARIES = BigDecimal.valueOf(1);
+    public static final BigDecimal RE_BALANCING_BOUNDARIES = BigDecimal.valueOf(0.01);
 
     public static final Integer FORECAST_DAYS = 180;
 
