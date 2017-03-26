@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -56,8 +55,10 @@ public class BackTestingTask {
         CustomDate today = CustomDate.getToday();
         List<Portfolio> lastPortfolio = new ArrayList<>();
         List<Portfolio> portfolioList = new ArrayList<>();
+        AssetPriceUtils assetPriceUtils = new AssetPriceUtils(customDate.getDayFromSql(1), assets, dataRepository);
         while (customDate.moveOneDayForward().compareTo(today) <= 0) {
-            Map<Long, BigDecimal> latestAssetPrice = getLatestAssetPrices(assets, customDate.getDateSql());
+            Map<Long, BigDecimal> latestAssetPrice = assetPriceUtils.getLatestPrices();
+            assetPriceUtils.moveOneDayForward();
             lastPortfolio = CoreTask.executeTask(user, lastPortfolio, activeStrategy, latestAssetPrice, assets, null);
             portfolioList.addAll(lastPortfolio);
         }
@@ -92,15 +93,5 @@ public class BackTestingTask {
         }
 
         return returnAggregatedListDTO;
-    }
-
-    private Map<Long, BigDecimal> getLatestAssetPrices(final Iterable<Asset> assets, final Date date) {
-        // TODO make it faster
-        Map<Long, BigDecimal> latestPrices = new HashMap<>();
-        for (Asset curr : assets) {
-            Data data = dataRepository.findTop1ByDateLessThanEqualAndAssetOrderByDateDesc(date, curr);
-            latestPrices.put(data.getAsset().getId(), data.getValue());
-        }
-        return latestPrices;
     }
 }

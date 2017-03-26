@@ -3,6 +3,7 @@ package it.uiip.digitalgarage.roboadvice.core.demoTask;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.PortfolioDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.StrategyDTO;
 import it.uiip.digitalgarage.roboadvice.core.CoreTask;
+import it.uiip.digitalgarage.roboadvice.core.backTestingTask.AssetPriceUtils;
 import it.uiip.digitalgarage.roboadvice.persistence.model.*;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.DataRepository;
@@ -11,9 +12,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.sql.Date;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -49,7 +48,9 @@ public class DemoTask {
         }
 
         Iterable<Asset> assets = assetRepository.findAll();
-        Map<Long, BigDecimal> latestAssetPrice = getLatestAssetPrices(assets, from.getDateSql(), dataRepository);
+        AssetPriceUtils assetPriceUtils = new AssetPriceUtils(from.getDateSql(), assets, dataRepository);
+        Map<Long, BigDecimal> latestAssetPrice = assetPriceUtils.getLatestPrices();
+        assetPriceUtils.moveOneDayForward();
 
         List<Portfolio> lastPortfolio = new ArrayList<>();
         lastPortfolio =
@@ -57,7 +58,8 @@ public class DemoTask {
 
         List<Portfolio> returnList = new ArrayList<>();
         while (from.moveOneDayForward().compareTo(to) < 0) {
-            latestAssetPrice = getLatestAssetPrices(assets, from.getDateSql(), dataRepository);
+            latestAssetPrice = assetPriceUtils.getLatestPrices();
+            assetPriceUtils.moveOneDayForward();
             lastPortfolio = CoreTask.executeTask(user, lastPortfolio, activeStrategy, latestAssetPrice, assets, null);
             returnList.addAll(lastPortfolio);
         }
@@ -71,6 +73,7 @@ public class DemoTask {
         java.util.Date curDate = null;
         List<PortfolioDTO> returnAggregatedListDTO = new ArrayList<>();
 
+        // TODO remove this!!!
         for (int i = 0; i < returnListDTO.size(); i++) {
             if (returnListDTO.get(i).getDate() == curDate) {
                 if (returnListDTO.get(i).getAssetClassId() == curAssetClassID) {
@@ -91,17 +94,5 @@ public class DemoTask {
         }
 
         return returnAggregatedListDTO;
-    }
-
-    private static Map<Long, BigDecimal> getLatestAssetPrices(final Iterable<Asset> assets, final Date date, final
-    DataRepository dataRepository) {
-        // TODO make a class utility that returns this
-        // TODO make it faster
-        Map<Long, BigDecimal> latestPrices = new HashMap<>();
-        for (Asset curr : assets) {
-            Data data = dataRepository.findTop1ByDateLessThanEqualAndAssetOrderByDateDesc(date, curr);
-            latestPrices.put(data.getAsset().getId(), data.getValue());
-        }
-        return latestPrices;
     }
 }

@@ -44,7 +44,7 @@ public class DemoRESTController {
 
         List<PortfolioDTO> returnList =
                 demoTask.computeDemo(fromDate, toDate, demoDTO.getStrategy(), demoDTO.getWorth());
-        
+
         LOGGER.debug("Back-test called from date " + demoDTO.getFrom());
         return new SuccessResponse<>(returnList);
     }
