@@ -17,7 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CoreTask {
+// final class with only static methods and private constructor
+public final class CoreTask {
 
     private static final Log LOGGER = LogFactory.getLog(CoreTask.class);
 
@@ -26,12 +27,10 @@ public class CoreTask {
                                               final Map<Long, BigDecimal> assetPrice,
                                               final Iterable<Asset> assets,
                                               final BigDecimal worthToAllocate) {
-        // TODO more readable code here
-        if (lastPortfolio.isEmpty()) {
+        if (isNewUser(lastPortfolio)) {
             BigDecimal worth = worthToAllocate == null ? RoboAdviceConstant.DEFAULT_START_WORTH : worthToAllocate;
             return createPortfolio(user, assets, worth, assetPrice, activeStrategy);
-        } else if (user.getLastStrategyComputed() != null &&
-                user.getLastStrategyComputed().compareTo(activeStrategy.get(0).getStartingDate()) != 0) {
+        } else if (hasChangedStrategy(user, activeStrategy)) {
             BigDecimal dayWorth = computeWorth(lastPortfolio, assetPrice);
             return createPortfolio(user, assets, dayWorth, assetPrice, activeStrategy);
         } else {
@@ -200,6 +199,15 @@ public class CoreTask {
             currPortfolio.setValue(rebalancedValue);
         }
         return portfolio;
+    }
+
+    private static boolean isNewUser(List<Portfolio> portfolio){
+        return portfolio == null || portfolio.isEmpty();
+    }
+
+    private static boolean hasChangedStrategy(User user, List<Strategy> activeStrategy){
+        return user.getLastStrategyComputed() != null &&
+                user.getLastStrategyComputed().compareTo(activeStrategy.get(0).getStartingDate()) != 0;
     }
 
     private CoreTask() {
