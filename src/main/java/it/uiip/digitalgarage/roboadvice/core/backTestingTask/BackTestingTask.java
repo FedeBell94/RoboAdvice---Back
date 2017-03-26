@@ -1,4 +1,4 @@
-package it.uiip.digitalgarage.roboadvice.core.demoTask;
+package it.uiip.digitalgarage.roboadvice.core.backTestingTask;
 
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.PortfolioDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.StrategyDTO;
@@ -8,6 +8,8 @@ import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.DataRepository;
 import it.uiip.digitalgarage.roboadvice.utils.CustomDate;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -16,15 +18,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DemoTask {
+@Service
+public class BackTestingTask {
 
-    // TODO if needed, call here the dao, to remove all the dao(repository) from the controllers
-    public static List<PortfolioDTO> computeDemo(CustomDate from, CustomDate to, List<StrategyDTO> strategy,
-                                          BigDecimal worth, AssetRepository assetRepository,
-                                          DataRepository dataRepository, ModelMapper modelMapper) {
+    private final AssetRepository assetRepository;
+    private final DataRepository dataRepository;
+    private final ModelMapper modelMapper;
+
+    @Autowired
+    public BackTestingTask(AssetRepository assetRepository, DataRepository dataRepository, ModelMapper modelMapper){
+        this.assetRepository = assetRepository;
+        this.dataRepository = dataRepository;
+        this.modelMapper = modelMapper;
+    }
+
+    public List<PortfolioDTO> computeBackTesting(Date fromDate, List<StrategyDTO> strategy) {
+
         User user = User.builder()
-                .registration(from.getYesterdaySql())
-                .lastPortfolioComputation(from.getDateSql())
+                .registration(fromDate)
+                .lastPortfolioComputation(fromDate)
                 .build();
 
         List<Strategy> activeStrategy = new ArrayList<>(strategy.size());
@@ -32,37 +44,36 @@ public class DemoTask {
             Strategy insertStrategy = Strategy.builder()
                     .assetClass(AssetClass.builder().id(currStrategy.getAssetClassId()).build())
                     .percentage(currStrategy.getPercentage())
-                    .startingDate(from.getDateSql())
+                    .startingDate(fromDate)
                     .user(user)
                     .build();
             activeStrategy.add(insertStrategy);
         }
 
         Iterable<Asset> assets = assetRepository.findAll();
-        Map<Long, BigDecimal> latestAssetPrice = getLatestAssetPrices(assets, from.getDateSql(), dataRepository);
+        CustomDate customDate = new CustomDate(fromDate);
 
+        CustomDate today = CustomDate.getToday();
         List<Portfolio> lastPortfolio = new ArrayList<>();
-        lastPortfolio =
-                CoreTask.executeTask(user, lastPortfolio, activeStrategy, latestAssetPrice, assets, worth);
-
-        List<Portfolio> returnList = new ArrayList<>();
-        while (from.moveOneDayForward().compareTo(to) < 0) {
-            latestAssetPrice = getLatestAssetPrices(assets, from.getDateSql(), dataRepository);
+        List<Portfolio> portfolioList = new ArrayList<>();
+        while (customDate.moveOneDayForward().compareTo(today) <= 0) {
+            Map<Long, BigDecimal> latestAssetPrice = getLatestAssetPrices(assets, customDate.getDateSql());
             lastPortfolio = CoreTask.executeTask(user, lastPortfolio, activeStrategy, latestAssetPrice, assets, null);
-            returnList.addAll(lastPortfolio);
+            portfolioList.addAll(lastPortfolio);
         }
 
-        List<PortfolioDTO> returnListDTO = new ArrayList<>(returnList.size());
-        for (Portfolio p : returnList) {
+        List<PortfolioDTO> returnListDTO = new ArrayList<>(portfolioList.size());
+        for (Portfolio p : portfolioList) {
             returnListDTO.add(modelMapper.map(p, PortfolioDTO.class));
         }
 
+        // TODO remove this!!!!
         long curAssetClassID = 0;
-        java.util.Date curDate = null;
+        java.util.Date curDate = new Date(Long.MIN_VALUE);
         List<PortfolioDTO> returnAggregatedListDTO = new ArrayList<>();
 
         for (int i = 0; i < returnListDTO.size(); i++) {
-            if (returnListDTO.get(i).getDate() == curDate) {
+            if (returnListDTO.get(i).getDate().compareTo(curDate) == 0) {
                 if (returnListDTO.get(i).getAssetClassId() == curAssetClassID) {
                     returnAggregatedListDTO.get(returnAggregatedListDTO.size() - 1).setValue(
                             returnAggregatedListDTO.get(returnAggregatedListDTO.size() - 1).getValue()
@@ -83,9 +94,7 @@ public class DemoTask {
         return returnAggregatedListDTO;
     }
 
-    private static Map<Long, BigDecimal> getLatestAssetPrices(final Iterable<Asset> assets, final Date date, final
-                                                       DataRepository dataRepository) {
-        // TODO make a class utility that returns this
+    private Map<Long, BigDecimal> getLatestAssetPrices(final Iterable<Asset> assets, final Date date) {
         // TODO make it faster
         Map<Long, BigDecimal> latestPrices = new HashMap<>();
         for (Asset curr : assets) {
@@ -93,8 +102,5 @@ public class DemoTask {
             latestPrices.put(data.getAsset().getId(), data.getValue());
         }
         return latestPrices;
-    }
-
-    private DemoTask() {
     }
 }
