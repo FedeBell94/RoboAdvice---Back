@@ -1,12 +1,13 @@
 package it.uiip.digitalgarage.roboadvice.service.forecastTask;
 
-import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.AssetClassDTO;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Data;
 
+import java.math.BigDecimal;
+import java.sql.Date;
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Map;
 
 public interface IDataForecastComputation {
 
-    List<AssetClassDTO> computeForecast(Iterable<Data> data, LocalDate to);
+    Map<Date, BigDecimal> computeForecast(Iterable<Data> data, LocalDate to);
 }

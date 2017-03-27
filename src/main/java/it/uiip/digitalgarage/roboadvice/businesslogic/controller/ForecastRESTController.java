@@ -4,7 +4,6 @@ import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.PortfolioDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
 import it.uiip.digitalgarage.roboadvice.service.forecastTask.DataForecastTask;
-import it.uiip.digitalgarage.roboadvice.service.forecastTask.DumbForecastImpl;
 import it.uiip.digitalgarage.roboadvice.service.forecastTask.IDataForecastComputation;
 import it.uiip.digitalgarage.roboadvice.utils.CustomDate;
 import it.uiip.digitalgarage.roboadvice.utils.RoboAdviceConstant;
@@ -28,7 +27,7 @@ public class ForecastRESTController {
 
     private final DataForecastTask dataForecastTask;
 
-    private final IDataForecastComputation chosenComputationStrategy = new DumbForecastImpl();
+    private final IDataForecastComputation chosenComputationStrategy = null;
 
     @Autowired
     public ForecastRESTController(final DataForecastTask dataForecastTask) {
