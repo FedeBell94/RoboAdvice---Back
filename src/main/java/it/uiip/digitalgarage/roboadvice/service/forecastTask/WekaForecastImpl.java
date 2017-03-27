@@ -126,7 +126,7 @@ public class WekaForecastImpl implements IDataForecastComputation {
                 if (isDaily) {
                     result.put(customDate.getDayFromSql(i), prediction);
                 } else {
-                    result.put(customDate.getDayFromSql(i + 30), prediction);
+                    result.put(customDate.getDayFromSql(i * 30), prediction);
                 }
             }
 
