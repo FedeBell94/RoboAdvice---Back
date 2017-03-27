@@ -17,38 +17,75 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CoreTask {
+// final class with only static methods and private constructor
+
+/**
+ * This class performs the core task of the application Robo-Advice. All methods are static, and the class is declared
+ * final ini order to avoid others to extend this class and change the core behaviour. In addition to this, the default
+ * constructor of this class is private.
+ */
+public final class CoreTask {
 
     private static final Log LOGGER = LogFactory.getLog(CoreTask.class);
 
+    /**
+     * This static method execute the core behaviour of the application. If the user passed is new, a new portfolio will
+     * be created; if the user is not new and he has changed the strategy in the previous day, all the money will be
+     * reallocated in order to fit the new strategy. Finally the default case: the portfolio of the user is updated,
+     * changing the portfolio with the current asset prices, and eventually re-balancing his portfolio in order to
+     * follow the chosen strategy.
+     *
+     * @param user            The {@link User} owner of the portfolio.
+     * @param lastPortfolio   The last {@link Portfolio} computed for the user.
+     * @param activeStrategy  The active {@link Strategy} of the user.
+     * @param assetPrice      The latest asset prices.
+     * @param assets          All the {@link Asset}.
+     * @param worthToAllocate The worth to allocate in the portfolio. If null is passed, the default worth will be
+     *                        applied
+     *
+     * @return The next portfolio computed for the user.
+     */
     public static List<Portfolio> executeTask(final User user, final List<Portfolio> lastPortfolio,
                                               final List<Strategy> activeStrategy,
                                               final Map<Long, BigDecimal> assetPrice,
                                               final Iterable<Asset> assets,
                                               final BigDecimal worthToAllocate) {
-        // TODO more readable code here
-        if (lastPortfolio.isEmpty()) {
+        if (isNewUser(lastPortfolio)) {
             BigDecimal worth = worthToAllocate == null ? RoboAdviceConstant.DEFAULT_START_WORTH : worthToAllocate;
             return createPortfolio(user, assets, worth, assetPrice, activeStrategy);
-        } else if (user.getLastStrategyComputed() != null &&
-                user.getLastStrategyComputed().compareTo(activeStrategy.get(0).getStartingDate()) != 0) {
+        } else if (hasChangedStrategy(user, activeStrategy)) {
             BigDecimal dayWorth = computeWorth(lastPortfolio, assetPrice);
             return createPortfolio(user, assets, dayWorth, assetPrice, activeStrategy);
         } else {
-            List<Portfolio> computedPortfolio = updatePortfolio(lastPortfolio, assetPrice);
+            List<Portfolio> computedPortfolio = updatePortfolio(lastPortfolio, assetPrice, activeStrategy);
             if (needToReBalance(computedPortfolio, activeStrategy)) {
-                return reBalancePortfolio(computedPortfolio, activeStrategy);
+                reBalancePortfolio(computedPortfolio, assetPrice);
             }
             return computedPortfolio;
         }
     }
 
+    /**
+     * This method update the portfolio of the user. This method take the last portfolio of the user and returns a new
+     * portfolio with all the data computed to follow the new asset prices.
+     */
     private static List<Portfolio> updatePortfolio(final List<Portfolio> lastPortfolio,
-                                                   final Map<Long, BigDecimal> assetPrice) {
+                                                   final Map<Long, BigDecimal> assetPrice,
+                                                   final List<Strategy> activeStrategy) {
         Date date = new CustomDate(lastPortfolio.get(0).getDate()).moveOneDayForward().getDateSql();
         List<Portfolio> returnList = new ArrayList<>(assetPrice.size());
+        Map<Long, BigDecimal> strategyPercentage = new HashMap<>();
+        for (Strategy currStrategy : activeStrategy) {
+            strategyPercentage.put(currStrategy.getAssetClass().getId(), currStrategy.getPercentage());
+        }
+
         for (Portfolio currPortfolio : lastPortfolio) {
-            BigDecimal assetMoney = currPortfolio.getUnit().multiply(assetPrice.get(currPortfolio.getAsset().getId()));
+            BigDecimal assetMoney = currPortfolio.getUnit()
+                    .multiply(assetPrice.get(currPortfolio.getAsset().getId()))
+                    .setScale(4, BigDecimal.ROUND_HALF_UP);
+            BigDecimal globalInfluence = currPortfolio.getAsset().getFixedPercentage()
+                    .multiply(strategyPercentage.get(currPortfolio.getAssetClass().getId()))
+                    .divide(new BigDecimal(10000), 4, BigDecimal.ROUND_HALF_UP);
             returnList.add(Portfolio.builder()
                     .user(currPortfolio.getUser())
                     .assetClass(currPortfolio.getAssetClass())
@@ -56,11 +93,15 @@ public class CoreTask {
                     .unit(currPortfolio.getUnit())
                     .value(assetMoney)
                     .date(date)
+                    .globalInfluence(globalInfluence)
                     .build());
         }
         return returnList;
     }
 
+    /**
+     * This method return a new portfolio created for the user, with the worth passed as argument.
+     */
     private static List<Portfolio> createPortfolio(final User user, final Iterable<Asset> assets,
                                                    final BigDecimal worth,
                                                    final Map<Long, BigDecimal> assetPrice,
@@ -72,7 +113,9 @@ public class CoreTask {
                 if (currAsset.getAssetClass().getId().equals(currStrategy.getAssetClass().getId())) {
 
                     BigDecimal assetMoney = worth.multiply(currStrategy.getPercentage())
-                            .multiply(currAsset.getFixedPercentage()).divide(new BigDecimal(10000), 4);
+                            .multiply(currAsset.getFixedPercentage())
+                            .setScale(4, BigDecimal.ROUND_HALF_UP)
+                            .divide(new BigDecimal(10000), 4, BigDecimal.ROUND_HALF_UP);
 
                     BigDecimal latestAssetPrice = assetPrice.get(currAsset.getId());
                     BigDecimal assetUnits = assetMoney.divide(latestAssetPrice, 4, RoundingMode.HALF_UP);
@@ -91,6 +134,9 @@ public class CoreTask {
         return insertList;
     }
 
+    /**
+     * This method compute the worth of the portfolio with the prices of the asset passed.
+     */
     private static BigDecimal computeWorth(final List<Portfolio> portfolios, final Map<Long, BigDecimal> assetPrice) {
         BigDecimal worth = new BigDecimal(0);
         for (Portfolio currPortfolio : portfolios) {
@@ -101,106 +147,79 @@ public class CoreTask {
         return worth;
     }
 
-    // TODO remove this suppress warning
-    @SuppressWarnings("Duplicates")
+    /**
+     * This method checks if the passed portfolio needs to be rebalanced to follow the passed strategy. The percentage
+     * boundaries to determine if is needed to re-balance or not is defined in the {@link RoboAdviceConstant} class.
+     */
     private static boolean needToReBalance(List<Portfolio> portfolio, List<Strategy> strategy) {
+        BigDecimal totalWorth = BigDecimal.ZERO;
         Map<Long, BigDecimal> assetClassWorth = new HashMap<>();
-        BigDecimal total = BigDecimal.ZERO;
         for (Portfolio currPortfolio : portfolio) {
+            totalWorth = totalWorth.add(currPortfolio.getValue());
             Long currAssetClassId = currPortfolio.getAssetClass().getId();
-            BigDecimal worth = assetClassWorth.get(currAssetClassId);
-            if (worth == null) {
+            BigDecimal currWorth = assetClassWorth.get(currAssetClassId);
+            if (currWorth == null) {
                 assetClassWorth.put(currAssetClassId, currPortfolio.getValue());
             } else {
-                assetClassWorth.put(currAssetClassId, worth.add(currPortfolio.getValue()));
+                currWorth = currWorth.add(currPortfolio.getValue());
+                assetClassWorth.put(currAssetClassId, currWorth);
             }
-            total = total.add(currPortfolio.getValue());
         }
 
-        for (Map.Entry currAssetClass : assetClassWorth.entrySet()) {
-            BigDecimal assetClassPercentage = ((BigDecimal) currAssetClass.getValue())
-                    .divide(total, BigDecimal.ROUND_HALF_UP)
-                    .multiply(BigDecimal.valueOf(100))
-                    .setScale(4, BigDecimal.ROUND_HALF_UP);
-            Strategy currStrategy = null;
-            for (Strategy s : strategy) {
-                if (s.getAssetClass().getId() == currAssetClass.getKey()) {
-                    currStrategy = s;
-                    break;
-                }
-            }
-            BigDecimal strategyPercentage = currStrategy.getPercentage();
-
-            if (assetClassPercentage.subtract(strategyPercentage).abs()
-                    .compareTo(RoboAdviceConstant.RE_BALANCING_BOUNDARIES) > 0) {
-                LOGGER.debug("Re-balancing portfolio on date " + portfolio.get(0).getDate() +
-                        " needed (asset class percentage: " + assetClassPercentage +
-                        ", expected strategy percentage: " + strategyPercentage + " on asset class id " +
-                        currAssetClass.getKey());
+        for (Strategy currStrategy : strategy) {
+            BigDecimal actualPercentage = assetClassWorth.get(currStrategy.getAssetClass().getId())
+                    .divide(totalWorth, 4, BigDecimal.ROUND_HALF_UP);
+            BigDecimal strategyPercentage = currStrategy.getPercentage()
+                    .divide(BigDecimal.valueOf(100), 4, BigDecimal.ROUND_HALF_UP);
+            BigDecimal percentageDifference = actualPercentage
+                    .subtract(strategyPercentage)
+                    .abs();
+            if (percentageDifference.compareTo(RoboAdviceConstant.RE_BALANCING_BOUNDARIES) > 0) {
+                LOGGER.debug("Current portfolio needs to be rebalanced on " + portfolio.get(0).getDate());
                 return true;
             }
         }
         return false;
     }
-    
-    @SuppressWarnings("Duplicates")
-    private static List<Portfolio> reBalancePortfolio(List<Portfolio> portfolio, List<Strategy> strategy) {
-        Map<Long, BigDecimal> assetClassWorth = new HashMap<>();
-        BigDecimal total = BigDecimal.ZERO;
+
+    /**
+     * Compute the re-balance algorithm. This method modifies directly the portfolio passed as input!!!
+     */
+    private static void reBalancePortfolio(List<Portfolio> portfolio, Map<Long, BigDecimal> assetPrice) {
+        BigDecimal totalWorth = BigDecimal.ZERO;
         for (Portfolio currPortfolio : portfolio) {
-            Long currAssetClassId = currPortfolio.getAssetClass().getId();
-            BigDecimal worth = assetClassWorth.get(currAssetClassId);
-            if (worth == null) {
-                assetClassWorth.put(currAssetClassId, currPortfolio.getValue());
-            } else {
-                assetClassWorth.put(currAssetClassId, worth.add(currPortfolio.getValue()));
-            }
-            total = total.add(currPortfolio.getValue());
-        }
-
-        // Calculate the percentage to remove/add for each asset class
-        Map<Long, BigDecimal> assetClassPercentage = new HashMap<>();
-        for (Map.Entry currAssetClass : assetClassWorth.entrySet()) {
-            BigDecimal assetClassTotal = (BigDecimal) currAssetClass.getValue();
-            BigDecimal globalPercentage = assetClassTotal
-                    .divide(total, BigDecimal.ROUND_HALF_UP)
-                    .multiply(BigDecimal.valueOf(100));
-            Long currAssetClassId = (Long) currAssetClass.getKey();
-            Strategy currStrategy = null;
-            for (Strategy s : strategy) {
-                if (s.getAssetClass().getId().compareTo(currAssetClassId) == 0) {
-                    currStrategy = s;
-                    break;
-                }
-            }
-            BigDecimal strategyPercentage = currStrategy.getPercentage();
-
-            BigDecimal percentageDifference = globalPercentage.subtract(strategyPercentage)
-                    .divide(BigDecimal.valueOf(100), BigDecimal.ROUND_HALF_UP);
-
-            BigDecimal localPercentage = total
-                    .multiply(percentageDifference)
-                    .divide(assetClassTotal, BigDecimal.ROUND_HALF_UP)
-                    .setScale(8, BigDecimal.ROUND_HALF_UP);
-
-            assetClassPercentage.put(currAssetClassId, localPercentage);
+            totalWorth = totalWorth.add(currPortfolio.getValue());
         }
 
         for (Portfolio currPortfolio : portfolio) {
-            BigDecimal localPercentage = assetClassPercentage.get(currPortfolio.getAssetClass().getId());
-            BigDecimal rebalancedUnits = currPortfolio.getUnit()
-                    .add(currPortfolio.getUnit().multiply(localPercentage.negate()))
-                    .setScale(4, BigDecimal.ROUND_HALF_UP);
-            BigDecimal rebalancedValue = currPortfolio.getValue()
-                    .add(currPortfolio.getValue().multiply(localPercentage.negate()))
-                    .setScale(4, BigDecimal.ROUND_HALF_UP);
-
-            currPortfolio.setUnit(rebalancedUnits);
-            currPortfolio.setValue(rebalancedValue);
+            BigDecimal newWorth = totalWorth
+                    .multiply(currPortfolio.getGlobalInfluence());
+            BigDecimal currAssetPrice = assetPrice.get(currPortfolio.getAsset().getId());
+            BigDecimal newUnits = newWorth
+                    .divide(currAssetPrice, 4, BigDecimal.ROUND_HALF_UP);
+            currPortfolio.setValue(newWorth);
+            currPortfolio.setUnit(newUnits);
         }
-        return portfolio;
     }
 
+    /**
+     * Check if the user is new (the user doesn't have a portfolio yet).
+     */
+    private static boolean isNewUser(List<Portfolio> portfolio) {
+        return portfolio == null || portfolio.isEmpty();
+    }
+
+    /**
+     * Check if the user has changed the strategy yesterday.
+     */
+    private static boolean hasChangedStrategy(User user, List<Strategy> activeStrategy) {
+        return user.getLastStrategyComputed() != null &&
+                user.getLastStrategyComputed().compareTo(activeStrategy.get(0).getStartingDate()) != 0;
+    }
+
+    /**
+     * The constructor of this class is private in order to make not possible to instantiate this utility class.
+     */
     private CoreTask() {
     }
 }

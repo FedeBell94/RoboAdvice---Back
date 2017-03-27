@@ -2,9 +2,8 @@ package it.uiip.digitalgarage.roboadvice.test.unitTests;
 
 import it.uiip.digitalgarage.roboadvice.businesslogic.controller.PortfolioRESTController;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.PortfolioDTO;
+import it.uiip.digitalgarage.roboadvice.core.backTestingTask.BackTestingTask;
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
-import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
-import it.uiip.digitalgarage.roboadvice.persistence.repository.DataRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.PortfolioRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
 import it.uiip.digitalgarage.roboadvice.utils.CustomDate;
@@ -15,7 +14,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.modelmapper.ModelMapper;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.Authentication;
 import org.springframework.test.context.ContextConfiguration;
@@ -54,13 +52,7 @@ public class PortfolioRESTControllerTests {
     private Authentication authentication;
 
     @Mock
-    private DataRepository dataRepository;
-
-    @Mock
-    private AssetRepository assetRepository;
-
-    @Mock
-    private ModelMapper modelMapper;
+    private BackTestingTask backTestingTask;
 
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
@@ -73,8 +65,7 @@ public class PortfolioRESTControllerTests {
     public void before() {
 
         portfolioRESTController =
-                new PortfolioRESTController(userRepository, portfolioRepository, dataRepository, assetRepository,
-                        modelMapper);
+                new PortfolioRESTController(userRepository, portfolioRepository, backTestingTask);
 
         customDate = CustomDate.getToday();
 

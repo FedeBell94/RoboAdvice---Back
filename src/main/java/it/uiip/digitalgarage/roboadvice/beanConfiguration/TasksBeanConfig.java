@@ -1,11 +1,11 @@
 package it.uiip.digitalgarage.roboadvice.beanConfiguration;
 
-import it.uiip.digitalgarage.roboadvice.core.INightlyTask;
-import it.uiip.digitalgarage.roboadvice.core.NightlyTask;
 import it.uiip.digitalgarage.roboadvice.core.dataUpdater.DataUpdater;
 import it.uiip.digitalgarage.roboadvice.core.dataUpdater.IDataSource;
 import it.uiip.digitalgarage.roboadvice.core.dataUpdater.IDataUpdater;
 import it.uiip.digitalgarage.roboadvice.core.dataUpdater.quandl.QuandlDataSource;
+import it.uiip.digitalgarage.roboadvice.core.nightlyTask.INightlyTask;
+import it.uiip.digitalgarage.roboadvice.core.nightlyTask.NightlyTask;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,7 +13,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
 @EnableJpaRepositories("it.uiip.digitalgarage.roboadvice.persistence.repository")
-public class NightlyTaskBeanConfig {
+public class TasksBeanConfig {
 
     @Bean
     public IDataSource dataSource() {

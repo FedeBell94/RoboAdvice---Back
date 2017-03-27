@@ -43,4 +43,7 @@ public class Portfolio implements Serializable{
     @Column(name = "date", nullable = false)
     private Date date;
 
+    @Transient
+    private BigDecimal globalInfluence;
+
 }

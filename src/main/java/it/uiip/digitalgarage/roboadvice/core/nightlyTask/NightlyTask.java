@@ -1,5 +1,6 @@
-package it.uiip.digitalgarage.roboadvice.core;
+package it.uiip.digitalgarage.roboadvice.core.nightlyTask;
 
+import it.uiip.digitalgarage.roboadvice.core.CoreTask;
 import it.uiip.digitalgarage.roboadvice.core.dataUpdater.IDataUpdater;
 import it.uiip.digitalgarage.roboadvice.persistence.model.*;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.*;

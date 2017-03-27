@@ -1,7 +1,7 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
 import it.uiip.digitalgarage.roboadvice.businesslogic.exception.BadRequestException;
-import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.AssetClassHistoryDTO;
+import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.AssetClassDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
@@ -71,7 +71,7 @@ public class AssetClassRESTController {
      *                     required.
      * @param to           Optional - The date in format yyyy-MM-dd to when the history of the asset class is required.
      *
-     * @return An {@link AbstractResponse} containing a list of {@link AssetClassHistoryDTO} objects required.
+     * @return An {@link AbstractResponse} containing a list of {@link AssetClassDTO} objects required.
      *
      * @throws BadRequestException Exception thrown in cas date 'from' is after date 'to'.
      */
@@ -161,11 +161,11 @@ public class AssetClassRESTController {
 
 
         // Mapping the compute data in DTO object
-        List<AssetClassHistoryDTO> returnData = new ArrayList<>(computedData.size());
+        List<AssetClassDTO> returnData = new ArrayList<>(computedData.size());
         SortedSet<LocalDate> keys = new TreeSet<>(computedData.keySet());
         for (LocalDate key : keys) {
             BigDecimal value = computedData.get(key);
-            returnData.add(AssetClassHistoryDTO.builder()
+            returnData.add(AssetClassDTO.builder()
                     .date(Date.valueOf(key))
                     .value(value).build());
         }
