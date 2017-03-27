@@ -6,7 +6,7 @@ import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.StrategyDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.ErrorResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
-import it.uiip.digitalgarage.roboadvice.core.backTestingTask.BackTestingTask;
+import it.uiip.digitalgarage.roboadvice.service.backTestingTask.BackTestingTask;
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.PortfolioRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;

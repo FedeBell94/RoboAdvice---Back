@@ -1,10 +1,10 @@
-package it.uiip.digitalgarage.roboadvice.core.demoTask;
+package it.uiip.digitalgarage.roboadvice.service.demoTask;
 
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.PortfolioDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.StrategyDTO;
-import it.uiip.digitalgarage.roboadvice.core.CoreTask;
-import it.uiip.digitalgarage.roboadvice.core.backTestingTask.AssetPriceUtils;
-import it.uiip.digitalgarage.roboadvice.core.backTestingTask.PortfolioConversionUtil;
+import it.uiip.digitalgarage.roboadvice.service.CoreTask;
+import it.uiip.digitalgarage.roboadvice.service.backTestingTask.AssetPriceUtils;
+import it.uiip.digitalgarage.roboadvice.service.backTestingTask.PortfolioConversionUtil;
 import it.uiip.digitalgarage.roboadvice.persistence.model.*;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.DataRepository;

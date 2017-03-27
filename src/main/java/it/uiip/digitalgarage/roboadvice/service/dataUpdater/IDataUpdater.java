@@ -1,4 +1,4 @@
-package it.uiip.digitalgarage.roboadvice.core.dataUpdater;
+package it.uiip.digitalgarage.roboadvice.service.dataUpdater;
 
 /**
  * Download and update the prices for the assets.

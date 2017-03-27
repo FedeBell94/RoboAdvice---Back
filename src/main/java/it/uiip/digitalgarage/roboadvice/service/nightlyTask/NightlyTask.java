@@ -1,7 +1,7 @@
-package it.uiip.digitalgarage.roboadvice.core.nightlyTask;
+package it.uiip.digitalgarage.roboadvice.service.nightlyTask;
 
-import it.uiip.digitalgarage.roboadvice.core.CoreTask;
-import it.uiip.digitalgarage.roboadvice.core.dataUpdater.IDataUpdater;
+import it.uiip.digitalgarage.roboadvice.service.CoreTask;
+import it.uiip.digitalgarage.roboadvice.service.dataUpdater.IDataUpdater;
 import it.uiip.digitalgarage.roboadvice.persistence.model.*;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.*;
 import it.uiip.digitalgarage.roboadvice.utils.CustomDate;

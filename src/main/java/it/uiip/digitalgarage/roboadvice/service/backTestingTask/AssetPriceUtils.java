@@ -1,4 +1,4 @@
-package it.uiip.digitalgarage.roboadvice.core.backTestingTask;
+package it.uiip.digitalgarage.roboadvice.service.backTestingTask;
 
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Data;

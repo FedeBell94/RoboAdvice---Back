@@ -1,4 +1,4 @@
-package it.uiip.digitalgarage.roboadvice.core.dataUpdater;
+package it.uiip.digitalgarage.roboadvice.service.dataUpdater;
 
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Data;

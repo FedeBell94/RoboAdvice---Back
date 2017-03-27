@@ -1,4 +1,4 @@
-package it.uiip.digitalgarage.roboadvice.core;
+package it.uiip.digitalgarage.roboadvice.service;
 
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Portfolio;
@@ -16,8 +16,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-// final class with only static methods and private constructor
 
 /**
  * This class performs the core task of the application Robo-Advice. All methods are static, and the class is declared
@@ -41,7 +39,7 @@ public final class CoreTask {
      * @param assetPrice      The latest asset prices.
      * @param assets          All the {@link Asset}.
      * @param worthToAllocate The worth to allocate in the portfolio. If null is passed, the default worth will be
-     *                        applied
+     *                        applied in case of creation of new strategy.
      *
      * @return The next portfolio computed for the user.
      */

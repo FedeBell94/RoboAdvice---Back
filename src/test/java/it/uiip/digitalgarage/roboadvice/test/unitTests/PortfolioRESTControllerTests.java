@@ -2,7 +2,7 @@ package it.uiip.digitalgarage.roboadvice.test.unitTests;
 
 import it.uiip.digitalgarage.roboadvice.businesslogic.controller.PortfolioRESTController;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.PortfolioDTO;
-import it.uiip.digitalgarage.roboadvice.core.backTestingTask.BackTestingTask;
+import it.uiip.digitalgarage.roboadvice.service.backTestingTask.BackTestingTask;
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.PortfolioRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;

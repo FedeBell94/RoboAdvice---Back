@@ -1,10 +1,10 @@
-package it.uiip.digitalgarage.roboadvice.core.dataUpdater.quandl;
+package it.uiip.digitalgarage.roboadvice.service.dataUpdater.quandl;
 
 import com.jimmoores.quandl.DataSetRequest;
 import com.jimmoores.quandl.QuandlSession;
 import com.jimmoores.quandl.Row;
 import com.jimmoores.quandl.TabularResult;
-import it.uiip.digitalgarage.roboadvice.core.dataUpdater.IDataSource;
+import it.uiip.digitalgarage.roboadvice.service.dataUpdater.IDataSource;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Data;
 import it.uiip.digitalgarage.roboadvice.utils.CustomDate;
