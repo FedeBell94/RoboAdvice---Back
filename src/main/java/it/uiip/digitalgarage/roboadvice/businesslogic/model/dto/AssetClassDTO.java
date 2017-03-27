@@ -11,4 +11,5 @@ public class AssetClassDTO {
     private Date date;
 
     private BigDecimal value;
+
 }

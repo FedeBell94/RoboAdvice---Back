@@ -35,7 +35,7 @@ public class AssetPriceUtils {
             currentPrices.put(data.getAsset().getId(), data.getValue());
         }
 
-        if(inputDataMap == null){
+        if(inputDataMap != null){
             this.dataMap = inputDataMap;
         } else {
             dataMap = new HashMap<>();

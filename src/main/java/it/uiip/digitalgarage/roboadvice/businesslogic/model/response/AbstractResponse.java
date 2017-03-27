@@ -2,6 +2,9 @@ package it.uiip.digitalgarage.roboadvice.businesslogic.model.response;
 
 import lombok.Getter;
 
+/**
+ * This is the default structure of the response given to the frontend.
+ */
 @Getter
 public abstract class AbstractResponse<T> {
 

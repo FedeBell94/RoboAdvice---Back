@@ -87,8 +87,7 @@ public class DataForecastTask {
         Iterable<Asset> assets = assetRepository.findAll();
 
         List<Strategy> activeStrategy = strategyRepository.findByUserAndActiveTrue(user);
-        List<Portfolio> lastPortfolio =
-                portfolioRepository.findByUserAndDate(user, user.getLastPortfolioComputation());
+        List<Portfolio> lastPortfolio = portfolioRepository.findByUserAndDate(user, user.getLastPortfolioComputation());
 
         AssetPriceUtils assetPriceUtils =
                 new AssetPriceUtils(customDate.getDayFromSql(1), assets, dataRepository, computedForecast);

@@ -1,16 +1,17 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
+import it.uiip.digitalgarage.roboadvice.businesslogic.exception.BadRequestException;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.BackTestingDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.PortfolioDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.StrategyDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
-import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.ErrorResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
-import it.uiip.digitalgarage.roboadvice.service.backTestingTask.BackTestingTask;
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.PortfolioRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
+import it.uiip.digitalgarage.roboadvice.service.backTestingTask.BackTestingTask;
 import it.uiip.digitalgarage.roboadvice.utils.CustomDate;
+import it.uiip.digitalgarage.roboadvice.utils.RoboAdviceConstant;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,9 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Class used to create all the API rest used to manage the Portfolio.
+ */
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping(value = "securedApi")
@@ -66,11 +70,23 @@ public class PortfolioRESTController {
         return new SuccessResponse<>(portfolio);
     }
 
+    /**
+     * Compute the backTesting task - returns a list of portfolio as the user was registered many years ago.
+     *
+     * @param backtestingDTO The {@link BackTestingDTO} containing the strategy and the from date.
+     *
+     * @return The list of {@link PortfolioDTO} required.
+     *
+     * @throws BadRequestException If the strategy is not passed correctly.
+     */
     @RequestMapping(value = "/backTesting", method = RequestMethod.POST)
-    public AbstractResponse backTesting(@RequestBody BackTestingDTO backtestingDTO) {
-
-        if (backtestingDTO.getStrategy() == null) {
-            return new ErrorResponse("Missing parameter: STRATEGY.");
+    public AbstractResponse backTesting(@RequestBody BackTestingDTO backtestingDTO) throws BadRequestException {
+        if (backtestingDTO == null || backtestingDTO.getStrategy() == null) {
+            throw new BadRequestException("Bad request - parameter required: strategy.");
+        }
+        if (RoboAdviceConstant.STARTING_DATA.compareTo(backtestingDTO.getFrom()) > 0) {
+            throw new BadRequestException(
+                    "Bad request - invalid data: you could not go before " + RoboAdviceConstant.STARTING_DATA);
         }
 
         Date fromDate = backtestingDTO.getFrom() == null ? CustomDate.getToday().getDayFromSql(-500) :

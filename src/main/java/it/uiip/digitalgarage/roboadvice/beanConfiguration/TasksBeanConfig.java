@@ -13,6 +13,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+/**
+ * Configuration of the services/tasks of this project.
+ */
 @Configuration
 @EnableJpaRepositories("it.uiip.digitalgarage.roboadvice.persistence.repository")
 public class TasksBeanConfig {
@@ -40,6 +43,7 @@ public class TasksBeanConfig {
     public IDataForecastComputation dataForecastComputation() {
 
         return new WekaForecastImpl();
+        //return new DumbForecastImpl();
     }
 
 }

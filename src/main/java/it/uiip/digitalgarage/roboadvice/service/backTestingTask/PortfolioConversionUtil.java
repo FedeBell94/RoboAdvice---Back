@@ -16,7 +16,7 @@ public class PortfolioConversionUtil {
 
     /**
      * This method convert from {@link List} of {@link Portfolio} (13 rows for each portfolio) to {@link List} of {@link
-     * PortfolioDTO} (4 rows for each). <br/>
+     * PortfolioDTO} (4 rows for each).
      * THIS METHOD WORKS ONLY FOR A SINGLE PORTFOLIO!!! DO NOT PASS A LIST OF
      * PORTFOLIO AS INPUT CONTAINING THE PORTFOLIOS FOR DIFFERENT DAYS, IT WON'T WORK.
      *

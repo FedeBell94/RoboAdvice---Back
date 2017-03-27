@@ -7,16 +7,20 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
+/**
+ * Configuration of the SpringSecurity entities.
+ */
 @Configuration
 public class SpringSecurityBeanConfig {
 
     @Bean
-    public AuthenticationEntryPoint authenticationEntryPoint(){
+    public AuthenticationEntryPoint authenticationEntryPoint() {
         return new AuthEntryPoint();
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider(){
+    public AuthenticationProvider authenticationProvider() {
         return new AuthProvider();
     }
+
 }

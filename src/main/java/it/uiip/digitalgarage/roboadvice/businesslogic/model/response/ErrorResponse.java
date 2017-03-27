@@ -7,7 +7,7 @@ public class ErrorResponse extends AbstractResponse<String> {
 	}
 
 	public ErrorResponse(String s){
-		super(0, ExchangeError.DEFAULT_ERROR_CODE, s);
+		super(0, ExchangeError.BAD_REQUEST_ERROR, s);
 	}
 
 }

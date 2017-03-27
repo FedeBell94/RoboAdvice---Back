@@ -4,7 +4,6 @@ package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 import it.uiip.digitalgarage.roboadvice.businesslogic.exception.BadRequestException;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.StrategyDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
-import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.ErrorResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
 import it.uiip.digitalgarage.roboadvice.persistence.model.AssetClass;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Strategy;
@@ -57,6 +56,7 @@ public class StrategyRESTController {
      * Retrieve the last active strategy for the caller {@link User}.
      *
      * @param authentication Represents the authentication token of an authenticated request.
+     *
      * @return The last active {@link StrategyDTO} for the user, null in case the user has not a strategy set.
      */
     @RequestMapping(value = "/strategy", method = RequestMethod.GET)
@@ -78,15 +78,16 @@ public class StrategyRESTController {
      *
      * @param strategyInput  The new strategy to insert into the database.
      * @param authentication Represents the authentication token of an authenticated request.
+     *
      * @return An empty {@link SuccessResponse}.
+     *
      * @throws BadRequestException In case the total percentage of the strategy is different from 100%
      */
     @RequestMapping(value = "/strategy", method = RequestMethod.POST)
     public AbstractResponse updateStrategy(Authentication authentication,
                                            @RequestBody List<StrategyDTO> strategyInput) throws BadRequestException {
-
         if (strategyInput == null) {
-            return new ErrorResponse("Missing parameter: strategyInput.");
+            throw new BadRequestException("Bad request - missing parameter strategy.");
         }
 
         // Checking if the total percentage of the strategy is 100%
