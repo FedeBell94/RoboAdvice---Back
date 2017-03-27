@@ -120,6 +120,9 @@ public class WekaForecastImpl implements IDataForecastComputation {
                 // for (int j = 0; j < 2; j++) {
                 NumericPrediction predForTarget = predsAtStep.get(0);
                 BigDecimal prediction = BigDecimal.valueOf(predForTarget.predicted());
+                if (prediction.compareTo(BigDecimal.ZERO) <= 0){
+                    prediction = new BigDecimal("0.01");
+                }
 //                System.out.print("" + predForTarget.predicted() + " ");
                 // }
 //                System.out.println();
