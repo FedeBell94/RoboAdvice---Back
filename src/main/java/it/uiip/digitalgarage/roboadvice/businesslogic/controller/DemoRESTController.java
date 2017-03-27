@@ -7,6 +7,7 @@ import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractRes
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
 import it.uiip.digitalgarage.roboadvice.service.demoTask.DemoTask;
 import it.uiip.digitalgarage.roboadvice.utils.CustomDate;
+import it.uiip.digitalgarage.roboadvice.utils.RoboAdviceConstant;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,10 @@ public class DemoRESTController {
         if (demoDTO == null || demoDTO.getFrom() == null || demoDTO.getStrategy() == null ||
                 demoDTO.getWorth() == null) {
             throw new BadRequestException("Bad request - parameters needed: from, strategy, worth.");
+        }
+        if (RoboAdviceConstant.STARTING_DATA.compareTo(demoDTO.getFrom()) > 0) {
+            throw new BadRequestException(
+                    "Bad request - invalid data: you could not go before " + RoboAdviceConstant.STARTING_DATA);
         }
 
         if (demoDTO.getTo() == null) {

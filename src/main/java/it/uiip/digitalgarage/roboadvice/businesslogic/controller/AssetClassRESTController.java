@@ -11,6 +11,7 @@ import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetClassReposit
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.DataRepository;
 import it.uiip.digitalgarage.roboadvice.utils.CustomDate;
+import it.uiip.digitalgarage.roboadvice.utils.RoboAdviceConstant;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,6 +83,10 @@ public class AssetClassRESTController {
                                                  @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate to)
             throws BadRequestException {
         if (from != null) {
+            if (RoboAdviceConstant.STARTING_DATA.compareTo(from) > 0) {
+                throw new BadRequestException(
+                        "Bad request - invalid data: you could not go before " + RoboAdviceConstant.STARTING_DATA);
+            }
             if (CustomDate.getToday().compareTo(from) <= 0) {
                 throw new BadRequestException("Bad request - Date from must be before today.");
             }

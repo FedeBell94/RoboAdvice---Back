@@ -11,6 +11,7 @@ import it.uiip.digitalgarage.roboadvice.persistence.repository.PortfolioReposito
 import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
 import it.uiip.digitalgarage.roboadvice.service.backTestingTask.BackTestingTask;
 import it.uiip.digitalgarage.roboadvice.utils.CustomDate;
+import it.uiip.digitalgarage.roboadvice.utils.RoboAdviceConstant;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,6 +83,10 @@ public class PortfolioRESTController {
     public AbstractResponse backTesting(@RequestBody BackTestingDTO backtestingDTO) throws BadRequestException {
         if (backtestingDTO == null || backtestingDTO.getStrategy() == null) {
             throw new BadRequestException("Bad request - parameter required: strategy.");
+        }
+        if (RoboAdviceConstant.STARTING_DATA.compareTo(backtestingDTO.getFrom()) > 0) {
+            throw new BadRequestException(
+                    "Bad request - invalid data: you could not go before " + RoboAdviceConstant.STARTING_DATA);
         }
 
         Date fromDate = backtestingDTO.getFrom() == null ? CustomDate.getToday().getDayFromSql(-500) :
