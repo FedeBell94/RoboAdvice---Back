@@ -67,4 +67,9 @@ public class DataUpdater implements IDataUpdater {
         }
         dataRepository.save(dataList);
     }
+
+    @Override
+    public CustomDate getLastComputationData(){
+        return this.lastDataUpdate == null ? RoboAdviceConstant.STARTING_DATA : lastDataUpdate;
+    }
 }

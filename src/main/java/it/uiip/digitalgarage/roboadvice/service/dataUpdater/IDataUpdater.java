@@ -1,5 +1,7 @@
 package it.uiip.digitalgarage.roboadvice.service.dataUpdater;
 
+import it.uiip.digitalgarage.roboadvice.utils.CustomDate;
+
 /**
  * Download and update the prices for the assets.
  */
@@ -12,6 +14,14 @@ public interface IDataUpdater {
      *                             and the update of the data fails.
      */
     void updateAssetData() throws DataUpdateException;
+
+
+    /**
+     * This method returns the date of the last computation of the data.
+     *
+     * @return The date of the last computation of the data.
+     */
+    CustomDate getLastComputationData();
 
     /**
      * Exception thrown when the update of the data fails.
