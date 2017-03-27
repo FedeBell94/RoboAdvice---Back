@@ -1,4 +1,4 @@
-package it.uiip.digitalgarage.roboadvice.core.forecastTask;
+package it.uiip.digitalgarage.roboadvice.service.forecastTask;
 
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.AssetClassDTO;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Data;

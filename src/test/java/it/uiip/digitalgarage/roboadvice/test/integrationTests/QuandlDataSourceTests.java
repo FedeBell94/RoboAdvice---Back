@@ -1,8 +1,8 @@
 package it.uiip.digitalgarage.roboadvice.test.integrationTests;
 
 import it.uiip.digitalgarage.roboadvice.Application;
-import it.uiip.digitalgarage.roboadvice.core.dataUpdater.IDataSource;
-import it.uiip.digitalgarage.roboadvice.core.dataUpdater.quandl.QuandlDataSource;
+import it.uiip.digitalgarage.roboadvice.service.dataUpdater.IDataSource;
+import it.uiip.digitalgarage.roboadvice.service.dataUpdater.quandl.QuandlDataSource;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Data;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;

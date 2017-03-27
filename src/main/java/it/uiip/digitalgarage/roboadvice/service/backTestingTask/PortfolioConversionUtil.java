@@ -1,4 +1,4 @@
-package it.uiip.digitalgarage.roboadvice.core.backTestingTask;
+package it.uiip.digitalgarage.roboadvice.service.backTestingTask;
 
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.PortfolioDTO;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Portfolio;

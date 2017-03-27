@@ -1,4 +1,4 @@
-package it.uiip.digitalgarage.roboadvice.core.nightlyTask;
+package it.uiip.digitalgarage.roboadvice.service.nightlyTask;
 
 public interface INightlyTask {
 

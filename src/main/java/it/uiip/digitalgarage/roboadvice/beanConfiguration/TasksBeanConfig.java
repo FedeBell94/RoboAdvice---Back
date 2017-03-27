@@ -1,11 +1,11 @@
 package it.uiip.digitalgarage.roboadvice.beanConfiguration;
 
-import it.uiip.digitalgarage.roboadvice.core.dataUpdater.DataUpdater;
-import it.uiip.digitalgarage.roboadvice.core.dataUpdater.IDataSource;
-import it.uiip.digitalgarage.roboadvice.core.dataUpdater.IDataUpdater;
-import it.uiip.digitalgarage.roboadvice.core.dataUpdater.quandl.QuandlDataSource;
-import it.uiip.digitalgarage.roboadvice.core.nightlyTask.INightlyTask;
-import it.uiip.digitalgarage.roboadvice.core.nightlyTask.NightlyTask;
+import it.uiip.digitalgarage.roboadvice.service.dataUpdater.DataUpdater;
+import it.uiip.digitalgarage.roboadvice.service.dataUpdater.IDataSource;
+import it.uiip.digitalgarage.roboadvice.service.dataUpdater.IDataUpdater;
+import it.uiip.digitalgarage.roboadvice.service.dataUpdater.quandl.QuandlDataSource;
+import it.uiip.digitalgarage.roboadvice.service.nightlyTask.INightlyTask;
+import it.uiip.digitalgarage.roboadvice.service.nightlyTask.NightlyTask;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
