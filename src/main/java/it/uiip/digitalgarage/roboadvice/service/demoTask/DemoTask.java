@@ -49,7 +49,7 @@ public class DemoTask {
         }
 
         Iterable<Asset> assets = assetRepository.findAll();
-        AssetPriceUtils assetPriceUtils = new AssetPriceUtils(from.getDateSql(), assets, dataRepository);
+        AssetPriceUtils assetPriceUtils = new AssetPriceUtils(from.getDateSql(), assets, dataRepository, null);
         Map<Long, BigDecimal> latestAssetPrice = assetPriceUtils.getLatestPrices();
         assetPriceUtils.moveOneDayForward();
 

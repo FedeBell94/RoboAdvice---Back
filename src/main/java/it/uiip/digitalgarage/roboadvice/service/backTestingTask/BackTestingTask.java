@@ -31,6 +31,7 @@ public class BackTestingTask {
         this.portfolioConversion = portfolioConversion;
     }
 
+    @SuppressWarnings("Duplicates")
     public List<PortfolioDTO> computeBackTesting(Date fromDate, List<StrategyDTO> strategy) {
 
         User user = User.builder()
@@ -55,7 +56,8 @@ public class BackTestingTask {
         CustomDate today = CustomDate.getToday();
         List<Portfolio> lastPortfolio = new ArrayList<>();
         List<PortfolioDTO> returnPortfolio = new ArrayList<>();
-        AssetPriceUtils assetPriceUtils = new AssetPriceUtils(customDate.getDayFromSql(1), assets, dataRepository);
+        AssetPriceUtils assetPriceUtils =
+                new AssetPriceUtils(customDate.getDayFromSql(1), assets, dataRepository, null);
         while (customDate.moveOneDayForward().compareTo(today) <= 0) {
             Map<Long, BigDecimal> latestAssetPrice = assetPriceUtils.getLatestPrices();
             assetPriceUtils.moveOneDayForward();

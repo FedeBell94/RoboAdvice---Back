@@ -68,9 +68,8 @@ public class NightlyTask implements INightlyTask {
 
             List<Strategy> activeStrategy = strategyRepository.findByUserAndActiveTrue(currUser);
 
-            savePortfolioList
-                    .addAll(CoreTask
-                            .executeTask(currUser, lastPortfolio, activeStrategy, latestAssetPrice, assets, null));
+            savePortfolioList.addAll(
+                    CoreTask.executeTask(currUser, lastPortfolio, activeStrategy, latestAssetPrice, assets, null));
 
             currUser.setLastPortfolioComputation(CustomDate.getToday().getDateSql());
             currUser.setLastStrategyComputed(activeStrategy.get(0).getStartingDate());
