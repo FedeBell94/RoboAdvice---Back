@@ -52,8 +52,7 @@ public class ForecastRESTController {
         User user = userRepository.findByUsername(authentication.getName());
 
         LocalDate previsionDateTo = CustomDate.getToday().getDayFromLocalDate(RoboAdviceConstant.FORECAST_DAYS);
-        List<PortfolioDTO> forecastData =
-                dataForecastTask.getForecast(previsionDateTo, user);
+        List<PortfolioDTO> forecastData = dataForecastTask.getForecast(previsionDateTo, user);
 
         LOGGER.debug("Forecast rest API called.");
         return new SuccessResponse<>(forecastData);
