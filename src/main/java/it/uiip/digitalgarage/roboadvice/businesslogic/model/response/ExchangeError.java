@@ -1,7 +1,8 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.model.response;
 
 public enum ExchangeError {
-	DEFAULT_ERROR_CODE(0, ""), EMAIL_ALREADY_USED(100, "Email already used"), SECURITY_ERROR(999, "Security error");
+	DEFAULT_ERROR_CODE(0, ""), EMAIL_ALREADY_USED(100, "Email already used"), SECURITY_ERROR(999, "Security error"),
+	BAD_REQUEST_ERROR(101, "Bad request error");
 
 	private final int errorCode;
 	private final String errorString;

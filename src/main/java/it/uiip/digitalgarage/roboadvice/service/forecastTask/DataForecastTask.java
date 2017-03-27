@@ -89,6 +89,11 @@ public class DataForecastTask {
         List<Strategy> activeStrategy = strategyRepository.findByUserAndActiveTrue(user);
         List<Portfolio> lastPortfolio =
                 portfolioRepository.findByUserAndDate(user, user.getLastPortfolioComputation());
+        // prevents error if the nightly task has not worked during the last night
+        CustomDate today = CustomDate.getToday();
+        for(Portfolio p : lastPortfolio){
+            p.setDate(today.getDateSql());
+        }
 
         AssetPriceUtils assetPriceUtils =
                 new AssetPriceUtils(customDate.getDayFromSql(1), assets, dataRepository, computedForecast);
