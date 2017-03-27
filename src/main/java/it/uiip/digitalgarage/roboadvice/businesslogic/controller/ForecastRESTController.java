@@ -1,10 +1,12 @@
 package it.uiip.digitalgarage.roboadvice.businesslogic.controller;
 
+import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.AdviceDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.dto.PortfolioDTO;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.AbstractResponse;
 import it.uiip.digitalgarage.roboadvice.businesslogic.model.response.SuccessResponse;
 import it.uiip.digitalgarage.roboadvice.persistence.model.User;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
+import it.uiip.digitalgarage.roboadvice.service.adviceTask.AdviceTask;
 import it.uiip.digitalgarage.roboadvice.service.forecastTask.DataForecastTask;
 import it.uiip.digitalgarage.roboadvice.utils.CustomDate;
 import it.uiip.digitalgarage.roboadvice.utils.RoboAdviceConstant;
@@ -32,11 +34,14 @@ public class ForecastRESTController {
 
     private final DataForecastTask dataForecastTask;
     private final UserRepository userRepository;
+    private final AdviceTask adviceTask;
 
     @Autowired
-    public ForecastRESTController(DataForecastTask dataForecastTask, UserRepository userRepository) {
+    public ForecastRESTController(DataForecastTask dataForecastTask, UserRepository userRepository,
+                                  AdviceTask adviceTask) {
         this.dataForecastTask = dataForecastTask;
         this.userRepository = userRepository;
+        this.adviceTask = adviceTask;
     }
 
     /**
@@ -56,6 +61,15 @@ public class ForecastRESTController {
 
         LOGGER.debug("Forecast rest API called.");
         return new SuccessResponse<>(forecastData);
+    }
+
+    @RequestMapping(value = "/giveMeSomeAdvicePlease", method = RequestMethod.GET)
+    public AbstractResponse requestAdvice() {
+
+        List<AdviceDTO> adviceList = adviceTask.getAdvice();
+
+        LOGGER.debug("Give me some advice please rest API called.");
+        return new SuccessResponse<>(adviceList);
     }
 
 }

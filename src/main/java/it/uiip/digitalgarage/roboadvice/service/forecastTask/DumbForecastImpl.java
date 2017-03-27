@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Dumb forecast used to test the program.
@@ -30,7 +31,7 @@ public class DumbForecastImpl implements IDataForecastComputation {
         Map<Date, BigDecimal> returnMap = new HashMap<>();
         CustomDate customDate = CustomDate.getToday();
         do{
-            Double random = Math.random() / 10;
+            Double random = ThreadLocalRandom.current().nextInt(-9, 10) / 10.0;
             value = value.add(BigDecimal.valueOf(random));
             returnMap.put(customDate.getDateSql(), value);
         } while(customDate.moveOneDayForward().compareTo(to) < 0);
