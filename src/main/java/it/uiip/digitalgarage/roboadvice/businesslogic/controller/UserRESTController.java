@@ -102,7 +102,6 @@ public class UserRESTController {
      */
     @RequestMapping(value = "/registerUser", method = RequestMethod.POST)
     public AbstractResponse registerUser(@RequestBody UserDTO inputUser) throws BadRequestException {
-
         if (inputUser.getUsername() == null || inputUser.getPassword() == null || inputUser.getNickname() == null) {
             throw new BadRequestException("Bad request - field needed: username, password, nickname");
         }
