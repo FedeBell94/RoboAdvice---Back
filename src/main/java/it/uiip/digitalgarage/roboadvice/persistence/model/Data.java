@@ -14,7 +14,7 @@ import java.sql.Date;
 
 @Entity
 @Table(name = "Data", indexes = {@Index(name = "DATE_KEY", columnList = "date")})
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder @ToString
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Data implements Serializable {
 
     @Id

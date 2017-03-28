@@ -1,21 +1,19 @@
 package it.uiip.digitalgarage.roboadvice.service.forecastTask;
 
 import it.uiip.digitalgarage.roboadvice.persistence.model.Data;
+import it.uiip.digitalgarage.roboadvice.utils.CustomDate;
+import jersey.repackaged.com.google.common.collect.Iterators;
+import jersey.repackaged.com.google.common.collect.Lists;
+import weka.classifiers.evaluation.NumericPrediction;
+import weka.classifiers.functions.GaussianProcesses;
+import weka.classifiers.timeseries.WekaForecaster;
+import weka.core.*;
 
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.*;
-
-import it.uiip.digitalgarage.roboadvice.utils.CustomDate;
-import jersey.repackaged.com.google.common.collect.Iterators;
-import jersey.repackaged.com.google.common.collect.Lists;
-import weka.core.*;
-import weka.classifiers.functions.GaussianProcesses;
-import weka.classifiers.evaluation.NumericPrediction;
-import weka.classifiers.timeseries.WekaForecaster;
-
 import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 /**
  * Created by Simone on 27/03/2017.
@@ -59,7 +57,7 @@ public class WekaForecastImpl implements IDataForecastComputation {
 
             // Set class index
             List<Instance> setEntries = new ArrayList<>();
-            LocalDate tmpDate = null;
+            LocalDate tmpDate;
 
             for (Data curData : data) {
 
