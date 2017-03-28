@@ -21,9 +21,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This service is used to give some advice to the user on the strategy. The advices given are very simple, we just say
+ * for each asset class if it is better to retain, sell or buy some other actions. The way we give advice is based on
+ * our asset forecast.
+ */
 @Service
 public class AdviceTask {
 
+    // days in which the advice is computed (difference of the forecast form now to the next n-days)
     private static final Integer ADVICE_DAYS = 4;
 
     private final DataRepository dataRepository;
@@ -47,22 +53,26 @@ public class AdviceTask {
         this.assetClassRepository = assetClassRepository;
     }
 
-    @SuppressWarnings("Duplicates")
+    /**
+     * This method return a List of {@link AdviceDTO} containing the advice for the user: sell(-1), maintain(0), buy(1).
+     *
+     * @return The List of {@link AdviceDTO} asked.
+     */
     public List<AdviceDTO> getAdvice() {
         initializeForecastData();
 
         Iterable<AssetClass> assetClass = assetClassRepository.findAll();
         List<AdviceDTO> adviceList = new ArrayList<>();
-        for(AssetClass currAssetClass : assetClass){
+        for (AssetClass currAssetClass : assetClass) {
             BigDecimal endValue = endValues.get(currAssetClass.getId());
             BigDecimal initialValue = initialValues.get(currAssetClass.getId());
             BigDecimal difference = BigDecimal.ZERO;
-            if(endValue != null){
+            if (endValue != null) {
                 difference = endValue.subtract(initialValue);
             }
 
             AdviceDTO.Advice advice = null;
-            switch(difference.compareTo(BigDecimal.ZERO)){
+            switch (difference.compareTo(BigDecimal.ZERO)) {
                 case 0:
                     advice = AdviceDTO.Advice.MAINTAIN_ASSET;
                     break;
@@ -79,7 +89,11 @@ public class AdviceTask {
         return adviceList;
     }
 
-    public void initializeForecastData(){
+    /**
+     * This class initialize the forecast data. If called more than once during the same day, the values are not
+     * computed during the same day, but they will be computed only in different days.
+     */
+    public void initializeForecastData() {
         if (computedForecast == null || computedForecastDate == null ||
                 computedForecastDate.compareTo(dataUpdater.getLastComputationData()) < 0) {
             CustomDate adviceDate = CustomDate.getToday().moveForward(ADVICE_DAYS);
@@ -89,10 +103,10 @@ public class AdviceTask {
             Date tomorrow = CustomDate.getToday().moveOneDayForward().getDateSql();
             Iterable<Asset> assets = assetRepository.findAll();
             initialValues = new HashMap<>();
-            for(Asset currAsset : assets){
+            for (Asset currAsset : assets) {
                 BigDecimal forecastValue = computedForecast.get(currAsset.getId()).get(tomorrow);
                 BigDecimal value = initialValues.get(currAsset.getAssetClass().getId());
-                if(forecastValue != null) {
+                if (forecastValue != null) {
                     if (value == null) {
                         initialValues.put(currAsset.getAssetClass().getId(), forecastValue);
                     } else {
@@ -103,10 +117,10 @@ public class AdviceTask {
 
             // Building the map containing the values for each asset class for the advice final date
             endValues = new HashMap<>();
-            for(Asset currAsset : assets){
+            for (Asset currAsset : assets) {
                 BigDecimal forecastValue = computedForecast.get(currAsset.getId()).get(adviceDate.getDateSql());
                 BigDecimal value = endValues.get(currAsset.getAssetClass().getId());
-                if(forecastValue != null) {
+                if (forecastValue != null) {
                     if (value == null) {
                         endValues.put(currAsset.getAssetClass().getId(), forecastValue);
                     } else {
@@ -117,6 +131,11 @@ public class AdviceTask {
         }
     }
 
+    /**
+     * When this method is called, the forecast data will be updated.
+     *
+     * @param adviceDate The final date to compute the forecast.
+     */
     private void updateForecastData(LocalDate adviceDate) {
         computedForecast = new HashMap<>();
         Iterable<Asset> assets = assetRepository.findAll();
