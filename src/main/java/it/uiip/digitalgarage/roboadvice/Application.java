@@ -60,10 +60,16 @@ public class Application {
     public void executeNightTask() {
         LOGGER.debug("Night task started.");
         Long startTime = System.currentTimeMillis();
-        nightlyTask.executeNightlyTask();
-        adviceTask.initializeForecastData();
-        dataForecastTask
-                .initializeForecastData(CustomDate.getToday().getDayFromLocalDate(RoboAdviceConstant.FORECAST_DAYS));
+
+        try{
+            nightlyTask.executeNightlyTask();
+            adviceTask.initializeForecastData();
+            dataForecastTask
+                    .initializeForecastData(CustomDate.getToday().getDayFromLocalDate(RoboAdviceConstant.FORECAST_DAYS));
+        } catch (INightlyTask.NightlyTaskFailedException e){
+            LOGGER.error(e.getMessage());
+        }
+
         Long endTime = System.currentTimeMillis();
         LOGGER.debug("Night task ended -> execution time " + (endTime - startTime) + "ms. ");
     }
