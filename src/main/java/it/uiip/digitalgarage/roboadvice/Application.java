@@ -1,12 +1,15 @@
 package it.uiip.digitalgarage.roboadvice;
 
-import it.uiip.digitalgarage.roboadvice.service.nightlyTask.INightlyTask;
-import it.uiip.digitalgarage.roboadvice.service.dataUpdater.IDataUpdater;
 import it.uiip.digitalgarage.roboadvice.persistence.model.Asset;
 import it.uiip.digitalgarage.roboadvice.persistence.model.AssetClass;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetClassRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
-import it.uiip.digitalgarage.roboadvice.persistence.repository.UserRepository;
+import it.uiip.digitalgarage.roboadvice.service.adviceTask.AdviceTask;
+import it.uiip.digitalgarage.roboadvice.service.dataUpdater.IDataUpdater;
+import it.uiip.digitalgarage.roboadvice.service.forecastTask.DataForecastTask;
+import it.uiip.digitalgarage.roboadvice.service.nightlyTask.INightlyTask;
+import it.uiip.digitalgarage.roboadvice.utils.CustomDate;
+import it.uiip.digitalgarage.roboadvice.utils.RoboAdviceConstant;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONObject;
@@ -15,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import javax.annotation.PostConstruct;
 import java.io.FileReader;
@@ -28,32 +32,38 @@ public class Application {
 
     private static final Log LOGGER = LogFactory.getLog(Application.class);
 
-    private final UserRepository userRepository;
     private final AssetRepository assetRepository;
     private final AssetClassRepository assetClassRepository;
 
     private final INightlyTask nightlyTask;
     private final IDataUpdater dataUpdater;
+    private final AdviceTask adviceTask;
+    private final DataForecastTask dataForecastTask;
 
     @Autowired
-    public Application(final UserRepository userRepository, final AssetRepository assetRepository,
-                       final AssetClassRepository assetClassRepository, final INightlyTask nightlyTask, final
-                       IDataUpdater dataUpdater) {
-        this.userRepository = userRepository;
+    public Application(AssetRepository assetRepository, AssetClassRepository assetClassRepository,
+                       INightlyTask nightlyTask, IDataUpdater dataUpdater, AdviceTask adviceTask,
+                       DataForecastTask dataForecastTask) {
         this.assetRepository = assetRepository;
         this.assetClassRepository = assetClassRepository;
         this.nightlyTask = nightlyTask;
         this.dataUpdater = dataUpdater;
+        this.adviceTask = adviceTask;
+        this.dataForecastTask = dataForecastTask;
     }
 
 
     // Execution of night task
-    //@Scheduled(cron = "0 0 10 * * TUE-SAT")
+    @PostConstruct
+    @Scheduled(cron = "0 0 4 * * TUE-SAT")
     //@Scheduled(cron = "*/1 * * * * *")
     public void executeNightTask() {
         LOGGER.debug("Night task started.");
         Long startTime = System.currentTimeMillis();
         nightlyTask.executeNightlyTask();
+        adviceTask.initializeForecastData();
+        dataForecastTask
+                .initializeForecastData(CustomDate.getToday().getDayFromLocalDate(RoboAdviceConstant.FORECAST_DAYS));
         Long endTime = System.currentTimeMillis();
         LOGGER.debug("Night task ended -> execution time " + (endTime - startTime) + "ms. ");
     }

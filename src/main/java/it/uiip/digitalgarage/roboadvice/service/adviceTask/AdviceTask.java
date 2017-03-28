@@ -49,6 +49,37 @@ public class AdviceTask {
 
     @SuppressWarnings("Duplicates")
     public List<AdviceDTO> getAdvice() {
+        initializeForecastData();
+
+        Iterable<AssetClass> assetClass = assetClassRepository.findAll();
+        List<AdviceDTO> adviceList = new ArrayList<>();
+        for(AssetClass currAssetClass : assetClass){
+            BigDecimal endValue = endValues.get(currAssetClass.getId());
+            BigDecimal initialValue = initialValues.get(currAssetClass.getId());
+            BigDecimal difference = BigDecimal.ZERO;
+            if(endValue != null){
+                difference = endValue.subtract(initialValue);
+            }
+
+            AdviceDTO.Advice advice = null;
+            switch(difference.compareTo(BigDecimal.ZERO)){
+                case 0:
+                    advice = AdviceDTO.Advice.MAINTAIN_ASSET;
+                    break;
+                case 1:
+                    advice = AdviceDTO.Advice.BUY_ASSET;
+                    break;
+                case -1:
+                    advice = AdviceDTO.Advice.SELL_ASSET;
+                    break;
+            }
+            adviceList.add(AdviceDTO.builder().assetClassId(currAssetClass.getId()).advice(advice).build());
+        }
+
+        return adviceList;
+    }
+
+    public void initializeForecastData(){
         if (computedForecast == null || computedForecastDate == null ||
                 computedForecastDate.compareTo(dataUpdater.getLastComputationData()) < 0) {
             CustomDate adviceDate = CustomDate.getToday().moveForward(ADVICE_DAYS);
@@ -84,33 +115,6 @@ public class AdviceTask {
                 }
             }
         }
-
-        Iterable<AssetClass> assetClass = assetClassRepository.findAll();
-        List<AdviceDTO> adviceList = new ArrayList<>();
-        for(AssetClass currAssetClass : assetClass){
-            BigDecimal endValue = endValues.get(currAssetClass.getId());
-            BigDecimal initialValue = initialValues.get(currAssetClass.getId());
-            BigDecimal difference = BigDecimal.ZERO;
-            if(endValue != null){
-                difference = endValue.subtract(initialValue);
-            }
-
-            AdviceDTO.Advice advice = null;
-            switch(difference.compareTo(BigDecimal.ZERO)){
-                case 0:
-                    advice = AdviceDTO.Advice.MAINTAIN_ASSET;
-                    break;
-                case 1:
-                    advice = AdviceDTO.Advice.BUY_ASSET;
-                    break;
-                case -1:
-                    advice = AdviceDTO.Advice.SELL_ASSET;
-                    break;
-            }
-            adviceList.add(AdviceDTO.builder().assetClassId(currAssetClass.getId()).advice(advice).build());
-        }
-
-        return adviceList;
     }
 
     private void updateForecastData(LocalDate adviceDate) {

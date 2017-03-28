@@ -55,29 +55,28 @@ public class DataForecastTask {
     }
 
     public List<PortfolioDTO> getForecast(LocalDate to, User user) {
+        initializeForecastData(to);
+        return computePortfolio(to, user);
+    }
+
+    public void initializeForecastData(LocalDate to) {
         if (computedForecast == null || computedForecastDate == null ||
                 computedForecastDate.compareTo(dataUpdater.getLastComputationData()) < 0) {
             LOGGER.debug("Data forecast computation started");
             Long startTime = System.currentTimeMillis();
 
-            updateForecastData(to);
+            computedForecast = new HashMap<>();
+            Iterable<Asset> assets = assetRepository.findAll();
+            for (Asset currAsset : assets) {
+                Iterable<Data> assetData = dataRepository.findByAssetOrderByDateDesc(currAsset);
+                Map<Date, BigDecimal> currAssetForecast = dataForecastComputation.computeForecast(assetData, to);
+                computedForecast.put(currAsset.getId(), currAssetForecast);
+            }
+            computedForecastDate = CustomDate.getToday();
 
             Long endTime = System.currentTimeMillis();
             LOGGER.debug("Forecast computation ended -> execution time " + (endTime - startTime) + "ms.");
         }
-
-        return computePortfolio(to, user);
-    }
-
-    private void updateForecastData(LocalDate to) {
-        computedForecast = new HashMap<>();
-        Iterable<Asset> assets = assetRepository.findAll();
-        for (Asset currAsset : assets) {
-            Iterable<Data> assetData = dataRepository.findByAssetOrderByDateDesc(currAsset);
-            Map<Date, BigDecimal> currAssetForecast = dataForecastComputation.computeForecast(assetData, to);
-            computedForecast.put(currAsset.getId(), currAssetForecast);
-        }
-        computedForecastDate = CustomDate.getToday();
     }
 
     @SuppressWarnings("Duplicates")
