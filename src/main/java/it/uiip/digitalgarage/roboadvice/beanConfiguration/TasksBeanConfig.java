@@ -41,9 +41,7 @@ public class TasksBeanConfig {
 
     @Bean
     public IDataForecastComputation dataForecastComputation() {
-
         return new WekaForecastImpl();
-        //return new DumbForecastImpl();
     }
 
 }
