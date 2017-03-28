@@ -30,7 +30,6 @@ public class CoreTaskTests {
     private static final Log LOGGER = LogFactory.getLog(CoreTask.class);
 
 
-
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -39,7 +38,7 @@ public class CoreTaskTests {
     public Portfolio portfolio;
     public List<Strategy> strategyList;
     public Strategy strategy;
-    public Map<Long,BigDecimal> assetPrice;
+    public Map<Long, BigDecimal> assetPrice;
     public List<Asset> assetList;
     public CustomDate customDate;
 
@@ -65,15 +64,15 @@ public class CoreTaskTests {
                 .percentage(new BigDecimal("100")).startingDate(Date.valueOf(LocalDate.now())).build();
         strategyList.add(strategy);
         assetPrice = new HashMap<>();
-        assetPrice.put(1L,new BigDecimal("900"));
+        assetPrice.put(1L, new BigDecimal("900"));
     }
 
     @Test
     public void testExecuteTaskNewUser() {
 
-        List<Portfolio> result = CoreTask.executeTask(testUser,testPortfolio,strategyList,assetPrice,assetList,new BigDecimal("10000"));
+        List<Portfolio> result = CoreTask.executeTask(testUser, testPortfolio, strategyList, assetPrice, assetList, new BigDecimal("10000"));
 
-        assertEquals(result.get(0).getValue().compareTo(new BigDecimal("10000")) , 0 );
+        assertEquals(0, result.get(0).getValue().compareTo(new BigDecimal("10000")));
 
     }
 
@@ -82,9 +81,9 @@ public class CoreTaskTests {
 
         testUser.setIsNewUser(false);
         testPortfolio.add(portfolio);
-        List<Portfolio> result = CoreTask.executeTask(testUser,testPortfolio,strategyList,assetPrice,assetList,new BigDecimal("10000"));
-
-        assertEquals(result.get(0).getAsset().getId() == 1L , true  );
+        List<Portfolio> result = CoreTask.executeTask(testUser, testPortfolio, strategyList, assetPrice, assetList, null);
+        assertTrue(result.get(0).getAsset().getId() == 1L);
+        assertEquals(0, result.get(0).getValue().compareTo(new BigDecimal("2700")));
     }
 
     @Test
@@ -95,16 +94,17 @@ public class CoreTaskTests {
         strategyList.clear();
         strategyList.add(strategy);
         testPortfolio.add(portfolio);
-        List<Portfolio> result = CoreTask.executeTask(testUser,testPortfolio,strategyList,assetPrice,assetList,new BigDecimal("10000"));
+        List<Portfolio> result = CoreTask.executeTask(testUser, testPortfolio, strategyList, assetPrice, assetList, new BigDecimal("10000"));
 
-        assertEquals(result.get(0).getAsset().getId() == 1L , true  );
+        assertTrue(result.get(0).getAsset().getId() == 1L);
+        assertEquals(0, result.get(0).getValue().compareTo(new BigDecimal("2700")));
     }
 
     @Test
     public void testExecuteTaskRebalance() {
 
         testUser.setLastStrategyComputed(null);
-        strategy.setStartingDate(CustomDate.getToday().getYesterdaySql());;
+        strategy.setStartingDate(CustomDate.getToday().getYesterdaySql());
 
         AssetClass ac1 = AssetClass.builder().id(1L).build();
         AssetClass ac2 = AssetClass.builder().id(2L).build();
@@ -137,11 +137,11 @@ public class CoreTaskTests {
         assetPrice.put(2L, BigDecimal.ONE);
         assetPrice.put(3L, BigDecimal.ONE);
 
-        List<Portfolio> result = CoreTask.executeTask(testUser,testPortfolio,strategyList,assetPrice,assetList,null);
+        List<Portfolio> result = CoreTask.executeTask(testUser, testPortfolio, strategyList, assetPrice, assetList, null);
 
-        for(Portfolio p : result){
+        for (Portfolio p : result) {
             BigDecimal val = p.getValue();
-            switch((int) (long) p.getAsset().getId()){
+            switch ((int) (long) p.getAsset().getId()) {
                 case 1:
                     assertTrue(val.compareTo(BigDecimal.valueOf(700)) == 0);
                     break;
