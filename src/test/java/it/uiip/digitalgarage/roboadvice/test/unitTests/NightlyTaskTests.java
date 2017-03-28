@@ -1,6 +1,7 @@
 package it.uiip.digitalgarage.roboadvice.test.unitTests;
 
 import it.uiip.digitalgarage.roboadvice.Application;
+import it.uiip.digitalgarage.roboadvice.service.nightlyTask.INightlyTask;
 import it.uiip.digitalgarage.roboadvice.service.nightlyTask.NightlyTask;
 import it.uiip.digitalgarage.roboadvice.service.dataUpdater.IDataUpdater;
 import it.uiip.digitalgarage.roboadvice.persistence.model.*;
@@ -135,7 +136,11 @@ public class NightlyTaskTests {
         NightlyTask nightlyTask = new NightlyTask(strategyRepositoryMock, portfolioRepositoryMock, assetRepositoryMock,
                 dataRepositoryMock, userRepositoryMock, dataUpdaterMock);
 
-        nightlyTask.executeNightlyTask();
+        try {
+            nightlyTask.executeNightlyTask();
+        } catch(INightlyTask.NightlyTaskFailedException e){
+            assertTrue(false);
+        }
 
         assertTrue(true);
 

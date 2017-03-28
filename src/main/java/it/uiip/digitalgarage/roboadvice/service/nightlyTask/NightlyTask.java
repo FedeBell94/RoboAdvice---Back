@@ -39,13 +39,13 @@ public class NightlyTask implements INightlyTask {
     }
 
     @Override
-    public void executeNightlyTask() {
+    public void executeNightlyTask() throws NightlyTaskFailedException {
 
         try {
             dataUpdater.updateAssetData();
         } catch (IDataUpdater.DataUpdateException e) {
             LOGGER.error("Failed to execute nightly task due to an error in updating asset data.");
-            return;
+            throw new NightlyTaskFailedException("Failed to execute nightly task due to an error in update asset data");
         }
 
         Iterable<User> users = userRepository.findAll();
