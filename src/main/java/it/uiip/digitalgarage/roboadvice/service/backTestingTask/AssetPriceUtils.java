@@ -10,6 +10,10 @@ import java.sql.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Utility class used to manage the prices of the assets. This class gives the prices for the current assets in the day
+ * passed, and for the days after accessing only few times the database, and speeding up the performance of the project.
+ */
 public class AssetPriceUtils {
 
     private final CustomDate currentDate;
@@ -19,6 +23,15 @@ public class AssetPriceUtils {
 
     private Map<Long, Map<Date, BigDecimal>> dataMap;
 
+    /**
+     * Constructor of the class.
+     *
+     * @param startingDate   The date from where give the assets price.
+     * @param assets         All the assets
+     * @param dataRepository The unique instance of the data repository.
+     * @param inputDataMap   This is a map containing the id of the asset as key, and a map containing the date and the
+     *                       respective value as value. This parameter can also be null.
+     */
     public AssetPriceUtils(Date startingDate, Iterable<Asset> assets, DataRepository dataRepository,
                            Map<Long, Map<Date, BigDecimal>> inputDataMap) {
         this.currentDate = new CustomDate(startingDate);
@@ -28,6 +41,9 @@ public class AssetPriceUtils {
         this.initClass(inputDataMap);
     }
 
+    /**
+     * Initialize the class finding the required data to provide the latest prices.
+     */
     private void initClass(Map<Long, Map<Date, BigDecimal>> inputDataMap) {
         for (Asset currAsset : assets) {
             Data data = dataRepository
@@ -35,7 +51,7 @@ public class AssetPriceUtils {
             currentPrices.put(data.getAsset().getId(), data.getValue());
         }
 
-        if(inputDataMap != null){
+        if (inputDataMap != null) {
             this.dataMap = inputDataMap;
         } else {
             dataMap = new HashMap<>();
@@ -51,10 +67,18 @@ public class AssetPriceUtils {
         }
     }
 
+    /**
+     * Move the logical date of the instance of this class one day forward.
+     */
     public void moveOneDayForward() {
         this.currentDate.moveOneDayForward();
     }
 
+    /**
+     * Return the latest prices for the assets in the current logical day.
+     *
+     * @return A {@link Map} containing the id of the asset as key, and the price of the asset as value.
+     */
     public Map<Long, BigDecimal> getLatestPrices() {
         for (Asset currAsset : assets) {
             Map<Date, BigDecimal> currAssetData = dataMap.get(currAsset.getId());

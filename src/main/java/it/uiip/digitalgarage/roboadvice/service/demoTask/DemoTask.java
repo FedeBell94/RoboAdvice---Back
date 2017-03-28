@@ -9,6 +9,7 @@ import it.uiip.digitalgarage.roboadvice.persistence.model.*;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.AssetRepository;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.DataRepository;
 import it.uiip.digitalgarage.roboadvice.utils.CustomDate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -21,13 +22,11 @@ public class DemoTask {
 
     private final AssetRepository assetRepository;
     private final DataRepository dataRepository;
-    private final PortfolioConversionUtil portfolioConversion;
 
-    public DemoTask(AssetRepository assetRepository, DataRepository dataRepository,
-                    PortfolioConversionUtil portfolioConversion) {
+    @Autowired
+    public DemoTask(AssetRepository assetRepository, DataRepository dataRepository) {
         this.assetRepository = assetRepository;
         this.dataRepository = dataRepository;
-        this.portfolioConversion = portfolioConversion;
     }
 
     public List<PortfolioDTO> computeDemo(CustomDate from, CustomDate to, List<StrategyDTO> strategy,
@@ -62,7 +61,7 @@ public class DemoTask {
             latestAssetPrice = assetPriceUtils.getLatestPrices();
             assetPriceUtils.moveOneDayForward();
             lastPortfolio = CoreTask.executeTask(user, lastPortfolio, activeStrategy, latestAssetPrice, assets, null);
-            returnPortfolio.addAll(portfolioConversion.convertPortfolio(lastPortfolio));
+            returnPortfolio.addAll(PortfolioConversionUtil.convertPortfolio(lastPortfolio));
         }
         return returnPortfolio;
     }

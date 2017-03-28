@@ -36,7 +36,6 @@ public class DataForecastTask {
     private final PortfolioRepository portfolioRepository;
     private final IDataUpdater dataUpdater;
     private final IDataForecastComputation dataForecastComputation;
-    private final PortfolioConversionUtil portfolioConversion;
 
     private Map<Long, Map<Date, BigDecimal>> computedForecast;
     private CustomDate computedForecastDate;
@@ -44,13 +43,12 @@ public class DataForecastTask {
     @Autowired
     public DataForecastTask(DataRepository dataRepository, AssetRepository assetRepository, IDataUpdater dataUpdater,
                             StrategyRepository strategyRepository, IDataForecastComputation dataForecastComputation,
-                            PortfolioConversionUtil portfolioConversion, PortfolioRepository portfolioRepository) {
+                            PortfolioRepository portfolioRepository) {
         this.dataRepository = dataRepository;
         this.assetRepository = assetRepository;
         this.strategyRepository = strategyRepository;
         this.dataUpdater = dataUpdater;
         this.dataForecastComputation = dataForecastComputation;
-        this.portfolioConversion = portfolioConversion;
         this.portfolioRepository = portfolioRepository;
     }
 
@@ -95,7 +93,7 @@ public class DataForecastTask {
             Map<Long, BigDecimal> latestAssetPrice = assetPriceUtils.getLatestPrices();
             assetPriceUtils.moveOneDayForward();
             lastPortfolio = CoreTask.executeTask(user, lastPortfolio, activeStrategy, latestAssetPrice, assets, null);
-            returnPortfolio.addAll(portfolioConversion.convertPortfolio(lastPortfolio));
+            returnPortfolio.addAll(PortfolioConversionUtil.convertPortfolio(lastPortfolio));
         }
 
         return returnPortfolio;

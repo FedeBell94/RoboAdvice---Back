@@ -11,8 +11,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Class used to convert the {@link Portfolio} used in the backend (13 rows), to the one used by the frontend (4 rows).
+ */
 @Service
-public class PortfolioConversionUtil {
+public final class PortfolioConversionUtil {
 
     /**
      * This method convert from {@link List} of {@link Portfolio} (13 rows for each portfolio) to {@link List} of {@link
@@ -24,7 +27,7 @@ public class PortfolioConversionUtil {
      *
      * @return The {@link List} of {@link PortfolioDTO} corresponding to the one passed as input.
      */
-    public List<PortfolioDTO> convertPortfolio(List<Portfolio> portfolio) {
+    public static List<PortfolioDTO> convertPortfolio(List<Portfolio> portfolio) {
         Map<Long, BigDecimal> tempMap = new HashMap<>();
         for (Portfolio currPort : portfolio) {
             Long currAssetClassId = currPort.getAssetClass().getId();
@@ -48,5 +51,8 @@ public class PortfolioConversionUtil {
             returnList.add(lastPortfolio);
         }
         return returnList;
+    }
+
+    private PortfolioConversionUtil() {
     }
 }

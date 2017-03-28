@@ -16,21 +16,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Class used to perform the back-testing of the strategy of an User.
+ */
 @Service
 public class BackTestingTask {
 
     private final AssetRepository assetRepository;
     private final DataRepository dataRepository;
-    private final PortfolioConversionUtil portfolioConversion;
 
     @Autowired
-    public BackTestingTask(AssetRepository assetRepository, DataRepository dataRepository,
-                           PortfolioConversionUtil portfolioConversion) {
+    public BackTestingTask(AssetRepository assetRepository, DataRepository dataRepository) {
         this.assetRepository = assetRepository;
         this.dataRepository = dataRepository;
-        this.portfolioConversion = portfolioConversion;
     }
 
+    /**
+     * This class compute the back-testing of the strategy passed, from the date passed, to today.
+     *
+     * @param fromDate The date from where to start to compute the back-testing.
+     * @param strategy The strategy to use to compute the back testing.
+     *
+     * @return The portfolio of the user computed with the strategy passed from the given day.
+     */
     @SuppressWarnings("Duplicates")
     public List<PortfolioDTO> computeBackTesting(Date fromDate, List<StrategyDTO> strategy) {
 
@@ -62,7 +70,7 @@ public class BackTestingTask {
             Map<Long, BigDecimal> latestAssetPrice = assetPriceUtils.getLatestPrices();
             assetPriceUtils.moveOneDayForward();
             lastPortfolio = CoreTask.executeTask(user, lastPortfolio, activeStrategy, latestAssetPrice, assets, null);
-            returnPortfolio.addAll(portfolioConversion.convertPortfolio(lastPortfolio));
+            returnPortfolio.addAll(PortfolioConversionUtil.convertPortfolio(lastPortfolio));
         }
         return returnPortfolio;
     }
