@@ -3,6 +3,7 @@ package it.uiip.digitalgarage.roboadvice.test.unitTests;
 import it.uiip.digitalgarage.roboadvice.persistence.model.*;
 import it.uiip.digitalgarage.roboadvice.service.CoreTask;
 import it.uiip.digitalgarage.roboadvice.utils.CustomDate;
+import it.uiip.digitalgarage.roboadvice.utils.RoboAdviceConstant;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
@@ -70,9 +71,10 @@ public class CoreTaskTests {
     @Test
     public void testExecuteTaskNewUser() {
 
-        List<Portfolio> result = CoreTask.executeTask(testUser, testPortfolio, strategyList, assetPrice, assetList, new BigDecimal("10000"));
+        List<Portfolio> result =
+                CoreTask.executeTask(testUser, testPortfolio, strategyList, assetPrice, assetList, null);
 
-        assertEquals(0, result.get(0).getValue().compareTo(new BigDecimal("10000")));
+        assertEquals(0, result.get(0).getValue().compareTo(RoboAdviceConstant.DEFAULT_START_WORTH));
 
     }
 
@@ -81,7 +83,8 @@ public class CoreTaskTests {
 
         testUser.setIsNewUser(false);
         testPortfolio.add(portfolio);
-        List<Portfolio> result = CoreTask.executeTask(testUser, testPortfolio, strategyList, assetPrice, assetList, null);
+        List<Portfolio> result =
+                CoreTask.executeTask(testUser, testPortfolio, strategyList, assetPrice, assetList, null);
         assertTrue(result.get(0).getAsset().getId() == 1L);
         assertEquals(0, result.get(0).getValue().compareTo(new BigDecimal("2700")));
     }
@@ -94,7 +97,8 @@ public class CoreTaskTests {
         strategyList.clear();
         strategyList.add(strategy);
         testPortfolio.add(portfolio);
-        List<Portfolio> result = CoreTask.executeTask(testUser, testPortfolio, strategyList, assetPrice, assetList, new BigDecimal("10000"));
+        List<Portfolio> result =
+                CoreTask.executeTask(testUser, testPortfolio, strategyList, assetPrice, assetList, null);
 
         assertTrue(result.get(0).getAsset().getId() == 1L);
         assertEquals(0, result.get(0).getValue().compareTo(new BigDecimal("2700")));
@@ -121,12 +125,15 @@ public class CoreTaskTests {
         Asset a2 = Asset.builder().id(2L).assetClass(ac2).fixedPercentage(BigDecimal.valueOf(40)).build();
         Asset a3 = Asset.builder().id(3L).assetClass(ac2).fixedPercentage(BigDecimal.valueOf(60)).build();
 
-        Portfolio p1 = Portfolio.builder().asset(a1).assetClass(ac1).unit(BigDecimal.valueOf(800)).value(BigDecimal.valueOf(800))
+        Portfolio p1 = Portfolio.builder().asset(a1).assetClass(ac1).unit(BigDecimal.valueOf(800))
+                .value(BigDecimal.valueOf(800))
                 .date(CustomDate.getToday().getYesterdaySql()).build();
-        Portfolio p2 = Portfolio.builder().asset(a2).assetClass(ac2).unit(BigDecimal.valueOf(200)).value(BigDecimal.valueOf(200))
+        Portfolio p2 = Portfolio.builder().asset(a2).assetClass(ac2).unit(BigDecimal.valueOf(200))
+                .value(BigDecimal.valueOf(200))
                 .date(CustomDate.getToday().getYesterdaySql()).build();
-        Portfolio p3 = Portfolio.builder().asset(a3).assetClass(ac2).unit(BigDecimal.valueOf(0)).value(BigDecimal.valueOf(0))
-                .date(CustomDate.getToday().getYesterdaySql()).build();
+        Portfolio p3 =
+                Portfolio.builder().asset(a3).assetClass(ac2).unit(BigDecimal.valueOf(0)).value(BigDecimal.valueOf(0))
+                        .date(CustomDate.getToday().getYesterdaySql()).build();
         testPortfolio.clear();
         testPortfolio.add(p1);
         testPortfolio.add(p2);
@@ -137,7 +144,8 @@ public class CoreTaskTests {
         assetPrice.put(2L, BigDecimal.ONE);
         assetPrice.put(3L, BigDecimal.ONE);
 
-        List<Portfolio> result = CoreTask.executeTask(testUser, testPortfolio, strategyList, assetPrice, assetList, null);
+        List<Portfolio> result =
+                CoreTask.executeTask(testUser, testPortfolio, strategyList, assetPrice, assetList, null);
 
         for (Portfolio p : result) {
             BigDecimal val = p.getValue();
