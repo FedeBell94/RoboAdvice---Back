@@ -14,6 +14,10 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.*;
 
+/**
+ * Implementation of the {@link INightlyTask} interface. This implementation takes in consideration also if something
+ * one night went wrong, and the portfolios of the users need to be computed again.
+ */
 @Service
 public class NightlyTask implements INightlyTask {
 
@@ -62,6 +66,7 @@ public class NightlyTask implements INightlyTask {
             List<Portfolio> lastPortfolio =
                     portfolioRepository.findByUserAndDate(currUser, currUser.getLastPortfolioComputation());
 
+            // if the last computation of a portfolio for the user is not yesterday, I start the recovery task
             if (currUser.getLastPortfolioComputation().compareTo(CustomDate.getToday().getYesterdaySql()) != 0) {
                 savePortfolioList.addAll(portfolioRecovery(currUser, lastPortfolio, assets));
             }
@@ -78,6 +83,10 @@ public class NightlyTask implements INightlyTask {
         portfolioRepository.save(savePortfolioList);
     }
 
+    /**
+     * Execute the portfolio recovery for the user passed. This method calculates and returns all the portfolios from
+     * the date when the portfolio is not computed, to YESTERDAY!!! It is not computed the portfolio of today!
+     */
     private List<Portfolio> portfolioRecovery(User user, List<Portfolio> lastPortfolio, Iterable<Asset> assets) {
         List<Strategy> activeStrategy;
         if (user.getLastStrategyComputed() == null) {
@@ -91,7 +100,6 @@ public class NightlyTask implements INightlyTask {
             Date date = new CustomDate(user.getLastPortfolioComputation()).moveOneDayForward().getDateSql();
             Map<Long, BigDecimal> assetPrice = getLatestAssetPrices(assets, date);
 
-            // TODO do NOT change the caller lastPortfolio!!!!!!!
             List<Portfolio> tmp = CoreTask.executeTask(user, lastPortfolio, activeStrategy, assetPrice, assets, null);
             lastPortfolio.clear();
             lastPortfolio.addAll(tmp);
@@ -105,6 +113,9 @@ public class NightlyTask implements INightlyTask {
         return returnList;
     }
 
+    /**
+     * This method returns the latest asset price for the date provided.
+     */
     private Map<Long, BigDecimal> getLatestAssetPrices(final Iterable<Asset> assets, final Date date) {
         Map<Long, BigDecimal> latestPrices = new HashMap<>();
         for (Asset curr : assets) {
