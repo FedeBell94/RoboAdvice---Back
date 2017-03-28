@@ -1,11 +1,10 @@
 package it.uiip.digitalgarage.roboadvice.test.unitTests;
 
-import it.uiip.digitalgarage.roboadvice.Application;
-import it.uiip.digitalgarage.roboadvice.service.nightlyTask.INightlyTask;
-import it.uiip.digitalgarage.roboadvice.service.nightlyTask.NightlyTask;
-import it.uiip.digitalgarage.roboadvice.service.dataUpdater.IDataUpdater;
 import it.uiip.digitalgarage.roboadvice.persistence.model.*;
 import it.uiip.digitalgarage.roboadvice.persistence.repository.*;
+import it.uiip.digitalgarage.roboadvice.service.dataUpdater.IDataUpdater;
+import it.uiip.digitalgarage.roboadvice.service.nightlyTask.INightlyTask;
+import it.uiip.digitalgarage.roboadvice.service.nightlyTask.NightlyTask;
 import it.uiip.digitalgarage.roboadvice.utils.CustomDate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -74,10 +73,9 @@ public class NightlyTaskTests {
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    private List<User> users;
-
     @Before
     public void before() {
+        List<User> users;
 
         User testUser = User.builder().id(1L).username("testUser").password("12345").nickname("testUser")
                 .lastPortfolioComputation(Date.valueOf(LocalDate.now())).build();

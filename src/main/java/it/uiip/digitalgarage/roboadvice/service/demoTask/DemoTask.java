@@ -17,6 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Class used to perform the demo of the system.
+ */
 @Service
 public class DemoTask {
 
@@ -29,6 +32,16 @@ public class DemoTask {
         this.dataRepository = dataRepository;
     }
 
+    /**
+     * This method compute the demo of the strategy passed between the date passed, and with the given worth.
+     *
+     * @param from     The date from which compute the demo.
+     * @param to       The date to which compute the demo.
+     * @param strategy The strategy with compute the demo.
+     * @param worth    The initial worth to start the demo.
+     *
+     * @return The portfolios computed as demo.
+     */
     public List<PortfolioDTO> computeDemo(CustomDate from, CustomDate to, List<StrategyDTO> strategy,
                                           BigDecimal worth) {
         User user = User.builder()

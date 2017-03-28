@@ -65,14 +65,12 @@ public class StrategyRESTControllerTests {
 
     private StrategyRESTController strategyRESTController;
 
-    private CustomDate customDate;
-
     private List<StrategyDTO> strategyDTOList;
 
     @Before
     public void before() {
 
-        customDate = CustomDate.getToday();
+        CustomDate customDate = CustomDate.getToday();
 
         strategyRESTController =
                 new StrategyRESTController(modelMapper, userRepository, strategyRepository, assetClassRepository);
