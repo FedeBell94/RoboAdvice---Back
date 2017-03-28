@@ -61,10 +61,12 @@ public class AdviceTask {
             for(Asset currAsset : assets){
                 BigDecimal forecastValue = computedForecast.get(currAsset.getId()).get(tomorrow);
                 BigDecimal value = initialValues.get(currAsset.getAssetClass().getId());
-                if(value == null){
-                    initialValues.put(currAsset.getAssetClass().getId(), forecastValue);
-                } else{
-                    initialValues.put(currAsset.getAssetClass().getId(), value.add(forecastValue));
+                if(forecastValue != null) {
+                    if (value == null) {
+                        initialValues.put(currAsset.getAssetClass().getId(), forecastValue);
+                    } else {
+                        initialValues.put(currAsset.getAssetClass().getId(), value.add(forecastValue));
+                    }
                 }
             }
 
@@ -73,10 +75,12 @@ public class AdviceTask {
             for(Asset currAsset : assets){
                 BigDecimal forecastValue = computedForecast.get(currAsset.getId()).get(adviceDate.getDateSql());
                 BigDecimal value = endValues.get(currAsset.getAssetClass().getId());
-                if(value == null){
-                    endValues.put(currAsset.getAssetClass().getId(), forecastValue);
-                } else{
-                    endValues.put(currAsset.getAssetClass().getId(), value.add(forecastValue));
+                if(forecastValue != null) {
+                    if (value == null) {
+                        endValues.put(currAsset.getAssetClass().getId(), forecastValue);
+                    } else {
+                        endValues.put(currAsset.getAssetClass().getId(), value.add(forecastValue));
+                    }
                 }
             }
         }
@@ -84,8 +88,12 @@ public class AdviceTask {
         Iterable<AssetClass> assetClass = assetClassRepository.findAll();
         List<AdviceDTO> adviceList = new ArrayList<>();
         for(AssetClass currAssetClass : assetClass){
-            BigDecimal difference = endValues.get(currAssetClass.getId())
-                    .subtract(initialValues.get(currAssetClass.getId()));
+            BigDecimal endValue = endValues.get(currAssetClass.getId());
+            BigDecimal initialValue = initialValues.get(currAssetClass.getId());
+            BigDecimal difference = BigDecimal.ZERO;
+            if(endValue != null){
+                difference = endValue.subtract(initialValue);
+            }
 
             AdviceDTO.Advice advice = null;
             switch(difference.compareTo(BigDecimal.ZERO)){
