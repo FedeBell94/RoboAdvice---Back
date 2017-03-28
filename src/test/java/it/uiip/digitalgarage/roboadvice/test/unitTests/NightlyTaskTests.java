@@ -48,7 +48,7 @@ import static org.mockito.Mockito.when;
 public class NightlyTaskTests {
 
 
-    private static final Log LOGGER = LogFactory.getLog(Application.class);
+    private static final Log LOGGER = LogFactory.getLog(NightlyTask.class);
 
     @Mock
     private StrategyRepository strategyRepositoryMock;
@@ -125,7 +125,7 @@ public class NightlyTaskTests {
                 dataRepositoryMock, userRepositoryMock, dataUpdaterMock);
 
         assertEquals(
-                "class it.uiip.digitalgarage.roboadvice.core.NightlyTask",
+                "class it.uiip.digitalgarage.roboadvice.service.nightlyTask.NightlyTask",
                 nightlyTask.getClass().toString());
 
     }
