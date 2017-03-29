@@ -85,6 +85,8 @@ public class DataForecastTask {
 
         List<Strategy> activeStrategy = strategyRepository.findByUserAndActiveTrue(user);
         List<Portfolio> lastPortfolio = portfolioRepository.findByUserAndDate(user, user.getLastPortfolioComputation());
+        User userTemp = User.builder().id(user.getId()).lastPortfolioComputation(CustomDate.getToday()
+                .getYesterdaySql()).build();
 
         AssetPriceUtils assetPriceUtils =
                 new AssetPriceUtils(customDate.getDayFromSql(1), assets, dataRepository, computedForecast);
@@ -92,7 +94,8 @@ public class DataForecastTask {
         while (customDate.moveOneDayForward().compareTo(to) <= 0) {
             Map<Long, BigDecimal> latestAssetPrice = assetPriceUtils.getLatestPrices();
             assetPriceUtils.moveOneDayForward();
-            lastPortfolio = CoreTask.executeTask(user, lastPortfolio, activeStrategy, latestAssetPrice, assets, null);
+            lastPortfolio =
+                    CoreTask.executeTask(userTemp, lastPortfolio, activeStrategy, latestAssetPrice, assets, null);
             returnPortfolio.addAll(PortfolioConversionUtil.convertPortfolio(lastPortfolio));
         }
 
